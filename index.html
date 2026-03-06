@@ -4,578 +4,589 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Periodic Table of Elements</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --border: rgba(255,255,255,0.07);
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --accent: #00d4ff;
+:root {
+  --bg: #0d0d0d;
+  --alkali:     #c8ff00;
+  --alkaline:   #ffdd00;
+  --lanthanide: #ff69b4;
+  --actinide:   #ff4499;
+  --transition: #00cfff;
+  --post-trans: #00ff99;
+  --metalloid:  #00ff66;
+  --nonmetal:   #ff6600;
+  --halogen:    #ff3366;
+  --noble:      #cc66ff;
+  --unknown:    #888888;
+  --font: 'Share Tech Mono', monospace;
+  --font-head: 'Orbitron', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: auto;
+  user-select: none;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.4rem;
+  padding: 0.75rem 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.legend-item {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  opacity: 0.8;
+}
+.legend-item:hover { opacity: 1; }
+.pt-wrap {
+  padding: 0.5rem 0.8rem 1rem;
+  overflow-x: auto;
+}
+.pt-grid {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(62px, 1fr));
+  gap: 3px;
+  min-width: 1140px;
+}
+.el {
+  position: relative;
+  border: 1px solid var(--c);
+  border-radius: 3px;
+  padding: 4px 4px 3px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  background: rgba(0,0,0,0.5);
+  min-height: 62px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 0 5px -2px var(--c), inset 0 0 8px -5px var(--c);
+}
+.el:hover, .el.active {
+  box-shadow: 0 0 16px 2px var(--c), inset 0 0 18px -5px var(--c);
+  transform: scale(1.1);
+  z-index: 50;
+  background: rgba(0,0,0,0.78);
+}
+.el.active { transform: scale(1.0); box-shadow: 0 0 24px 4px var(--c), inset 0 0 18px -5px var(--c); }
+.el-num {
+  font-size: 0.58rem;
+  color: var(--c);
+  opacity: 0.75;
+  line-height: 1;
+}
+.el-symbol {
+  font-family: var(--font-head);
+  font-size: 1.38rem;
+  font-weight: 700;
+  color: var(--c);
+  text-shadow: 0 0 10px var(--c), 0 0 22px var(--c);
+  line-height: 1;
+  text-align: center;
+}
+.el-name {
+  font-size: 0.5rem;
+  color: var(--c);
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.el-mass {
+  font-size: 0.48rem;
+  color: var(--c);
+  opacity: 0.45;
+  text-align: center;
+}
+.spacer {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+  min-height: 62px;
+}
+.gap-cell {
+  border: 1px dashed rgba(255,255,255,0.12) !important;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.3);
+  min-height: 62px;
+  cursor: default;
+  box-shadow: none !important;
+}
+.sep-row { grid-column: 1/-1; height: 16px; }
 
-    --alkali: #ff6b6b;
-    --alkaline: #ffa94d;
-    --transition: #74c0fc;
-    --post-transition: #a9e34b;
-    --metalloid: #63e6be;
-    --nonmetal: #f783ac;
-    --halogen: #da77f2;
-    --noble: #9775fa;
-    --lanthanide: #66d9e8;
-    --actinide: #ffd43b;
-    --unknown: #868e96;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: auto;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 80% 40% at 20% 20%, rgba(0,212,255,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 60% at 80% 80%, rgba(151,117,250,0.04) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  header {
-    padding: 2.5rem 2rem 1rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  .header-inner {
-    max-width: 1600px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    letter-spacing: 0.08em;
-    line-height: 0.9;
-    color: #fff;
-  }
-
-  h1 span { color: var(--accent); }
-
-  .subtitle {
-    font-size: 0.85rem;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    align-items: center;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-
-  .legend-item:hover { color: var(--text); }
-
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
-
-  .table-wrapper {
-    position: relative;
-    z-index: 1;
-    padding: 1rem 2rem 2rem;
-    overflow-x: auto;
-  }
-
-  .table-inner {
-    max-width: 1600px;
-    margin: 0 auto;
-  }
-
-  .pt-grid {
-    display: grid;
-    grid-template-columns: repeat(18, minmax(54px, 1fr));
-    grid-template-rows: repeat(10, minmax(54px, auto));
-    gap: 3px;
-    min-width: 1000px;
-  }
-
-  .el {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 4px 5px;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 54px;
-    overflow: hidden;
-  }
-
-  .el::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--cat-color);
-    opacity: 0.8;
-  }
-
-  .el:hover {
-    transform: scale(1.12) translateY(-2px);
-    border-color: var(--cat-color);
-    box-shadow: 0 0 20px -4px var(--cat-color), 0 8px 24px rgba(0,0,0,0.4);
-    z-index: 100;
-  }
-
-  .el.active {
-    border-color: var(--cat-color);
-    box-shadow: 0 0 0 2px var(--cat-color);
-  }
-
-  .el-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-    line-height: 1;
-  }
-
-  .el-symbol {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.35rem;
-    color: var(--cat-color);
-    line-height: 1;
-    letter-spacing: 0.02em;
-  }
-
-  .el-name {
-    font-size: 0.52rem;
-    color: var(--muted);
-    line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .el-mass {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.5rem;
-    color: rgba(255,255,255,0.25);
-  }
-
-  .spacer { background: transparent; border: none; pointer-events: none; }
-
-  .gap-cell {
-    background: var(--surface);
-    border: 1px dashed rgba(255,255,255,0.1);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.55rem;
-    color: rgba(255,255,255,0.2);
-    font-family: 'Space Mono', monospace;
-  }
-
-  #info-panel {
-    position: fixed;
-    right: 2rem;
-    bottom: 2rem;
-    width: 280px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.5rem;
-    z-index: 999;
-    transform: translateY(120%);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-
-  #info-panel.visible { transform: translateY(0); }
-
-  #info-panel .panel-symbol {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 4rem;
-    line-height: 1;
-    letter-spacing: 0.05em;
-  }
-
-  #info-panel .panel-name {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-top: 0.25rem;
-  }
-
-  #info-panel .panel-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-  }
-
-  .panel-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 1rem 0;
-  }
-
-  .panel-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
-  }
-
-  .panel-label {
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .panel-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--text);
-  }
-
-  .panel-category {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 3px;
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 0.75rem; right: 0.75rem;
-    background: none; border: none;
-    color: var(--muted); font-size: 1rem;
-    cursor: pointer; line-height: 1;
-    padding: 0.25rem;
-    transition: color 0.2s;
-  }
-  .close-btn:hover { color: var(--text); }
-
-  @media (max-width: 700px) {
-    header { padding: 1.5rem 1rem 0.5rem; }
-    .table-wrapper { padding: 0.5rem 0.5rem 1rem; }
-    #info-panel { right: 0.5rem; bottom: 0.5rem; width: calc(100vw - 1rem); }
-  }
+/* Info Panel */
+#info-overlay {
+  position: fixed; inset: 0;
+  display: none; z-index: 200;
+  pointer-events: none;
+}
+#info-overlay.open { display: block; pointer-events: auto; }
+#info-backdrop { position: absolute; inset: 0; }
+#info-panel {
+  position: absolute;
+  right: 1.5rem; top: 50%;
+  transform: translateY(-50%) scale(0.88);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+  width: 295px;
+  background: rgba(5,5,5,0.94);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.4rem 1.3rem 1.3rem;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+}
+#info-overlay.open #info-panel {
+  transform: translateY(-50%) scale(1);
+  opacity: 1;
+}
+.panel-close {
+  position: absolute; top: 0.6rem; right: 0.8rem;
+  background: none; border: none; color: #555;
+  font-size: 1.1rem; cursor: pointer;
+}
+.panel-close:hover { color: #ccc; }
+#panel-symbol {
+  font-family: var(--font-head);
+  font-size: 4.2rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+#shell-wrap {
+  position: relative;
+  width: 130px; height: 130px;
+  margin: 0.6rem auto 0;
+}
+.shell-orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.4;
+  top:50%; left:50%;
+  transform: translate(-50%,-50%);
+}
+.shell-nucleus {
+  position: absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 10px 4px currentColor;
+}
+.shell-electron {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 5px 2px currentColor;
+}
+#panel-shells-str {
+  text-align: center;
+  font-size: 0.65rem;
+  opacity: 0.6;
+  margin-top: 0.25rem;
+  letter-spacing: 0.1em;
+}
+#panel-name {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.08em;
+  margin-top: 0.5rem;
+}
+#panel-num {
+  text-align: center; font-size: 0.68rem;
+  color: #555; margin-top: 0.15rem; letter-spacing: 0.04em;
+}
+.panel-divider { height: 1px; margin: 0.8rem 0; opacity: 0.2; }
+.panel-row {
+  display: flex; justify-content: space-between;
+  align-items: baseline; margin-bottom: 0.4rem;
+}
+.panel-lbl { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 0.1em; }
+.panel-val { font-size: 0.78rem; }
+#panel-config { font-size: 0.68rem; text-align: center; margin-top: 0.3rem; opacity: 0.65; }
+.panel-badge {
+  display: inline-block; padding: 0.15rem 0.55rem;
+  border-radius: 2px; font-size: 0.62rem;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  margin-top: 0.55rem; border: 1px solid currentColor;
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div>
-      <h1>Periodic<br><span>Table</span></h1>
-      <p class="subtitle">118 Elements · Interactive</p>
-    </div>
-    <div class="legend" id="legend"></div>
-  </div>
-</header>
+<div class="legend" id="legend"></div>
+<div class="pt-wrap"><div class="pt-grid" id="pt-grid"></div></div>
 
-<div class="table-wrapper">
-  <div class="table-inner">
-    <div class="pt-grid" id="pt-grid"></div>
+<div id="info-overlay">
+  <div id="info-backdrop" onclick="closePanel()"></div>
+  <div id="info-panel">
+    <button class="panel-close" onclick="closePanel()">✕</button>
+    <div id="panel-symbol"></div>
+    <div id="shell-wrap"></div>
+    <div id="panel-shells-str"></div>
+    <div id="panel-name"></div>
+    <div id="panel-num"></div>
+    <div class="panel-divider" id="panel-div" style="background:#fff"></div>
+    <div id="panel-rows"></div>
+    <div id="panel-config"></div>
+    <div id="panel-badge-wrap"></div>
   </div>
-</div>
-
-<div id="info-panel">
-  <button class="close-btn" onclick="closePanel()">✕</button>
-  <div id="panel-content"></div>
 </div>
 
 <script>
-const CATEGORIES = {
-  alkali:           { label: 'Alkali Metal',        color: 'var(--alkali)' },
-  alkaline:         { label: 'Alkaline Earth',      color: 'var(--alkaline)' },
-  transition:       { label: 'Transition Metal',    color: 'var(--transition)' },
-  'post-transition':{ label: 'Post-Transition',     color: 'var(--post-transition)' },
-  metalloid:        { label: 'Metalloid',           color: 'var(--metalloid)' },
-  nonmetal:         { label: 'Reactive Nonmetal',   color: 'var(--nonmetal)' },
-  halogen:          { label: 'Halogen',             color: 'var(--halogen)' },
-  noble:            { label: 'Noble Gas',           color: 'var(--noble)' },
-  lanthanide:       { label: 'Lanthanide',          color: 'var(--lanthanide)' },
-  actinide:         { label: 'Actinide',            color: 'var(--actinide)' },
-  unknown:          { label: 'Unknown',             color: 'var(--unknown)' },
+const CATS = {
+  alkali:       { label:'Alkali Metals',          color:'#c8ff00' },
+  alkaline:     { label:'Alkaline Earth Metals',  color:'#ffdd00' },
+  lanthanide:   { label:'Lanthanoids',            color:'#ff69b4' },
+  actinide:     { label:'Aktinoids',              color:'#ff4499' },
+  transition:   { label:'Transition Metals',      color:'#00cfff' },
+  'post-trans': { label:'Post-Transition Metals', color:'#00ff99' },
+  metalloid:    { label:'Metalloids',             color:'#00ff66' },
+  nonmetal:     { label:'Other Nonmetals',        color:'#ff6600' },
+  halogen:      { label:'Halogens',               color:'#ff3366' },
+  noble:        { label:'Noble Gasses',           color:'#cc66ff' },
+  unknown:      { label:'Unknown',                color:'#888888' },
 };
 
+// [num, symbol, name, mass, cat, group, period, state, config, shells_per_orbit]
 const ELEMENTS = [
-  [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹'],
-  [2,'He','Helium','4.003','noble',18,1,'Gas','1s²'],
-  [3,'Li','Lithium','6.941','alkali',1,2,'Solid','[He] 2s¹'],
-  [4,'Be','Beryllium','9.012','alkaline',2,2,'Solid','[He] 2s²'],
-  [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹'],
-  [6,'C','Carbon','12.01','nonmetal',14,2,'Solid','[He] 2s²2p²'],
-  [7,'N','Nitrogen','14.01','nonmetal',15,2,'Gas','[He] 2s²2p³'],
-  [8,'O','Oxygen','15.99','nonmetal',16,2,'Gas','[He] 2s²2p⁴'],
-  [9,'F','Fluorine','18.99','halogen',17,2,'Gas','[He] 2s²2p⁵'],
-  [10,'Ne','Neon','20.18','noble',18,2,'Gas','[He] 2s²2p⁶'],
-  [11,'Na','Sodium','22.99','alkali',1,3,'Solid','[Ne] 3s¹'],
-  [12,'Mg','Magnesium','24.31','alkaline',2,3,'Solid','[Ne] 3s²'],
-  [13,'Al','Aluminium','26.98','post-transition',13,3,'Solid','[Ne] 3s²3p¹'],
-  [14,'Si','Silicon','28.09','metalloid',14,3,'Solid','[Ne] 3s²3p²'],
-  [15,'P','Phosphorus','30.97','nonmetal',15,3,'Solid','[Ne] 3s²3p³'],
-  [16,'S','Sulfur','32.06','nonmetal',16,3,'Solid','[Ne] 3s²3p⁴'],
-  [17,'Cl','Chlorine','35.45','halogen',17,3,'Gas','[Ne] 3s²3p⁵'],
-  [18,'Ar','Argon','39.95','noble',18,3,'Gas','[Ne] 3s²3p⁶'],
-  [19,'K','Potassium','39.10','alkali',1,4,'Solid','[Ar] 4s¹'],
-  [20,'Ca','Calcium','40.08','alkaline',2,4,'Solid','[Ar] 4s²'],
-  [21,'Sc','Scandium','44.96','transition',3,4,'Solid','[Ar] 3d¹4s²'],
-  [22,'Ti','Titanium','47.87','transition',4,4,'Solid','[Ar] 3d²4s²'],
-  [23,'V','Vanadium','50.94','transition',5,4,'Solid','[Ar] 3d³4s²'],
-  [24,'Cr','Chromium','52.00','transition',6,4,'Solid','[Ar] 3d⁵4s¹'],
-  [25,'Mn','Manganese','54.94','transition',7,4,'Solid','[Ar] 3d⁵4s²'],
-  [26,'Fe','Iron','55.85','transition',8,4,'Solid','[Ar] 3d⁶4s²'],
-  [27,'Co','Cobalt','58.93','transition',9,4,'Solid','[Ar] 3d⁷4s²'],
-  [28,'Ni','Nickel','58.69','transition',10,4,'Solid','[Ar] 3d⁸4s²'],
-  [29,'Cu','Copper','63.55','transition',11,4,'Solid','[Ar] 3d¹⁰4s¹'],
-  [30,'Zn','Zinc','65.38','transition',12,4,'Solid','[Ar] 3d¹⁰4s²'],
-  [31,'Ga','Gallium','69.72','post-transition',13,4,'Solid','[Ar] 3d¹⁰4s²4p¹'],
-  [32,'Ge','Germanium','72.63','metalloid',14,4,'Solid','[Ar] 3d¹⁰4s²4p²'],
-  [33,'As','Arsenic','74.92','metalloid',15,4,'Solid','[Ar] 3d¹⁰4s²4p³'],
-  [34,'Se','Selenium','78.97','nonmetal',16,4,'Solid','[Ar] 3d¹⁰4s²4p⁴'],
-  [35,'Br','Bromine','79.90','halogen',17,4,'Liquid','[Ar] 3d¹⁰4s²4p⁵'],
-  [36,'Kr','Krypton','83.80','noble',18,4,'Gas','[Ar] 3d¹⁰4s²4p⁶'],
-  [37,'Rb','Rubidium','85.47','alkali',1,5,'Solid','[Kr] 5s¹'],
-  [38,'Sr','Strontium','87.62','alkaline',2,5,'Solid','[Kr] 5s²'],
-  [39,'Y','Yttrium','88.91','transition',3,5,'Solid','[Kr] 4d¹5s²'],
-  [40,'Zr','Zirconium','91.22','transition',4,5,'Solid','[Kr] 4d²5s²'],
-  [41,'Nb','Niobium','92.91','transition',5,5,'Solid','[Kr] 4d⁴5s¹'],
-  [42,'Mo','Molybdenum','95.96','transition',6,5,'Solid','[Kr] 4d⁵5s¹'],
-  [43,'Tc','Technetium','[98]','transition',7,5,'Solid','[Kr] 4d⁵5s²'],
-  [44,'Ru','Ruthenium','101.1','transition',8,5,'Solid','[Kr] 4d⁷5s¹'],
-  [45,'Rh','Rhodium','102.9','transition',9,5,'Solid','[Kr] 4d⁸5s¹'],
-  [46,'Pd','Palladium','106.4','transition',10,5,'Solid','[Kr] 4d¹⁰'],
-  [47,'Ag','Silver','107.9','transition',11,5,'Solid','[Kr] 4d¹⁰5s¹'],
-  [48,'Cd','Cadmium','112.4','transition',12,5,'Solid','[Kr] 4d¹⁰5s²'],
-  [49,'In','Indium','114.8','post-transition',13,5,'Solid','[Kr] 4d¹⁰5s²5p¹'],
-  [50,'Sn','Tin','118.7','post-transition',14,5,'Solid','[Kr] 4d¹⁰5s²5p²'],
-  [51,'Sb','Antimony','121.8','metalloid',15,5,'Solid','[Kr] 4d¹⁰5s²5p³'],
-  [52,'Te','Tellurium','127.6','metalloid',16,5,'Solid','[Kr] 4d¹⁰5s²5p⁴'],
-  [53,'I','Iodine','126.9','halogen',17,5,'Solid','[Kr] 4d¹⁰5s²5p⁵'],
-  [54,'Xe','Xenon','131.3','noble',18,5,'Gas','[Kr] 4d¹⁰5s²5p⁶'],
-  [55,'Cs','Caesium','132.9','alkali',1,6,'Solid','[Xe] 6s¹'],
-  [56,'Ba','Barium','137.3','alkaline',2,6,'Solid','[Xe] 6s²'],
-  [57,'La','Lanthanum','138.9','lanthanide',3,6,'Solid','[Xe] 5d¹6s²'],
-  [58,'Ce','Cerium','140.1','lanthanide',null,null,'Solid','[Xe] 4f¹5d¹6s²'],
-  [59,'Pr','Praseodymium','140.9','lanthanide',null,null,'Solid','[Xe] 4f³6s²'],
-  [60,'Nd','Neodymium','144.2','lanthanide',null,null,'Solid','[Xe] 4f⁴6s²'],
-  [61,'Pm','Promethium','[145]','lanthanide',null,null,'Solid','[Xe] 4f⁵6s²'],
-  [62,'Sm','Samarium','150.4','lanthanide',null,null,'Solid','[Xe] 4f⁶6s²'],
-  [63,'Eu','Europium','152.0','lanthanide',null,null,'Solid','[Xe] 4f⁷6s²'],
-  [64,'Gd','Gadolinium','157.3','lanthanide',null,null,'Solid','[Xe] 4f⁷5d¹6s²'],
-  [65,'Tb','Terbium','158.9','lanthanide',null,null,'Solid','[Xe] 4f⁹6s²'],
-  [66,'Dy','Dysprosium','162.5','lanthanide',null,null,'Solid','[Xe] 4f¹⁰6s²'],
-  [67,'Ho','Holmium','164.9','lanthanide',null,null,'Solid','[Xe] 4f¹¹6s²'],
-  [68,'Er','Erbium','167.3','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²'],
-  [69,'Tm','Thulium','168.9','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²'],
-  [70,'Yb','Ytterbium','173.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²'],
-  [71,'Lu','Lutetium','175.0','lanthanide',3,6,'Solid','[Xe] 4f¹⁴5d¹6s²'],
-  [72,'Hf','Hafnium','178.5','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²'],
-  [73,'Ta','Tantalum','180.9','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²'],
-  [74,'W','Tungsten','183.8','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²'],
-  [75,'Re','Rhenium','186.2','transition',7,6,'Solid','[Xe] 4f¹⁴5d⁵6s²'],
-  [76,'Os','Osmium','190.2','transition',8,6,'Solid','[Xe] 4f¹⁴5d⁶6s²'],
-  [77,'Ir','Iridium','192.2','transition',9,6,'Solid','[Xe] 4f¹⁴5d⁷6s²'],
-  [78,'Pt','Platinum','195.1','transition',10,6,'Solid','[Xe] 4f¹⁴5d⁹6s¹'],
-  [79,'Au','Gold','197.0','transition',11,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s¹'],
-  [80,'Hg','Mercury','200.6','transition',12,6,'Liquid','[Xe] 4f¹⁴5d¹⁰6s²'],
-  [81,'Tl','Thallium','204.4','post-transition',13,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p¹'],
-  [82,'Pb','Lead','207.2','post-transition',14,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p²'],
-  [83,'Bi','Bismuth','209.0','post-transition',15,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p³'],
-  [84,'Po','Polonium','[209]','post-transition',16,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁴'],
-  [85,'At','Astatine','[210]','halogen',17,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁵'],
-  [86,'Rn','Radon','[222]','noble',18,6,'Gas','[Xe] 4f¹⁴5d¹⁰6s²6p⁶'],
-  [87,'Fr','Francium','[223]','alkali',1,7,'Solid','[Rn] 7s¹'],
-  [88,'Ra','Radium','[226]','alkaline',2,7,'Solid','[Rn] 7s²'],
-  [89,'Ac','Actinium','[227]','actinide',3,7,'Solid','[Rn] 6d¹7s²'],
-  [90,'Th','Thorium','232.0','actinide',null,null,'Solid','[Rn] 6d²7s²'],
-  [91,'Pa','Protactinium','231.0','actinide',null,null,'Solid','[Rn] 5f²6d¹7s²'],
-  [92,'U','Uranium','238.0','actinide',null,null,'Solid','[Rn] 5f³6d¹7s²'],
-  [93,'Np','Neptunium','[237]','actinide',null,null,'Solid','[Rn] 5f⁴6d¹7s²'],
-  [94,'Pu','Plutonium','[244]','actinide',null,null,'Solid','[Rn] 5f⁶7s²'],
-  [95,'Am','Americium','[243]','actinide',null,null,'Solid','[Rn] 5f⁷7s²'],
-  [96,'Cm','Curium','[247]','actinide',null,null,'Solid','[Rn] 5f⁷6d¹7s²'],
-  [97,'Bk','Berkelium','[247]','actinide',null,null,'Solid','[Rn] 5f⁹7s²'],
-  [98,'Cf','Californium','[251]','actinide',null,null,'Solid','[Rn] 5f¹⁰7s²'],
-  [99,'Es','Einsteinium','[252]','actinide',null,null,'Solid','[Rn] 5f¹¹7s²'],
-  [100,'Fm','Fermium','[257]','actinide',null,null,'Solid','[Rn] 5f¹²7s²'],
-  [101,'Md','Mendelevium','[258]','actinide',null,null,'Solid','[Rn] 5f¹³7s²'],
-  [102,'No','Nobelium','[259]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²'],
-  [103,'Lr','Lawrencium','[266]','actinide',3,7,'Solid','[Rn] 5f¹⁴7s²7p¹'],
-  [104,'Rf','Rutherfordium','[267]','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²'],
-  [105,'Db','Dubnium','[268]','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²'],
-  [106,'Sg','Seaborgium','[271]','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²'],
-  [107,'Bh','Bohrium','[272]','transition',7,7,'Solid','[Rn] 5f¹⁴6d⁵7s²'],
-  [108,'Hs','Hassium','[270]','transition',8,7,'Solid','[Rn] 5f¹⁴6d⁶7s²'],
-  [109,'Mt','Meitnerium','[278]','unknown',9,7,'Solid','[Rn] 5f¹⁴6d⁷7s²'],
-  [110,'Ds','Darmstadtium','[281]','unknown',10,7,'Solid','[Rn] 5f¹⁴6d⁸7s²'],
-  [111,'Rg','Roentgenium','[282]','unknown',11,7,'Solid','[Rn] 5f¹⁴6d⁹7s²'],
-  [112,'Cn','Copernicium','[285]','transition',12,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²'],
-  [113,'Nh','Nihonium','[286]','unknown',13,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p¹'],
-  [114,'Fl','Flerovium','[289]','unknown',14,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p²'],
-  [115,'Mc','Moscovium','[290]','unknown',15,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p³'],
-  [116,'Lv','Livermorium','[293]','unknown',16,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁴'],
-  [117,'Ts','Tennessine','[294]','unknown',17,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁵'],
-  [118,'Og','Oganesson','[294]','noble',18,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²7p⁶'],
+  [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹',[1]],
+  [2,'He','Helium','4.00028','noble',18,1,'Gas','1s²',[2]],
+  [3,'Li','Lithium','6.94','alkali',1,2,'Solid','[He] 2s¹',[2,1]],
+  [4,'Be','Beryllium','9.0122','alkaline',2,2,'Solid','[He] 2s²',[2,2]],
+  [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹',[2,3]],
+  [6,'C','Carbon','12.011','nonmetal',14,2,'Solid','[He] 2s²2p²',[2,4]],
+  [7,'N','Nitrogen','14.007','nonmetal',15,2,'Gas','[He] 2s²2p³',[2,5]],
+  [8,'O','Oxygen','15.999','nonmetal',16,2,'Gas','[He] 2s²2p⁴',[2,6]],
+  [9,'F','Flourine','18.998','halogen',17,2,'Gas','[He] 2s²2p⁵',[2,7]],
+  [10,'Ne','Neon','20.18','noble',18,2,'Gas','[He] 2s²2p⁶',[2,8]],
+  [11,'Na','Sodium','22.99','alkali',1,3,'Solid','[Ne] 3s¹',[2,8,1]],
+  [12,'Mg','Magnesium','24.305','alkaline',2,3,'Solid','[Ne] 3s²',[2,8,2]],
+  [13,'Al','Aluminium','26.982','post-trans',13,3,'Solid','[Ne] 3s²3p¹',[2,8,3]],
+  [14,'Si','Silicon','28.085','metalloid',14,3,'Solid','[Ne] 3s²3p²',[2,8,4]],
+  [15,'P','Phosphorus','30.974','nonmetal',15,3,'Solid','[Ne] 3s²3p³',[2,8,5]],
+  [16,'S','Sulfur','32.06','nonmetal',16,3,'Solid','[Ne] 3s²3p⁴',[2,8,6]],
+  [17,'Cl','Chlorine','35.45','halogen',17,3,'Gas','[Ne] 3s²3p⁵',[2,8,7]],
+  [18,'Ar','Argon','39.948','noble',18,3,'Gas','[Ne] 3s²3p⁶',[2,8,8]],
+  [19,'K','Potassium','39.098','alkali',1,4,'Solid','[Ar] 4s¹',[2,8,8,1]],
+  [20,'Ca','Calcium','40.078','alkaline',2,4,'Solid','[Ar] 4s²',[2,8,8,2]],
+  [21,'Sc','Scandium','44.956','transition',3,4,'Solid','[Ar] 3d¹4s²',[2,8,9,2]],
+  [22,'Ti','Titanium','47.867','transition',4,4,'Solid','[Ar] 3d²4s²',[2,8,10,2]],
+  [23,'V','Vanadium','50.942','transition',5,4,'Solid','[Ar] 3d³4s²',[2,8,11,2]],
+  [24,'Cr','Chromium','52.00','transition',6,4,'Solid','[Ar] 3d⁵4s¹',[2,8,13,1]],
+  [25,'Mn','Manganese','54.938','transition',7,4,'Solid','[Ar] 3d⁵4s²',[2,8,13,2]],
+  [26,'Fe','Iron','55.845','transition',8,4,'Solid','[Ar] 3d⁶4s²',[2,8,14,2]],
+  [27,'Co','Cobalt','58.933','transition',9,4,'Solid','[Ar] 3d⁷4s²',[2,8,15,2]],
+  [28,'Ni','Nickel','58.693','transition',10,4,'Solid','[Ar] 3d⁸4s²',[2,8,16,2]],
+  [29,'Cu','Copper','63.546','transition',11,4,'Solid','[Ar] 3d¹⁰4s¹',[2,8,18,1]],
+  [30,'Zn','Zinc','65.38','transition',12,4,'Solid','[Ar] 3d¹⁰4s²',[2,8,18,2]],
+  [31,'Ga','Gallium','69.723','post-trans',13,4,'Solid','[Ar] 3d¹⁰4s²4p¹',[2,8,18,3]],
+  [32,'Ge','Germanium','72.63','metalloid',14,4,'Solid','[Ar] 3d¹⁰4s²4p²',[2,8,18,4]],
+  [33,'As','Arsenic','74.922','metalloid',15,4,'Solid','[Ar] 3d¹⁰4s²4p³',[2,8,18,5]],
+  [34,'Se','Selenium','78.971','nonmetal',16,4,'Solid','[Ar] 3d¹⁰4s²4p⁴',[2,8,18,6]],
+  [35,'Br','Bromine','79.904','halogen',17,4,'Liquid','[Ar] 3d¹⁰4s²4p⁵',[2,8,18,7]],
+  [36,'Kr','Krypton','83.798','noble',18,4,'Gas','[Ar] 3d¹⁰4s²4p⁶',[2,8,18,8]],
+  [37,'Rb','Rubidium','85.468','alkali',1,5,'Solid','[Kr] 5s¹',[2,8,18,8,1]],
+  [38,'Sr','Strontium','87.62','alkaline',2,5,'Solid','[Kr] 5s²',[2,8,18,8,2]],
+  [39,'Y','Yttrium','88.906','transition',3,5,'Solid','[Kr] 4d¹5s²',[2,8,18,9,2]],
+  [40,'Zr','Zirconium','91.224','transition',4,5,'Solid','[Kr] 4d²5s²',[2,8,18,10,2]],
+  [41,'Nb','Niobium','92.906','transition',5,5,'Solid','[Kr] 4d⁴5s¹',[2,8,18,12,1]],
+  [42,'Mo','Molybdenum','95.95','transition',6,5,'Solid','[Kr] 4d⁵5s¹',[2,8,18,13,1]],
+  [43,'Tc','Technetium','(88)','transition',7,5,'Solid','[Kr] 4d⁵5s²',[2,8,18,13,2]],
+  [44,'Ru','Ruthenium','101.07','transition',8,5,'Solid','[Kr] 4d⁷5s¹',[2,8,18,15,1]],
+  [45,'Rh','Rhodium','102.91','transition',9,5,'Solid','[Kr] 4d⁸5s¹',[2,8,18,16,1]],
+  [46,'Pd','Palladium','106.42','transition',10,5,'Solid','[Kr] 4d¹⁰',[2,8,18,18]],
+  [47,'Ag','Silver','107.87','transition',11,5,'Solid','[Kr] 4d¹⁰5s¹',[2,8,18,18,1]],
+  [48,'Cd','Cadmium','112.41','transition',12,5,'Solid','[Kr] 4d¹⁰5s²',[2,8,18,18,2]],
+  [49,'In','Indium','114.82','post-trans',13,5,'Solid','[Kr] 4d¹⁰5s²5p¹',[2,8,18,18,3]],
+  [50,'Sn','Tin','118.71','post-trans',14,5,'Solid','[Kr] 4d¹⁰5s²5p²',[2,8,18,18,4]],
+  [51,'Sb','Antimony','121.76','metalloid',15,5,'Solid','[Kr] 4d¹⁰5s²5p³',[2,8,18,18,5]],
+  [52,'Te','Tellurium','127.6','metalloid',16,5,'Solid','[Kr] 4d¹⁰5s²5p⁴',[2,8,18,18,6]],
+  [53,'I','Iodine','126.9','halogen',17,5,'Solid','[Kr] 4d¹⁰5s²5p⁵',[2,8,18,18,7]],
+  [54,'Xe','Xenon','131.29','noble',18,5,'Gas','[Kr] 4d¹⁰5s²5p⁶',[2,8,18,18,8]],
+  [55,'Cs','Caesium','132.91','alkali',1,6,'Solid','[Xe] 6s¹',[2,8,18,18,8,1]],
+  [56,'Ba','Barium','137.33','alkaline',2,6,'Solid','[Xe] 6s²',[2,8,18,18,8,2]],
+  [57,'La','Lanthanum','138.91','lanthanide',3,6,'Solid','[Xe] 5d¹6s²',[2,8,18,18,9,2]],
+  [58,'Ce','Cerium','140.12','lanthanide',null,null,'Solid','[Xe] 4f¹5d¹6s²',[2,8,18,19,9,2]],
+  [59,'Pr','Praseodymium','140.91','lanthanide',null,null,'Solid','[Xe] 4f³6s²',[2,8,18,21,8,2]],
+  [60,'Nd','Neodymium','144.24','lanthanide',null,null,'Solid','[Xe] 4f⁴6s²',[2,8,18,22,8,2]],
+  [61,'Pm','Promethium','144.24','lanthanide',null,null,'Solid','[Xe] 4f⁵6s²',[2,8,18,23,8,2]],
+  [62,'Sm','Samarium','150.36','lanthanide',null,null,'Solid','[Xe] 4f⁶6s²',[2,8,18,24,8,2]],
+  [63,'Eu','Europium','151.96','lanthanide',null,null,'Solid','[Xe] 4f⁷6s²',[2,8,18,25,8,2]],
+  [64,'Gd','Gadolinium','157.25','lanthanide',null,null,'Solid','[Xe] 4f⁷5d¹6s²',[2,8,18,25,9,2]],
+  [65,'Tb','Terbium','158.93','lanthanide',null,null,'Solid','[Xe] 4f⁹6s²',[2,8,18,27,8,2]],
+  [66,'Dy','Dysprosium','162.5','lanthanide',null,null,'Solid','[Xe] 4f¹⁰6s²',[2,8,18,28,8,2]],
+  [67,'Ho','Holmium','164.93','lanthanide',null,null,'Solid','[Xe] 4f¹¹6s²',[2,8,18,29,8,2]],
+  [68,'Er','Erbium','167.26','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²',[2,8,18,30,8,2]],
+  [69,'Tm','Thulium','168.93','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²',[2,8,18,31,8,2]],
+  [70,'Yb','Ytterbium','173.05','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²',[2,8,18,32,8,2]],
+  [71,'Lu','Lutetium','174.97','lanthanide',3,6,'Solid','[Xe] 4f¹⁴5d¹6s²',[2,8,18,32,9,2]],
+  [72,'Hf','Hafnium','178.49','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²',[2,8,18,32,10,2]],
+  [73,'Ta','Tantalum','180.95','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²',[2,8,18,32,11,2]],
+  [74,'W','Tungsten','183.84','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²',[2,8,18,32,12,2]],
+  [75,'Re','Rhenium','186.21','transition',7,6,'Solid','[Xe] 4f¹⁴5d⁵6s²',[2,8,18,32,13,2]],
+  [76,'Os','Osmium','190.23','transition',8,6,'Solid','[Xe] 4f¹⁴5d⁶6s²',[2,8,18,32,14,2]],
+  [77,'Ir','Iridium','192.22','transition',9,6,'Solid','[Xe] 4f¹⁴5d⁷6s²',[2,8,18,32,15,2]],
+  [78,'Pt','Platinum','195.08','transition',10,6,'Solid','[Xe] 4f¹⁴5d⁹6s¹',[2,8,18,32,17,1]],
+  [79,'Au','Gold','196.97','transition',11,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s¹',[2,8,18,32,18,1]],
+  [80,'Hg','Mercury','200.59','transition',12,6,'Liquid','[Xe] 4f¹⁴5d¹⁰6s²',[2,8,18,32,18,2]],
+  [81,'Tl','Thallium','204.38','post-trans',13,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p¹',[2,8,18,32,18,3]],
+  [82,'Pb','Lead','207.2','post-trans',14,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p²',[2,8,18,32,18,4]],
+  [83,'Bi','Bismuth','208.98','post-trans',15,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p³',[2,8,18,32,18,5]],
+  [84,'Po','Polonium','(209)','post-trans',16,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁴',[2,8,18,32,18,6]],
+  [85,'At','Astatine','(210)','halogen',17,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁵',[2,8,18,32,18,7]],
+  [86,'Rn','Radon','(222)','noble',18,6,'Gas','[Xe] 4f¹⁴5d¹⁰6s²6p⁶',[2,8,18,32,18,8]],
+  [87,'Fr','Francium','(223)','alkali',1,7,'Solid','[Rn] 7s¹',[2,8,18,32,18,8,1]],
+  [88,'Ra','Radium','(226)','alkaline',2,7,'Solid','[Rn] 7s²',[2,8,18,32,18,8,2]],
+  [89,'Ac','Actinium','(227)','actinide',3,7,'Solid','[Rn] 6d¹7s²',[2,8,18,32,18,9,2]],
+  [90,'Th','Thorium','232.04','actinide',null,null,'Solid','[Rn] 6d²7s²',[2,8,18,32,18,10,2]],
+  [91,'Pa','Protactinium','231.04','actinide',null,null,'Solid','[Rn] 5f²6d¹7s²',[2,8,18,32,20,9,2]],
+  [92,'U','Uranium','238.03','actinide',null,null,'Solid','[Rn] 5f³6d¹7s²',[2,8,18,32,21,9,2]],
+  [93,'Np','Neptunium','(237)','actinide',null,null,'Solid','[Rn] 5f⁴6d¹7s²',[2,8,18,32,22,9,2]],
+  [94,'Pu','Plutonium','(244)','actinide',null,null,'Solid','[Rn] 5f⁶7s²',[2,8,18,32,24,8,2]],
+  [95,'Am','Americium','(243)','actinide',null,null,'Solid','[Rn] 5f⁷7s²',[2,8,18,32,25,8,2]],
+  [96,'Cm','Curium','(247)','actinide',null,null,'Solid','[Rn] 5f⁷6d¹7s²',[2,8,18,32,25,9,2]],
+  [97,'Bk','Berkelium','(247)','actinide',null,null,'Solid','[Rn] 5f⁹7s²',[2,8,18,32,27,8,2]],
+  [98,'Cf','Californium','(251)','actinide',null,null,'Solid','[Rn] 5f¹⁰7s²',[2,8,18,32,28,8,2]],
+  [99,'Es','Einsteinium','(252)','actinide',null,null,'Solid','[Rn] 5f¹¹7s²',[2,8,18,32,29,8,2]],
+  [100,'Fm','Fermium','(257)','actinide',null,null,'Solid','[Rn] 5f¹²7s²',[2,8,18,32,30,8,2]],
+  [101,'Md','Mendelevium','(258)','actinide',null,null,'Solid','[Rn] 5f¹³7s²',[2,8,18,32,31,8,2]],
+  [102,'No','Nobelium','(259)','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²',[2,8,18,32,32,8,2]],
+  [103,'Lr','Lawrencium','(266)','actinide',3,7,'Solid','[Rn] 5f¹⁴7s²7p¹',[2,8,18,32,32,8,3]],
+  [104,'Rf','Rutherfordium','(267)','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²',[2,8,18,32,32,10,2]],
+  [105,'Db','Dubnium','(268)','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²',[2,8,18,32,32,11,2]],
+  [106,'Sg','Seaborgium','(271)','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²',[2,8,18,32,32,12,2]],
+  [107,'Bh','Bohrium','(272)','transition',7,7,'Solid','[Rn] 5f¹⁴6d⁵7s²',[2,8,18,32,32,13,2]],
+  [108,'Hs','Hassium','(270)','transition',8,7,'Solid','[Rn] 5f¹⁴6d⁶7s²',[2,8,18,32,32,14,2]],
+  [109,'Mt','Meitnerium','(278)','unknown',9,7,'Unknown','[Rn] 5f¹⁴6d⁷7s²',[2,8,18,32,32,15,2]],
+  [110,'Ds','Darmstadtium','(281)','unknown',10,7,'Unknown','[Rn] 5f¹⁴6d⁸7s²',[2,8,18,32,32,16,2]],
+  [111,'Rg','Roentgenium','(282)','unknown',11,7,'Unknown','[Rn] 5f¹⁴6d⁹7s²',[2,8,18,32,32,17,2]],
+  [112,'Cn','Copernicium','(285)','transition',12,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²',[2,8,18,32,32,18,2]],
+  [113,'Nh','Nihonium','(286)','unknown',13,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p¹',[2,8,18,32,32,18,3]],
+  [114,'Fl','Flerovium','(289)','unknown',14,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p²',[2,8,18,32,32,18,4]],
+  [115,'Mc','Moscovium','(290)','unknown',15,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p³',[2,8,18,32,32,18,5]],
+  [116,'Lv','Livermorium','(293)','unknown',16,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p⁴',[2,8,18,32,32,18,6]],
+  [117,'Ts','Tennessine','(294)','unknown',17,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p⁵',[2,8,18,32,32,18,7]],
+  [118,'Og','Oganesson','(294)','noble',18,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²7p⁶',[2,8,18,32,32,18,8]],
 ];
 
-const byNumber = {};
-ELEMENTS.forEach(e => byNumber[e[0]] = e);
+const byNum = {};
+ELEMENTS.forEach(e => byNum[e[0]] = e);
 
+/* Legend */
+const legendEl = document.getElementById('legend');
+Object.entries(CATS).forEach(([k,{label,color}]) => {
+  const d = document.createElement('div');
+  d.className = 'legend-item';
+  d.style.color = color;
+  d.style.textShadow = `0 0 8px ${color}88`;
+  d.textContent = label;
+  legendEl.appendChild(d);
+});
+
+/* Grid */
 function buildGrid() {
   const grid = document.getElementById('pt-grid');
-  const cells = Array.from({length:10}, () => Array(18).fill(null));
+  const cells = Array.from({length:7}, () => Array(18).fill(null));
 
   ELEMENTS.forEach(el => {
-    const [num, sym, name, mass, cat, group, period] = el;
-    if (group && period) cells[period - 1][group - 1] = el;
+    const [num,sym,name,mass,cat,group,period] = el;
+    if (group && period) cells[period-1][group-1] = el;
   });
 
-  const lanthanides = ELEMENTS.filter(e => e[4] === 'lanthanide' && !e[6]);
-  const actinides   = ELEMENTS.filter(e => e[4] === 'actinide' && !e[6]);
-  lanthanides.forEach((el, i) => { cells[8][i+2] = el; });
-  actinides.forEach((el, i)   => { cells[9][i+2] = el; });
+  const lants = ELEMENTS.filter(e => e[4]==='lanthanide' && !e[6]);
+  const acts  = ELEMENTS.filter(e => e[4]==='actinide'   && !e[6]);
 
-  for (let r = 0; r < 10; r++) {
-    if (r === 7) {
-      for (let c = 0; c < 18; c++) {
-        const sp = document.createElement('div');
-        sp.className = 'spacer';
-        sp.style.cssText = `grid-column:${c+1};grid-row:${r+1}`;
-        grid.appendChild(sp);
-      }
-      continue;
-    }
+  for (let r = 0; r < 7; r++) {
     for (let c = 0; c < 18; c++) {
       const el = cells[r][c];
       if (!el) {
         const sp = document.createElement('div');
-        if ((r === 5 || r === 6) && c === 2) {
-          sp.className = 'gap-cell el';
-          sp.style.cssText = `grid-column:${c+1};grid-row:${r+1};--cat-color:var(--muted)`;
-          sp.innerHTML = `<span style="font-size:0.55rem;color:var(--muted);text-align:center;line-height:1.3">${r===5?'57–71':'89–103'}</span>`;
-        } else {
-          sp.className = 'spacer';
-          sp.style.cssText = `grid-column:${c+1};grid-row:${r+1}`;
-        }
+        if ((r===5||r===6) && c===2) {
+          sp.className = 'gap-cell';
+          sp.innerHTML = `<span>${r===5?'57-71':'89-103'}</span>`;
+        } else { sp.className = 'spacer'; }
         grid.appendChild(sp);
         continue;
       }
-      const [num, sym, name, mass, cat] = el;
-      const colorVar = CATEGORIES[cat]?.color || 'var(--unknown)';
-      const div = document.createElement('div');
-      div.className = 'el';
-      div.style.cssText = `grid-column:${c+1};grid-row:${r+1};--cat-color:${colorVar}`;
-      div.dataset.num = num;
-      div.innerHTML = `
-        <div class="el-num">${num}</div>
-        <div class="el-symbol">${sym}</div>
-        <div class="el-name">${name}</div>
-        <div class="el-mass">${mass}</div>
-      `;
-      div.addEventListener('click', () => showElement(num));
-      grid.appendChild(div);
+      grid.appendChild(makeCell(el));
     }
+  }
+
+  // Separator
+  const sep = document.createElement('div');
+  sep.className = 'sep-row';
+  grid.appendChild(sep);
+
+  // Lanthanide row
+  for (let c = 0; c < 18; c++) {
+    if (c < 3) { const s=document.createElement('div'); s.className='spacer'; grid.appendChild(s); continue; }
+    const el = lants[c-3];
+    grid.appendChild(el ? makeCell(el) : (() => { const s=document.createElement('div'); s.className='spacer'; return s; })());
+  }
+  // Actinide row
+  for (let c = 0; c < 18; c++) {
+    if (c < 3) { const s=document.createElement('div'); s.className='spacer'; grid.appendChild(s); continue; }
+    const el = acts[c-3];
+    grid.appendChild(el ? makeCell(el) : (() => { const s=document.createElement('div'); s.className='spacer'; return s; })());
   }
 }
 
-let activeEl = null;
+function makeCell(el) {
+  const [num,sym,name,mass,cat] = el;
+  const color = CATS[cat]?.color || '#888';
+  const div = document.createElement('div');
+  div.className = 'el';
+  div.dataset.num = num;
+  div.style.setProperty('--c', color);
+  div.innerHTML = `<div class="el-num">${num}</div><div class="el-symbol">${sym}</div><div class="el-name">${name}</div><div class="el-mass">${mass}</div>`;
+  div.addEventListener('click', () => showEl(num));
+  return div;
+}
 
-function showElement(num) {
-  const el = byNumber[num];
+/* Panel */
+let activeNum = null;
+
+function showEl(num) {
+  const el = byNum[num];
   if (!el) return;
-  const [n, sym, name, mass, cat, group, period, state, config] = el;
-  const colorVar = CATEGORIES[cat]?.color || 'var(--unknown)';
+  const [n,sym,name,mass,cat,group,period,state,config,shells] = el;
+  const color = CATS[cat]?.color || '#888';
 
-  if (activeEl) document.querySelector(`.el[data-num="${activeEl}"]`)?.classList.remove('active');
-  activeEl = num;
+  if (activeNum) document.querySelector(`.el[data-num="${activeNum}"]`)?.classList.remove('active');
+  activeNum = num;
   document.querySelector(`.el[data-num="${num}"]`)?.classList.add('active');
 
-  document.getElementById('panel-content').innerHTML = `
-    <div class="panel-symbol" style="color:${colorVar}">${sym}</div>
-    <div class="panel-name">${name}</div>
-    <div class="panel-num">Atomic Number ${n}</div>
-    <div class="panel-divider"></div>
-    <div class="panel-row"><span class="panel-label">Atomic Mass</span><span class="panel-value">${mass} u</span></div>
-    <div class="panel-row"><span class="panel-label">State (STP)</span><span class="panel-value">${state}</span></div>
-    ${group  ? `<div class="panel-row"><span class="panel-label">Group</span><span class="panel-value">${group}</span></div>` : ''}
-    ${period ? `<div class="panel-row"><span class="panel-label">Period</span><span class="panel-value">${period}</span></div>` : ''}
-    <div class="panel-row"><span class="panel-label">Config</span><span class="panel-value" style="font-size:0.7rem">${config}</span></div>
-    <div><span class="panel-category" style="background:${colorVar}22;color:${colorVar};border:1px solid ${colorVar}44">${CATEGORIES[cat]?.label || 'Unknown'}</span></div>
-  `;
+  const panel = document.getElementById('info-panel');
+  panel.style.borderColor = color;
+  panel.style.boxShadow = `0 0 30px -5px ${color}, 0 0 60px -15px ${color}`;
 
-  document.getElementById('info-panel').classList.add('visible');
+  const symEl = document.getElementById('panel-symbol');
+  symEl.textContent = sym;
+  symEl.style.color = color;
+  symEl.style.textShadow = `0 0 20px ${color}, 0 0 40px ${color}88`;
+
+  buildShellDiagram(shells, color);
+  document.getElementById('panel-shells-str').style.color = color;
+  document.getElementById('panel-shells-str').textContent = shells.join(' - ');
+
+  const nameEl = document.getElementById('panel-name');
+  nameEl.textContent = name;
+  nameEl.style.color = color;
+  nameEl.style.textShadow = `0 0 10px ${color}66`;
+
+  document.getElementById('panel-num').textContent = `Atomic Number ${n}`;
+  document.getElementById('panel-div').style.background = color;
+
+  const rows = [
+    ['Atomic Mass', mass + ' u'],
+    ['State (STP)', state],
+    group  ? ['Group',  group]  : null,
+    period ? ['Period', period] : null,
+  ].filter(Boolean);
+
+  document.getElementById('panel-rows').innerHTML = rows.map(([l,v]) =>
+    `<div class="panel-row"><span class="panel-lbl">${l}</span><span class="panel-val" style="color:${color};text-shadow:0 0 8px ${color}66">${v}</span></div>`
+  ).join('');
+
+  const cfgEl = document.getElementById('panel-config');
+  cfgEl.style.color = color;
+  cfgEl.textContent = config;
+
+  document.getElementById('panel-badge-wrap').innerHTML =
+    `<span class="panel-badge" style="color:${color};border-color:${color};background:${color}18">${CATS[cat]?.label||'Unknown'}</span>`;
+
+  document.getElementById('info-overlay').classList.add('open');
+}
+
+function buildShellDiagram(shells, color) {
+  const wrap = document.getElementById('shell-wrap');
+  wrap.innerHTML = '';
+  wrap.style.color = color;
+
+  const nuc = document.createElement('div');
+  nuc.className = 'shell-nucleus';
+  wrap.appendChild(nuc);
+
+  const maxShells = Math.min(shells.length, 4);
+  if (maxShells < 2) {
+    const maxR = 50, minR = 18;
+    const r = minR;
+    addOrbit(wrap, r, shells[0] || 0, color, 2.2);
+    return;
+  }
+  const maxR = 58, minR = 16;
+  for (let i = 0; i < maxShells; i++) {
+    const r = minR + (maxR - minR) * (i / (maxShells - 1));
+    addOrbit(wrap, r, shells[i], color, 2 + i * 1.4);
+  }
+}
+
+function addOrbit(wrap, r, count, color, duration) {
+  const orbit = document.createElement('div');
+  orbit.className = 'shell-orbit';
+  orbit.style.width = orbit.style.height = (r*2)+'px';
+  orbit.style.borderColor = color;
+
+  const shown = Math.min(count, 8);
+  for (let e = 0; e < shown; e++) {
+    const angle = (2*Math.PI*e/shown) - Math.PI/2;
+    const dot = document.createElement('div');
+    dot.className = 'shell-electron';
+    dot.style.left = `calc(50% + ${Math.cos(angle)*r - 2.5}px)`;
+    dot.style.top  = `calc(50% + ${Math.sin(angle)*r - 2.5}px)`;
+    dot.style.background = color;
+    dot.style.boxShadow = `0 0 5px 2px ${color}`;
+    orbit.appendChild(dot);
+  }
+
+  // Count label
+  const lbl = document.createElement('div');
+  lbl.style.cssText = `position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-size:0.55rem;color:${color};opacity:0.6`;
+  lbl.textContent = count;
+  orbit.appendChild(lbl);
+
+  wrap.appendChild(orbit);
 }
 
 function closePanel() {
-  document.getElementById('info-panel').classList.remove('visible');
-  if (activeEl) {
-    document.querySelector(`.el[data-num="${activeEl}"]`)?.classList.remove('active');
-    activeEl = null;
+  document.getElementById('info-overlay').classList.remove('open');
+  if (activeNum) {
+    document.querySelector(`.el[data-num="${activeNum}"]`)?.classList.remove('active');
+    activeNum = null;
   }
 }
 
-// Build legend
-const legendEl = document.getElementById('legend');
-Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
-  const item = document.createElement('div');
-  item.className = 'legend-item';
-  item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
-  legendEl.appendChild(item);
-});
-
 buildGrid();
 
+// Stagger-in animation
 document.querySelectorAll('.el:not(.spacer):not(.gap-cell)').forEach((el, i) => {
   el.style.opacity = '0';
-  el.style.transform = 'scale(0.85)';
-  el.style.transition = `opacity 0.3s ease ${i*4}ms, transform 0.3s ease ${i*4}ms`;
+  el.style.transform = 'scale(0.65)';
+  el.style.transition = `opacity 0.35s ease ${i*4.5}ms, transform 0.35s ease ${i*4.5}ms`;
   setTimeout(() => {
     el.style.opacity = '1';
     el.style.transform = '';
-  }, 50 + i * 4);
+  }, 20 + i * 4.5);
 });
 </script>
 </body>
 </html>
+
