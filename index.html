@@ -169,13 +169,13 @@
     border-color: var(--cat-color);
     box-shadow: 0 0 15px var(--cat-color), 0 0 30px var(--cat-color);
     z-index: 50;
-    animation: categoryGrow 0.6s ease-out forwards;
+    animation: categoryGrow 0.4s ease-out forwards;
   }
 
   @keyframes categoryGrow {
     from {
       transform: scale(1);
-      opacity: 0.8;
+      opacity: 0.6;
     }
     to {
       transform: scale(1.15);
@@ -183,8 +183,23 @@
     }
   }
 
+  .el.category-shrinking {
+    animation: categoryShrink 0.4s ease-out forwards;
+  }
+
+  @keyframes categoryShrink {
+    from {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+  }
+
   .el.category-dimmed {
-    opacity: 0.08;
+    opacity: 0.05;
     transition: opacity 0.3s ease;
   }
 
@@ -608,19 +623,18 @@ function toggleCategoryFilter(category, legendItem) {
     
     const highlightedElements = document.querySelectorAll('.el.category-highlighted');
     highlightedElements.forEach((el, index) => {
+        // apply shrinking animation with stagger
+      el.classList.add('category-shrinking');
       el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
-      el.style.animationDirection = 'reverse';
-      el.style.animationFillMode = 'forwards';
     });
     
-    // After animation completes, remove classes
+    // After animation completes, clear classes
     setTimeout(() => {
       document.querySelectorAll('.el').forEach(el => {
         el.classList.remove('category-highlighted');
         el.classList.remove('category-dimmed');
+        el.classList.remove('category-shrinking');
         el.style.animationDelay = '';
-        el.style.animationDirection = '';
-        el.style.animationFillMode = '';
       });
     }, 600);
   } else {
