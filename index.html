@@ -591,7 +591,13 @@ function buildGrid() {
           <div class="el-name">${name}</div>
           <div class="el-mass">${mass}</div>
         `;
-        div.addEventListener('click', () => showElement(num));
+        div.addEventListener('click', () => {
+          // In filter mode, only allow clicks on elements from the selected category
+          if (activeCategory && cat !== activeCategory) {
+            return;
+          }
+          showElement(num);
+        });
       }
       
       grid.appendChild(div);
