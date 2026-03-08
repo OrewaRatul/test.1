@@ -595,7 +595,7 @@ function buildGrid() {
           if (activeCategory && cat !== activeCategory) {
             // Deselect the filter
             const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
-            toggleCategoryFilter(activeCategory, legendItem);
+            toggleCategoryFilter(activeCategory, legendItem, false);
             return;
           }
           showElement(num);
@@ -652,35 +652,42 @@ Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
   item.className = 'legend-item';
   item.dataset.category = key;
   item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
-  item.addEventListener('click', () => toggleCategoryFilter(key, item));
+  item.addEventListener('click', () => toggleCategoryFilter(key, item, true));
   legendEl.appendChild(item);
 });
 
-function toggleCategoryFilter(category, legendItem) {
+function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
   if (activeCategory === category) {
-    // Deselect if clicking the same category - reverse domino effect
+    // Deselect if clicking the same category
     activeCategory = null;
     legendItem.classList.remove('active-filter');
     
-    const highlightedElements = document.querySelectorAll('.el.category-highlighted');
-    highlightedElements.forEach((el, index) => {
-        // apply shrinking animation with stagger
-      el.classList.add('category-shrinking');
-      el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
-    });
-    
-    // After animation completes, clear classes
-    // Calculate timeout based on number of elements for smooth animation
-    const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
-    const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000; // convert to ms
-    setTimeout(() => {
+    if (isHardDeselect) {
+      // Show shrinking animation when deselecting via category click
+      const highlightedElements = document.querySelectorAll('.el.category-highlighted');
+      highlightedElements.forEach((el, index) => {
+        el.classList.add('category-shrinking');
+        el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
+      });
+      
+      const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
+      const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000;
+      setTimeout(() => {
+        document.querySelectorAll('.el').forEach(el => {
+          el.classList.remove('category-highlighted');
+          el.classList.remove('category-dimmed');
+          el.classList.remove('category-shrinking');
+          el.style.animationDelay = '';
+        });
+      }, totalAnimationTime);
+    } else {
+      // No animation when deselecting via non-selected element click
       document.querySelectorAll('.el').forEach(el => {
         el.classList.remove('category-highlighted');
         el.classList.remove('category-dimmed');
-        el.classList.remove('category-shrinking');
         el.style.animationDelay = '';
       });
-    }, totalAnimationTime);
+    }
   } else {
     // Select new category
     if (activeCategory) {
