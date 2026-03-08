@@ -611,6 +611,8 @@ function showElement(num) {
   const el = byNumber[num];
   if (!el) return;
   const [n, sym, name, mass, cat, group, period, state, config] = el;
+  // ignore requests when a filter is active and element isn't in that category
+  if (activeCategory && cat !== activeCategory) return;
   const colorVar = CATEGORIES[cat]?.color || 'var(--unknown)';
 
   if (activeEl) document.querySelector(`.el[data-num="${activeEl}"]`)?.classList.remove('active');
