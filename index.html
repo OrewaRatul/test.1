@@ -159,17 +159,76 @@
     box-shadow: 0 0 20px -4px var(--cat-color), 0 8px 24px rgba(0,0,0,0.4);
     z-index: 100;
   }
+  
+  .el.category-dimmed:hover {
+    transform: scale(1.08);
+    filter: grayscale(0.5) brightness(0.8);
+  }
 
   .el.active {
     border-color: var(--cat-color);
-    box-shadow: 0 0 0 2px var(--cat-color);
+    box-shadow: 0 0 0 5px var(--cat-color), 0 0 20px var(--cat-color), 0 0 30px rgba(var(--cat-color), 0.4);
+  }
+
+  .el.category-highlighted {
+    border-color: var(--cat-color);
+    box-shadow: 0 0 0 5px var(--cat-color), 0 0 20px var(--cat-color), 0 0 30px rgba(var(--cat-color), 0.4);
+    z-index: 50;
+    animation: categoryGrow 0.4s ease-out forwards;
+  }
+
+  @keyframes categoryGrow {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+  }
+
+  .el.category-shrinking {
+    animation: categoryShrink 0.4s ease-out forwards;
+  }
+
+  @keyframes categoryShrink {
+    from {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+  }
+
+  .el.category-dimmed {
+    opacity: 0.15;
+    filter: grayscale(0.7) brightness(0.6);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+  
+  .el.category-dimmed .el-symbol,
+  .el.category-dimmed .el-name {
+    color: rgba(255,255,255,0.2) !important;
+  }
+  
+  .el.category-dimmed::before {
+    opacity: 0.2;
+  }
+
+  .legend-item.active-filter {
+    color: var(--accent);
+    font-weight: 600;
   }
 
   .el-num {
     font-family: 'Space Mono', monospace;
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     color: var(--muted);
     line-height: 1;
+    font-weight: 600;
   }
 
   .el-symbol {
@@ -181,18 +240,19 @@
   }
 
   .el-name {
-    font-size: 0.52rem;
-    color: var(--muted);
+    font-size: 0.42rem;
+    color: var(--text);
     line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 500;
   }
 
   .el-mass {
     font-family: 'Space Mono', monospace;
-    font-size: 0.5rem;
-    color: rgba(255,255,255,0.25);
+    font-size: 0.55rem;
+    color: rgba(255,255,255,0.5);
   }
 
   .spacer { background: transparent; border: none; pointer-events: none; }
@@ -342,7 +402,7 @@ const CATEGORIES = {
 const ELEMENTS = [
   [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹'],
   [2,'He','Helium','4.003','noble',18,1,'Gas','1s²'],
-  [3,'Li','Lithium','6.941','alkali',1,2,'Solid','[He] 2s¹'],
+  [3,'L','Lithium','6.941','alkali',1,2,'Solid','[He] 2s¹'],
   [4,'Be','Beryllium','9.012','alkaline',2,2,'Solid','[He] 2s²'],
   [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹'],
   [6,'C','Carbon','12.01','nonmetal',14,2,'Solid','[He] 2s²2p²'],
@@ -508,13 +568,40 @@ function buildGrid() {
       div.className = 'el';
       div.style.cssText = `grid-column:${c+1};grid-row:${r+1};--cat-color:${colorVar}`;
       div.dataset.num = num;
-      div.innerHTML = `
-        <div class="el-num">${num}</div>
-        <div class="el-symbol">${sym}</div>
-        <div class="el-name">${name}</div>
-        <div class="el-mass">${mass}</div>
-      `;
-      div.addEventListener('click', () => showElement(num));
+      div.dataset.category = cat;
+      
+      // Special handling for series labels in group 3
+      if (num === 71 && c === 2) {
+        div.innerHTML = `
+          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">La-Lu</div>
+          <div class="el-name" style="font-size: 0.5rem; margin-top: 2px;">57–71</div>
+        `;
+        div.style.pointerEvents = 'none';
+      } else if (num === 103 && c === 2) {
+        div.innerHTML = `
+          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">Ac-Lr</div>
+          <div class="el-name" style="font-size: 0.5rem; margin-top: 2px;">89–103</div>
+        `;
+        div.style.pointerEvents = 'none';
+      } else {
+        div.innerHTML = `
+          <div class="el-num">${num}</div>
+          <div class="el-symbol">${sym}</div>
+          <div class="el-name">${name}</div>
+          <div class="el-mass">${mass}</div>
+        `;
+        div.addEventListener('click', () => {
+          // In filter mode, clicking non-matching element will deselect the filter
+          if (activeCategory && cat !== activeCategory) {
+            // Deselect the filter
+            const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
+            toggleCategoryFilter(activeCategory, legendItem, false);
+            return;
+          }
+          showElement(num);
+        });
+      }
+      
       grid.appendChild(div);
     }
   }
@@ -558,12 +645,74 @@ function closePanel() {
 
 // Build legend
 const legendEl = document.getElementById('legend');
+let activeCategory = null;
+
 Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
   const item = document.createElement('div');
   item.className = 'legend-item';
+  item.dataset.category = key;
   item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
+  item.addEventListener('click', () => toggleCategoryFilter(key, item, true));
   legendEl.appendChild(item);
 });
+
+function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
+  if (activeCategory === category) {
+    // Deselect if clicking the same category
+    activeCategory = null;
+    legendItem.classList.remove('active-filter');
+    
+    if (isHardDeselect) {
+      // Show shrinking animation when deselecting via category click
+      const highlightedElements = document.querySelectorAll('.el.category-highlighted');
+      highlightedElements.forEach((el, index) => {
+        el.classList.add('category-shrinking');
+        el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
+      });
+      
+      const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
+      const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000;
+      setTimeout(() => {
+        document.querySelectorAll('.el').forEach(el => {
+          el.classList.remove('category-highlighted');
+          el.classList.remove('category-dimmed');
+          el.classList.remove('category-shrinking');
+          el.style.animationDelay = '';
+        });
+      }, totalAnimationTime);
+    } else {
+      // No animation when deselecting via non-selected element click
+      document.querySelectorAll('.el').forEach(el => {
+        el.classList.remove('category-highlighted');
+        el.classList.remove('category-dimmed');
+        el.style.animationDelay = '';
+      });
+    }
+  } else {
+    // Select new category
+    if (activeCategory) {
+      document.querySelector(`.legend-item[data-category="${activeCategory}"]`)?.classList.remove('active-filter');
+    }
+    activeCategory = category;
+    legendItem.classList.add('active-filter');
+    
+    // Dim all elements first
+    document.querySelectorAll('.el').forEach(el => {
+      el.classList.remove('category-highlighted');
+      el.classList.add('category-dimmed');
+      el.style.animationDelay = '';
+    });
+    
+    // Highlight and undim selected category with staggered animation
+    const selectedElements = document.querySelectorAll(`.el[data-category="${category}"]`);
+    selectedElements.forEach((el, index) => {
+      el.classList.remove('category-dimmed');
+      el.classList.add('category-highlighted');
+      // Stagger animation based on order for domino effect
+      el.style.animationDelay = `${index * 0.05}s`;
+    });
+  }
+}
 
 buildGrid();
 
