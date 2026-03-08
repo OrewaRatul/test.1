@@ -168,6 +168,14 @@
   .el.category-highlighted {
     border-color: var(--cat-color);
     box-shadow: 0 0 15px var(--cat-color), 0 0 30px var(--cat-color);
+    transform: scale(1.1);
+    z-index: 50;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .el.category-dimmed {
+    opacity: 0.25;
+    transition: opacity 0.2s ease;
   }
 
   .legend-item.active-filter {
@@ -587,8 +595,9 @@ function toggleCategoryFilter(category, legendItem) {
     // Deselect if clicking the same category
     activeCategory = null;
     legendItem.classList.remove('active-filter');
-    document.querySelectorAll('.el.category-highlighted').forEach(el => {
+    document.querySelectorAll('.el').forEach(el => {
       el.classList.remove('category-highlighted');
+      el.classList.remove('category-dimmed');
     });
   } else {
     // Select new category
@@ -597,10 +606,16 @@ function toggleCategoryFilter(category, legendItem) {
     }
     activeCategory = category;
     legendItem.classList.add('active-filter');
-    document.querySelectorAll('.el.category-highlighted').forEach(el => {
+    
+    // Dim all elements first
+    document.querySelectorAll('.el').forEach(el => {
       el.classList.remove('category-highlighted');
+      el.classList.add('category-dimmed');
     });
+    
+    // Highlight and undim selected category
     document.querySelectorAll(`.el[data-category="${category}"]`).forEach(el => {
+      el.classList.remove('category-dimmed');
       el.classList.add('category-highlighted');
     });
   }
