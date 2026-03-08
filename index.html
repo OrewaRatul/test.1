@@ -602,14 +602,27 @@ Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
 
 function toggleCategoryFilter(category, legendItem) {
   if (activeCategory === category) {
-    // Deselect if clicking the same category
+    // Deselect if clicking the same category - reverse domino effect
     activeCategory = null;
     legendItem.classList.remove('active-filter');
-    document.querySelectorAll('.el').forEach(el => {
-      el.classList.remove('category-highlighted');
-      el.classList.remove('category-dimmed');
-      el.style.animationDelay = '';
+    
+    const highlightedElements = document.querySelectorAll('.el.category-highlighted');
+    highlightedElements.forEach((el, index) => {
+      el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
+      el.style.animationDirection = 'reverse';
+      el.style.animationFillMode = 'forwards';
     });
+    
+    // After animation completes, remove classes
+    setTimeout(() => {
+      document.querySelectorAll('.el').forEach(el => {
+        el.classList.remove('category-highlighted');
+        el.classList.remove('category-dimmed');
+        el.style.animationDelay = '';
+        el.style.animationDirection = '';
+        el.style.animationFillMode = '';
+      });
+    }, 600);
   } else {
     // Select new category
     if (activeCategory) {
