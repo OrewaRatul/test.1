@@ -168,6 +168,39 @@
   .el.category-highlighted {
     border-color: var(--cat-color);
     box-shadow: 0 0 15px var(--cat-color), 0 0 30px var(--cat-color);
+    z-index: 50;
+    animation: categoryGrow 0.4s ease-out forwards;
+  }
+
+  @keyframes categoryGrow {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+  }
+
+  .el.category-shrinking {
+    animation: categoryShrink 0.4s ease-out forwards;
+  }
+
+  @keyframes categoryShrink {
+    from {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+  }
+
+  .el.category-dimmed {
+    opacity: 0.05;
+    transition: opacity 0.3s ease;
   }
 
   .legend-item.active-filter {
@@ -584,12 +617,26 @@ Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
 
 function toggleCategoryFilter(category, legendItem) {
   if (activeCategory === category) {
-    // Deselect if clicking the same category
+    // Deselect if clicking the same category - reverse domino effect
     activeCategory = null;
     legendItem.classList.remove('active-filter');
-    document.querySelectorAll('.el.category-highlighted').forEach(el => {
-      el.classList.remove('category-highlighted');
+    
+    const highlightedElements = document.querySelectorAll('.el.category-highlighted');
+    highlightedElements.forEach((el, index) => {
+        // apply shrinking animation with stagger
+      el.classList.add('category-shrinking');
+      el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
     });
+    
+    // After animation completes, clear classes
+    setTimeout(() => {
+      document.querySelectorAll('.el').forEach(el => {
+        el.classList.remove('category-highlighted');
+        el.classList.remove('category-dimmed');
+        el.classList.remove('category-shrinking');
+        el.style.animationDelay = '';
+      });
+    }, 600);
   } else {
     // Select new category
     if (activeCategory) {
@@ -597,11 +644,21 @@ function toggleCategoryFilter(category, legendItem) {
     }
     activeCategory = category;
     legendItem.classList.add('active-filter');
-    document.querySelectorAll('.el.category-highlighted').forEach(el => {
+    
+    // Dim all elements first
+    document.querySelectorAll('.el').forEach(el => {
       el.classList.remove('category-highlighted');
+      el.classList.add('category-dimmed');
+      el.style.animationDelay = '';
     });
-    document.querySelectorAll(`.el[data-category="${category}"]`).forEach(el => {
+    
+    // Highlight and undim selected category with staggered animation
+    const selectedElements = document.querySelectorAll(`.el[data-category="${category}"]`);
+    selectedElements.forEach((el, index) => {
+      el.classList.remove('category-dimmed');
       el.classList.add('category-highlighted');
+      // Stagger animation based on order for domino effect
+      el.style.animationDelay = `${index * 0.05}s`;
     });
   }
 }
