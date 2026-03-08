@@ -165,6 +165,16 @@
     box-shadow: 0 0 0 2px var(--cat-color);
   }
 
+  .el.category-highlighted {
+    border-color: var(--cat-color);
+    box-shadow: 0 0 15px var(--cat-color), 0 0 30px var(--cat-color);
+  }
+
+  .legend-item.active-filter {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
   .el-num {
     font-family: 'Space Mono', monospace;
     font-size: 0.65rem;
@@ -510,6 +520,7 @@ function buildGrid() {
       div.className = 'el';
       div.style.cssText = `grid-column:${c+1};grid-row:${r+1};--cat-color:${colorVar}`;
       div.dataset.num = num;
+      div.dataset.category = cat;
       div.innerHTML = `
         <div class="el-num">${num}</div>
         <div class="el-symbol">${sym}</div>
@@ -560,12 +571,40 @@ function closePanel() {
 
 // Build legend
 const legendEl = document.getElementById('legend');
+let activeCategory = null;
+
 Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
   const item = document.createElement('div');
   item.className = 'legend-item';
+  item.dataset.category = key;
   item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
+  item.addEventListener('click', () => toggleCategoryFilter(key, item));
   legendEl.appendChild(item);
 });
+
+function toggleCategoryFilter(category, legendItem) {
+  if (activeCategory === category) {
+    // Deselect if clicking the same category
+    activeCategory = null;
+    legendItem.classList.remove('active-filter');
+    document.querySelectorAll('.el.category-highlighted').forEach(el => {
+      el.classList.remove('category-highlighted');
+    });
+  } else {
+    // Select new category
+    if (activeCategory) {
+      document.querySelector(`.legend-item[data-category="${activeCategory}"]`)?.classList.remove('active-filter');
+    }
+    activeCategory = category;
+    legendItem.classList.add('active-filter');
+    document.querySelectorAll('.el.category-highlighted').forEach(el => {
+      el.classList.remove('category-highlighted');
+    });
+    document.querySelectorAll(`.el[data-category="${category}"]`).forEach(el => {
+      el.classList.add('category-highlighted');
+    });
+  }
+}
 
 buildGrid();
 
