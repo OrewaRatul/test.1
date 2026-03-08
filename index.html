@@ -472,8 +472,8 @@ function buildGrid() {
     if (group && period) cells[period - 1][group - 1] = el;
   });
 
-  const lanthanides = ELEMENTS.filter(e => e[4] === 'lanthanide' && !e[6]);
-  const actinides   = ELEMENTS.filter(e => e[4] === 'actinide' && !e[6]);
+  const lanthanides = ELEMENTS.filter(e => e[4] === 'lanthanide');
+  const actinides   = ELEMENTS.filter(e => e[4] === 'actinide');
   lanthanides.forEach((el, i) => { cells[8][i+2] = el; });
   actinides.forEach((el, i)   => { cells[9][i+2] = el; });
 
