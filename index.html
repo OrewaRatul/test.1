@@ -592,8 +592,11 @@ function buildGrid() {
           <div class="el-mass">${mass}</div>
         `;
         div.addEventListener('click', () => {
-          // In filter mode, only allow clicks on elements from the selected category
+          // In filter mode, clicking non-matching element will deselect the filter
           if (activeCategory && cat !== activeCategory) {
+            // Deselect the filter
+            const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
+            toggleCategoryFilter(activeCategory, legendItem);
             return;
           }
           showElement(num);
