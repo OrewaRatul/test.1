@@ -572,15 +572,15 @@ function buildGrid() {
       div.dataset.category = cat;
       
       // Special handling for series labels in group 3
-      if (num === 71) {
+      if (num === 71 && c === 2) {
         div.innerHTML = `
-          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">Lanthanoids</div>
+          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">La-Lu</div>
           <div class="el-name" style="font-size: 0.5rem; margin-top: 2px;">57–71</div>
         `;
         div.style.pointerEvents = 'none';
-      } else if (num === 103) {
+      } else if (num === 103 && c === 2) {
         div.innerHTML = `
-          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">Actinides</div>
+          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">Ac-Lr</div>
           <div class="el-name" style="font-size: 0.5rem; margin-top: 2px;">89–103</div>
         `;
         div.style.pointerEvents = 'none';
