@@ -190,7 +190,7 @@
   }
 
   .el.category-shrinking {
-    animation: categoryShrink 0.5s ease-out forwards;
+    animation: categoryShrink 0.8s ease-out forwards;
   }
 
   @keyframes categoryShrink {
@@ -671,6 +671,9 @@ function toggleCategoryFilter(category, legendItem) {
     });
     
     // After animation completes, clear classes
+    // Calculate timeout based on number of elements for smooth animation
+    const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
+    const totalAnimationTime = (maxStaggerDelay + 0.8) * 1000; // convert to ms
     setTimeout(() => {
       document.querySelectorAll('.el').forEach(el => {
         el.classList.remove('category-highlighted');
@@ -678,7 +681,7 @@ function toggleCategoryFilter(category, legendItem) {
         el.classList.remove('category-shrinking');
         el.style.animationDelay = '';
       });
-    }, 600);
+    }, totalAnimationTime);
   } else {
     // Select new category
     if (activeCategory) {
