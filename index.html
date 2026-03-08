@@ -190,7 +190,7 @@
   }
 
   .el.category-shrinking {
-    animation: categoryShrink 0.8s ease-out forwards;
+    animation: categoryShrink 0.4s ease-out forwards;
   }
 
   @keyframes categoryShrink {
@@ -673,7 +673,7 @@ function toggleCategoryFilter(category, legendItem) {
     // After animation completes, clear classes
     // Calculate timeout based on number of elements for smooth animation
     const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
-    const totalAnimationTime = (maxStaggerDelay + 0.8) * 1000; // convert to ms
+    const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000; // convert to ms
     setTimeout(() => {
       document.querySelectorAll('.el').forEach(el => {
         el.classList.remove('category-highlighted');
