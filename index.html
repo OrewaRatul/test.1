@@ -173,7 +173,7 @@
   }
 
   .el-symbol {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 1.35rem;
     color: var(--cat-color);
     line-height: 1;
@@ -227,7 +227,7 @@
   #info-panel.visible { transform: translateY(0); }
 
   #info-panel .panel-symbol {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 4rem;
     line-height: 1;
     letter-spacing: 0.05em;
@@ -472,8 +472,8 @@ function buildGrid() {
     if (group && period) cells[period - 1][group - 1] = el;
   });
 
-  const lanthanides = ELEMENTS.filter(e => e[4] === 'lanthanide' && !e[6]);
-  const actinides   = ELEMENTS.filter(e => e[4] === 'actinide' && !e[6]);
+  const lanthanides = ELEMENTS.filter(e => e[4] === 'lanthanide');
+  const actinides   = ELEMENTS.filter(e => e[4] === 'actinide');
   lanthanides.forEach((el, i) => { cells[8][i+2] = el; });
   actinides.forEach((el, i)   => { cells[9][i+2] = el; });
 
