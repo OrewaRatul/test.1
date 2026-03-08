@@ -109,6 +109,24 @@
     flex-shrink: 0;
   }
 
+  .effect-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 1rem;
+  }
+
+  .effect-toggle:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
   .table-wrapper {
     position: relative;
     z-index: 1;
@@ -167,14 +185,22 @@
 
   .el.active {
     border-color: var(--cat-color);
-    box-shadow: 0 0 0 5px var(--cat-color), 0 0 20px var(--cat-color), 0 0 30px rgba(var(--cat-color), 0.4);
+    box-shadow: 0 0 0 2px var(--cat-color);
   }
 
   .el.category-highlighted {
     border-color: var(--cat-color);
-    box-shadow: 0 0 0 5px var(--cat-color), 0 0 20px var(--cat-color), 0 0 30px rgba(var(--cat-color), 0.4);
+    box-shadow: 0 0 12px var(--cat-color), 0 0 20px var(--cat-color), inset 0 0 8px rgba(255,255,255,0.08);
     z-index: 50;
     animation: categoryGrow 0.4s ease-out forwards;
+    filter: brightness(1.15) saturate(1.2);
+  }
+
+  .el.category-highlighted-static {
+    border-color: var(--cat-color);
+    box-shadow: 0 0 20px -4px var(--cat-color), 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 50;
+    filter: brightness(1.15) saturate(1.2);
   }
 
   @keyframes categoryGrow {
@@ -370,6 +396,7 @@
       <p class="subtitle">118 Elements · Interactive</p>
     </div>
     <div class="legend" id="legend"></div>
+    <button class="effect-toggle" id="effect-toggle">Effect: Thick Outline</button>
   </div>
 </header>
 
@@ -523,6 +550,8 @@ const ELEMENTS = [
 const byNumber = {};
 ELEMENTS.forEach(e => byNumber[e[0]] = e);
 
+let currentEffect = 'animated';
+
 function buildGrid() {
   const grid = document.getElementById('pt-grid');
   const cells = Array.from({length:10}, () => Array(18).fill(null));
@@ -591,11 +620,8 @@ function buildGrid() {
           <div class="el-mass">${mass}</div>
         `;
         div.addEventListener('click', () => {
-          // In filter mode, clicking non-matching element will deselect the filter
+          // if a filter is active and this element isn't in that category, ignore the click
           if (activeCategory && cat !== activeCategory) {
-            // Deselect the filter
-            const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
-            toggleCategoryFilter(activeCategory, legendItem, false);
             return;
           }
           showElement(num);
@@ -613,6 +639,8 @@ function showElement(num) {
   const el = byNumber[num];
   if (!el) return;
   const [n, sym, name, mass, cat, group, period, state, config] = el;
+  // ignore requests when a filter is active and element isn't in that category
+  if (activeCategory && cat !== activeCategory) return;
   const colorVar = CATEGORIES[cat]?.color || 'var(--unknown)';
 
   if (activeEl) document.querySelector(`.el[data-num="${activeEl}"]`)?.classList.remove('active');
@@ -652,38 +680,54 @@ Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
   item.className = 'legend-item';
   item.dataset.category = key;
   item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
-  item.addEventListener('click', () => toggleCategoryFilter(key, item, true));
+  item.addEventListener('click', () => toggleCategoryFilter(key, item));
   legendEl.appendChild(item);
 });
 
-function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
+// Effect toggle
+const effectToggle = document.getElementById('effect-toggle');
+effectToggle.addEventListener('click', () => {
+  currentEffect = currentEffect === 'animated' ? 'static' : 'animated';
+  effectToggle.textContent = `Effect: ${currentEffect === 'animated' ? 'Thick Outline' : 'Soft Glow'}`;
+  // If a category is active, reapply the effect
+  if (activeCategory) {
+    const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
+    toggleCategoryFilter(activeCategory, legendItem);
+    toggleCategoryFilter(activeCategory, legendItem);
+  }
+});
+
+function toggleCategoryFilter(category, legendItem) {
+  const highlightClass = currentEffect === 'animated' ? 'category-highlighted' : 'category-highlighted-static';
   if (activeCategory === category) {
-    // Deselect if clicking the same category
+    // Deselect if clicking the same category - reverse domino effect
     activeCategory = null;
     legendItem.classList.remove('active-filter');
     
-    if (isHardDeselect) {
-      // Show shrinking animation when deselecting via category click
-      const highlightedElements = document.querySelectorAll('.el.category-highlighted');
+    const highlightedElements = document.querySelectorAll(`.el.${highlightClass}`);
+    if (currentEffect === 'animated') {
       highlightedElements.forEach((el, index) => {
+          // apply shrinking animation with stagger
         el.classList.add('category-shrinking');
         el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
       });
       
+      // After animation completes, clear classes
+      // Calculate timeout based on number of elements for smooth animation
       const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
-      const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000;
+      const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000; // convert to ms
       setTimeout(() => {
         document.querySelectorAll('.el').forEach(el => {
-          el.classList.remove('category-highlighted');
+          el.classList.remove('category-highlighted', 'category-highlighted-static');
           el.classList.remove('category-dimmed');
           el.classList.remove('category-shrinking');
           el.style.animationDelay = '';
         });
       }, totalAnimationTime);
     } else {
-      // No animation when deselecting via non-selected element click
+      // For static, just remove immediately
       document.querySelectorAll('.el').forEach(el => {
-        el.classList.remove('category-highlighted');
+        el.classList.remove('category-highlighted', 'category-highlighted-static');
         el.classList.remove('category-dimmed');
         el.style.animationDelay = '';
       });
@@ -698,7 +742,7 @@ function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
     
     // Dim all elements first
     document.querySelectorAll('.el').forEach(el => {
-      el.classList.remove('category-highlighted');
+      el.classList.remove('category-highlighted', 'category-highlighted-static');
       el.classList.add('category-dimmed');
       el.style.animationDelay = '';
     });
@@ -707,9 +751,11 @@ function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
     const selectedElements = document.querySelectorAll(`.el[data-category="${category}"]`);
     selectedElements.forEach((el, index) => {
       el.classList.remove('category-dimmed');
-      el.classList.add('category-highlighted');
-      // Stagger animation based on order for domino effect
-      el.style.animationDelay = `${index * 0.05}s`;
+      el.classList.add(highlightClass);
+      if (currentEffect === 'animated') {
+        // Stagger animation based on order for domino effect
+        el.style.animationDelay = `${index * 0.05}s`;
+      }
     });
   }
 }
