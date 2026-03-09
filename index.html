@@ -197,8 +197,8 @@
   }
 
   .el.category-highlighted-static {
-    /* thick glowing outline style */
-    border: 3px solid var(--cat-color);
+    /* thick glowing outline style without altering the element's own border */
+    /* keep original 1px border; only add an outer glow */
     box-shadow: 0 0 0 5px var(--cat-color), 0 0 15px rgba(var(--cat-color), 0.3);
     z-index: 50;
     filter: brightness(1.15) saturate(1.2);
@@ -709,7 +709,8 @@ function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
     legendItem.classList.remove('active-filter');
     
     const highlightedElements = document.querySelectorAll(`.el.${highlightClass}`);
-    if (currentEffect === 'animated' && isHardDeselect) {
+    if (isHardDeselect) {
+      // show domino shrinking regardless of current effect
       highlightedElements.forEach((el, index) => {
           // apply shrinking animation with stagger
         el.classList.add('category-shrinking');
