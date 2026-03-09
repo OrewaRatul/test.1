@@ -207,6 +207,8 @@ body::before{
 .sp{background:transparent;border:none;pointer-events:none}
 .gc{background:var(--surf);border:1px dashed var(--brd);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:default}
 .gc span{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:var(--txt3);text-align:center;line-height:1.5}
+.gc-series{background:var(--surf);border:1px solid var(--brd);border-radius:7px;padding:5px 6px 4px;display:flex;flex-direction:column;justify-content:center;gap:.18rem;cursor:default;overflow:hidden}
+.gc-series::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cat-color);border-radius:7px 0 0 7px}
 
 /* ════════════════════════════════════════════════════
    EFFECT STYLES
@@ -240,29 +242,33 @@ body::before{
   animation:dominoShrink .4s ease-out forwards;
 }
 
-/* ── EFFECT 3: Reverse Domino (Shrink-in) ────────── */
-@keyframes reversePop{
-  0%  {transform:scale(1.18);opacity:.5;filter:brightness(1.4) saturate(1.5)}
-  60% {transform:scale(.92); opacity:.9;filter:brightness(1.1) saturate(1.2)}
-  100%{transform:scale(1);   opacity:1; filter:brightness(1.08) saturate(1.1)}
+/* ── EFFECT 3: Ring Glow (Thick outline + domino) ── */
+@keyframes ringGrow{
+  from{transform:scale(1);opacity:.6}
+  to  {transform:scale(1.15);opacity:1}
 }
-@keyframes reverseOut{
-  from{transform:scale(1);opacity:1}
-  to  {transform:scale(1.12);opacity:.5}
+@keyframes ringShrink{
+  from{transform:scale(1.15);opacity:1}
+  to  {transform:scale(1);opacity:.6}
 }
 .fx3 .el.dm{
-  opacity:.12;filter:grayscale(.65) brightness(.55);
-  transition:opacity .28s ease,filter .28s ease;
+  opacity:.15;filter:grayscale(.7) brightness(.6);
+  transition:opacity .3s ease,filter .3s ease;
 }
 .fx3 .el.hi{
   border-color:var(--cat-color);
-  box-shadow:0 0 18px var(--cat-color),0 0 32px var(--cat-color),inset 0 0 10px rgba(255,255,255,.09);
+  box-shadow:0 0 0 5px var(--cat-color),0 0 20px var(--cat-color),0 0 30px rgba(255,255,255,.04);
   z-index:50;
-  animation:reversePop .45s cubic-bezier(.34,1.4,.64,1) forwards;
-  filter:brightness(1.12) saturate(1.2);
+  animation:ringGrow .4s ease-out forwards;
 }
 .fx3 .el.shrink{
-  animation:reverseOut .35s ease-out forwards;
+  animation:ringShrink .4s ease-out forwards;
+}
+/* instant-clear variant used when clicking a non-matching element */
+.fx3 .el.instant-clear{
+  animation:none !important;
+  transform:scale(1) !important;
+  opacity:1 !important;
 }
 
 /* ── INFO PANEL ──────────────────────────────────── */
@@ -348,7 +354,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
               <span class="fx-icon">◈</span> Domino Glow
             </div>
             <div class="fd-opt" data-fx="3" onclick="setEffect(3,this)">
-              <span class="fx-icon">◉</span> Reverse Pop
+              <span class="fx-icon">◉</span> Ring Glow
             </div>
           </div>
         </div>
@@ -545,7 +551,7 @@ const ELS=[
   [68,'Er','Erbium','167.3','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²',1802,3141,'9.066 g/cm³','2,8,18,30,8,2'],
   [69,'Tm','Thulium','168.9','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²',1818,2223,'9.321 g/cm³','2,8,18,31,8,2'],
   [70,'Yb','Ytterbium','173.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²',1097,1469,'6.965 g/cm³','2,8,18,32,8,2'],
-  [71,'Lu','Lutetium','175.0','lanthanide',3,6,'Solid','[Xe] 4f¹⁴5d¹6s²',1925,3675,'9.841 g/cm³','2,8,18,32,9,2'],
+  [71,'Lu','Lutetium','175.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴5d¹6s²',1925,3675,'9.841 g/cm³','2,8,18,32,9,2'],
   [72,'Hf','Hafnium','178.5','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²',2506,4876,'13.31 g/cm³','2,8,18,32,10,2'],
   [73,'Ta','Tantalum','180.9','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²',3290,5731,'16.69 g/cm³','2,8,18,32,11,2'],
   [74,'W','Tungsten','183.8','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²',3695,5828,'19.25 g/cm³','2,8,18,32,12,2'],
@@ -577,7 +583,7 @@ const ELS=[
   [100,'Fm','Fermium','[257]','actinide',null,null,'Solid','[Rn] 5f¹²7s²',1800,'N/A','~9.7 g/cm³','2,8,18,32,30,8,2'],
   [101,'Md','Mendelevium','[258]','actinide',null,null,'Solid','[Rn] 5f¹³7s²',1100,'N/A','~10.3 g/cm³','2,8,18,32,31,8,2'],
   [102,'No','Nobelium','[259]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²',1100,'N/A','~9.9 g/cm³','2,8,18,32,32,8,2'],
-  [103,'Lr','Lawrencium','[266]','actinide',3,7,'Solid','[Rn] 5f¹⁴7s²7p¹',1900,'N/A','~15.6 g/cm³','2,8,18,32,32,8,3'],
+  [103,'Lr','Lawrencium','[266]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²7p¹',1900,'N/A','~15.6 g/cm³','2,8,18,32,32,8,3'],
   [104,'Rf','Rutherfordium','[267]','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²',2400,'N/A','~23.2 g/cm³','2,8,18,32,32,10,2'],
   [105,'Db','Dubnium','[268]','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²','N/A','N/A','~29.3 g/cm³','2,8,18,32,32,11,2'],
   [106,'Sg','Seaborgium','[271]','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²','N/A','N/A','~35.0 g/cm³','2,8,18,32,32,12,2'],
@@ -633,7 +639,7 @@ function setFont(el){
 
 /* ── EFFECT SWITCHER ─────────────────────────────── */
 let currentFx = 1;
-const fxNames = {1:'Fade', 2:'Domino Glow', 3:'Reverse Pop'};
+const fxNames = {1:'Fade', 2:'Domino Glow', 3:'Ring Glow'};
 
 function toggleFxMenu(){
   document.getElementById('fx-menu').classList.toggle('open');
@@ -665,7 +671,7 @@ function buildLegend(){
     const d=document.createElement('div');
     d.className='leg-it';d.dataset.cat=k;
     d.innerHTML=`<div class="leg-dot" style="background:${cv}"></div>${label}`;
-    d.addEventListener('click',()=>filterCat(k,d));
+    d.addEventListener('click',()=>filterCat(k,d,true));
     w.appendChild(d);
   });
 }
@@ -675,6 +681,8 @@ function buildGrid(){
   const g=document.getElementById('pt-grid');
   const cells=Array.from({length:10},()=>Array(18).fill(null));
   ELS.forEach(([num,,,,cat,gr,pr])=>{if(gr&&pr)cells[pr-1][gr-1]=byN[num]});
+  // Remove Lu (71) and Lr (103) from group 3 — replace with gap cells below
+  cells[5][2]=null; cells[6][2]=null;
   ELS.filter(e=>e[4]==='lanthanide').forEach((el,i)=>cells[8][i+2]=el);
   ELS.filter(e=>e[4]==='actinide').forEach((el,i)=>cells[9][i+2]=el);
 
@@ -683,7 +691,14 @@ function buildGrid(){
     for(let c=0;c<18;c++){
       const el=cells[r][c];
       if(!el){
-        if((r===5||r===6)&&c===2){const s=mk('div','gc');s.style.cssText=`grid-column:${c+1};grid-row:${r+1}`;s.innerHTML=`<span>${r===5?'57–71':'89–103'}</span>`;g.appendChild(s)}
+        if((r===5||r===6)&&c===2){
+          const iLan=r===5;
+          const cv=iLan?'var(--lanthanide)':'var(--actinide)';
+          const s=mk('div','el gc-series');
+          s.style.cssText=`grid-column:${c+1};grid-row:${r+1};--cat-color:${cv};pointer-events:none`;
+          s.dataset.cat=iLan?'lanthanide':'actinide';
+          s.innerHTML=`<div class="el-sym" style="font-size:.8rem">${iLan?'La–Lu':'Ac–Lr'}</div><div class="el-name">${iLan?'57–71':'89–103'}</div>`;
+          g.appendChild(s);}
         else{const s=mk('div','sp');s.style.cssText=`grid-column:${c+1};grid-row:${r+1}`;g.appendChild(s)}
         continue;
       }
@@ -693,7 +708,10 @@ function buildGrid(){
       d.dataset.num=num;d.dataset.cat=cat;
       d.style.cssText=`grid-column:${c+1};grid-row:${r+1};--cat-color:${cv}`;
       d.innerHTML=`<div class="el-num">${num}</div><div class="el-sym">${sym}</div><div class="el-name">${name}</div><div class="el-mass">${mass}</div>`;
-      d.addEventListener('click',()=>showEl(num));
+      d.addEventListener('click',()=>{
+        if(aCat&&d.dataset.cat!==aCat){filterCat(aCat,document.querySelector(`.leg-it[data-cat="${aCat}"]`),false);return}
+        showEl(num);
+      });
       g.appendChild(d);
     }
   }
@@ -704,16 +722,14 @@ function mk(t,c){const e=document.createElement(t);e.className=c;return e}
 let aCat=null;
 let clearTimer=null;
 
-function clearFilter(){
+function clearFilter(instant=false){
   const aL=document.querySelectorAll('.leg-it');
-  const aE=document.querySelectorAll('.el[data-num]');
+  const aE=document.querySelectorAll('.el[data-cat]');
   aL.forEach(l=>l.classList.remove('act'));
 
-  if(currentFx===1){
-    // Effect 1: instant clear
-    aE.forEach(e=>{e.classList.remove('hi','dm')});
+  if(currentFx===1||instant){
+    aE.forEach(e=>{e.classList.remove('hi','dm','shrink');e.style.animationDelay=''});
   } else {
-    // Effects 2 & 3: stagger shrink out
     const highlighted=[...document.querySelectorAll('.el.hi')];
     highlighted.forEach((e,i)=>{
       e.classList.remove('hi');
@@ -732,37 +748,31 @@ function clearFilter(){
   aCat=null;
 }
 
-function filterCat(cat,item){
+function filterCat(cat,item,isLegendClick=true){
   const aL=document.querySelectorAll('.leg-it');
-  const aE=document.querySelectorAll('.el[data-num]');
+  const aE=document.querySelectorAll('.el[data-cat]');
 
   if(aCat===cat){
-    clearFilter();
+    const useInstant=(currentFx===3&&!isLegendClick);
+    clearFilter(useInstant);
     return;
   }
 
-  // Cancel any pending clear
   if(clearTimer){clearTimeout(clearTimer);clearTimer=null;}
 
-  // Clear previous
-  aE.forEach(e=>{
-    e.classList.remove('hi','dm','shrink');
-    e.style.animationDelay='';
-  });
+  aE.forEach(e=>{e.classList.remove('hi','dm','shrink');e.style.animationDelay='';});
 
   aCat=cat;
   aL.forEach(l=>l.classList.remove('act'));
   item.classList.add('act');
 
   if(currentFx===1){
-    // Effect 1: simple fade
     aE.forEach(e=>{
       e.dataset.cat===cat
         ?(e.classList.add('hi'),e.classList.remove('dm'))
         :(e.classList.add('dm'),e.classList.remove('hi'));
     });
   } else {
-    // Effects 2 & 3: dim all, then stagger-highlight
     aE.forEach(e=>e.classList.add('dm'));
     const sel=[...document.querySelectorAll(`.el[data-cat="${cat}"]`)];
     sel.forEach((e,i)=>{
