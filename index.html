@@ -620,8 +620,10 @@ function buildGrid() {
           <div class="el-mass">${mass}</div>
         `;
         div.addEventListener('click', () => {
-          // if a filter is active and this element isn't in that category, ignore the click
+          // if a filter is active and this element isn't in that category, deselect filter
           if (activeCategory && cat !== activeCategory) {
+            const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
+            toggleCategoryFilter(activeCategory, legendItem, false);
             return;
           }
           showElement(num);
@@ -680,7 +682,7 @@ Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
   item.className = 'legend-item';
   item.dataset.category = key;
   item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
-  item.addEventListener('click', () => toggleCategoryFilter(key, item));
+  item.addEventListener('click', () => toggleCategoryFilter(key, item, true));
   legendEl.appendChild(item);
 });
 
@@ -692,12 +694,13 @@ effectToggle.addEventListener('click', () => {
   // If a category is active, reapply the effect
   if (activeCategory) {
     const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
-    toggleCategoryFilter(activeCategory, legendItem);
-    toggleCategoryFilter(activeCategory, legendItem);
+    // temporarily deselect and reselect to reapply the new effect; treat as hard deselect
+    toggleCategoryFilter(activeCategory, legendItem, true);
+    toggleCategoryFilter(activeCategory, legendItem, true);
   }
 });
 
-function toggleCategoryFilter(category, legendItem) {
+function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
   const highlightClass = currentEffect === 'animated' ? 'category-highlighted' : 'category-highlighted-static';
   if (activeCategory === category) {
     // Deselect if clicking the same category - reverse domino effect
@@ -705,7 +708,7 @@ function toggleCategoryFilter(category, legendItem) {
     legendItem.classList.remove('active-filter');
     
     const highlightedElements = document.querySelectorAll(`.el.${highlightClass}`);
-    if (currentEffect === 'animated') {
+    if (currentEffect === 'animated' && isHardDeselect) {
       highlightedElements.forEach((el, index) => {
           // apply shrinking animation with stagger
         el.classList.add('category-shrinking');
@@ -725,7 +728,7 @@ function toggleCategoryFilter(category, legendItem) {
         });
       }, totalAnimationTime);
     } else {
-      // For static, just remove immediately
+      // instant removal (either static effect or soft deselect from element click)
       document.querySelectorAll('.el').forEach(el => {
         el.classList.remove('category-highlighted', 'category-highlighted-static');
         el.classList.remove('category-dimmed');
