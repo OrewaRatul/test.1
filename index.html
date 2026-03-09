@@ -197,10 +197,12 @@
   }
 
   .el.category-highlighted-static {
-    /* thick glowing outline style without altering the element's own border */
-    /* keep original 1px border; only add an outer glow */
+    /* thick glowing outline style with thick border and opening animation */
+    border-color: var(--cat-color);
+    border-width: 3px;
     box-shadow: 0 0 0 5px var(--cat-color), 0 0 15px rgba(var(--cat-color), 0.3);
     z-index: 50;
+    animation: categoryGrow 0.4s ease-out forwards;
     filter: brightness(1.15) saturate(1.2);
   }
 
