@@ -1,592 +1,2394 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="night">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Periodic Table of Elements</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<title>ChemLab – Periodic Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@200;300;400;600;700&family=Exo+2:wght@200;300;400;600;700&family=Cormorant+Garamond:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Raleway:wght@300;400;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0d0d0d;
-  --alkali:     #c8ff00;
-  --alkaline:   #ffdd00;
-  --lanthanide: #ff69b4;
-  --actinide:   #ff4499;
-  --transition: #00cfff;
-  --post-trans: #00ff99;
-  --metalloid:  #00ff66;
-  --nonmetal:   #ff6600;
-  --halogen:    #ff3366;
-  --noble:      #cc66ff;
-  --unknown:    #888888;
-  --font: 'Share Tech Mono', monospace;
-  --font-head: 'Orbitron', sans-serif;
+:root{
+  --font-body:'Outfit',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --el-sym-font:'Outfit',sans-serif;
+  --el-num-font:'IBM Plex Mono',monospace;
+  --el-mass-font:'IBM Plex Mono',monospace;
+  --el-sym-size:1.28rem;
+  --el-sym-weight:700;
+  --el-sym-spacing:0em;
+  --el-num-size:.65rem;
+  --el-num-color:var(--txt3);
+  --el-num-weight:600;
+  --el-name-size:.42rem;
+  --el-name-color:var(--txt);
+  --el-name-weight:500;
+  --el-mass-size:.55rem;
+  --el-mass-color:rgba(255,255,255,0.45);
+  --bg:#060811;--bg2:#0a0e1c;--bg3:#10172a;
+  --surf:#111827;--surf2:#192238;--surf3:#1f2d45;
+  --brd:rgba(79,142,247,.1);--brd2:rgba(79,142,247,.2);--brd3:rgba(79,142,247,.38);
+  --txt:#dce4ff;--txt2:#7e92c0;--txt3:#3d4f72;
+  --acc:#4f8ef7;--acc2:#6ea6ff;--acc-rgb:79,142,247;
+  --shadow:rgba(0,0,0,.55);
+  --alkali:#ff6b6b;--alkaline:#ff9f4a;--transition:#5ba4f5;
+  --post-transition:#6ee7a0;--metalloid:#2dd4bf;--nonmetal:#f472b6;
+  --halogen:#c084fc;--noble:#a78bfa;--lanthanide:#22d3ee;
+  --actinide:#fbbf24;--unknown:#94a3b8;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg);
-  font-family: var(--font);
-  min-height: 100vh;
-  overflow-x: auto;
-  user-select: none;
+[data-theme="day"]{
+  --bg:#edf0f9;--bg2:#e3e8f5;--bg3:#d6dcee;
+  --surf:#ffffff;--surf2:#f2f5fc;--surf3:#e8ecf7;
+  --brd:rgba(20,60,160,.12);--brd2:rgba(20,60,160,.22);--brd3:rgba(20,60,160,.38);
+  --txt:#0a1228;--txt2:#2e3f6e;--txt3:#6272a0;
+  --acc:#1d53d4;--acc2:#2d6aff;--acc-rgb:29,83,212;
+  --shadow:rgba(0,0,0,.14);
+  --alkali:#c81a1a;--alkaline:#c04a12;--transition:#1438b0;
+  --post-transition:#0f6836;--metalloid:#087a72;--nonmetal:#a81880;
+  --halogen:#6020cc;--noble:#3520aa;--lanthanide:#0572a0;
+  --actinide:#a05a08;--unknown:#3e5070;
+  --el-num-color:var(--txt3);
+  --el-name-color:var(--txt);
+  --el-mass-color:rgba(0,0,0,0.4);
 }
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 1.4rem;
-  padding: 0.75rem 1.2rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.legend-item {
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  opacity: 0.8;
-}
-.legend-item:hover { opacity: 1; }
-.pt-wrap {
-  padding: 0.5rem 0.8rem 1rem;
-  overflow-x: auto;
-}
-.pt-grid {
-  display: grid;
-  grid-template-columns: repeat(18, minmax(62px, 1fr));
-  gap: 3px;
-  min-width: 1140px;
-}
-.el {
-  position: relative;
-  border: 1px solid var(--c);
-  border-radius: 3px;
-  padding: 4px 4px 3px;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
-  background: rgba(0,0,0,0.5);
-  min-height: 62px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 0 5px -2px var(--c), inset 0 0 8px -5px var(--c);
-}
-.el:hover, .el.active {
-  box-shadow: 0 0 16px 2px var(--c), inset 0 0 18px -5px var(--c);
-  transform: scale(1.1);
-  z-index: 50;
-  background: rgba(0,0,0,0.78);
-}
-.el.active { transform: scale(1.0); box-shadow: 0 0 24px 4px var(--c), inset 0 0 18px -5px var(--c); }
-.el-num {
-  font-size: 0.58rem;
-  color: var(--c);
-  opacity: 0.75;
-  line-height: 1;
-}
-.el-symbol {
-  font-family: var(--font-head);
-  font-size: 1.38rem;
-  font-weight: 700;
-  color: var(--c);
-  text-shadow: 0 0 10px var(--c), 0 0 22px var(--c);
-  line-height: 1;
-  text-align: center;
-}
-.el-name {
-  font-size: 0.5rem;
-  color: var(--c);
-  opacity: 0.7;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
-  letter-spacing: 0.02em;
-}
-.el-mass {
-  font-size: 0.48rem;
-  color: var(--c);
-  opacity: 0.45;
-  text-align: center;
-}
-.spacer {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  pointer-events: none;
-  min-height: 62px;
-}
-.gap-cell {
-  border: 1px dashed rgba(255,255,255,0.12) !important;
-  border-radius: 3px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.62rem;
-  color: rgba(255,255,255,0.3);
-  min-height: 62px;
-  cursor: default;
-  box-shadow: none !important;
-}
-.sep-row { grid-column: 1/-1; height: 16px; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;transition:background .45s,color .45s}
+::selection{background:var(--acc);color:#fff}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--brd3);border-radius:99px}
 
-/* Info Panel */
-#info-overlay {
-  position: fixed; inset: 0;
-  display: none; z-index: 200;
-  pointer-events: none;
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 65% 45% at 12% 8%,rgba(var(--acc-rgb),.055) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 55% at 88% 88%,rgba(168,130,250,.04) 0%,transparent 60%);
+  transition:background .45s;
 }
-#info-overlay.open { display: block; pointer-events: auto; }
-#info-backdrop { position: absolute; inset: 0; }
-#info-panel {
-  position: absolute;
-  right: 1.5rem; top: 50%;
-  transform: translateY(-50%) scale(0.88);
-  opacity: 0;
-  transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
-  width: 295px;
-  background: rgba(5,5,5,0.94);
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 1.4rem 1.3rem 1.3rem;
-  pointer-events: auto;
-  backdrop-filter: blur(12px);
+
+/* ── SPLASH ─────────────────────────────────────── */
+#splash{
+  position:fixed;inset:0;background:#060811;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+  z-index:9999;transition:opacity .7s ease,transform .7s ease;
 }
-#info-overlay.open #info-panel {
-  transform: translateY(-50%) scale(1);
-  opacity: 1;
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+.sp-logo{font-family:'Outfit',sans-serif;font-size:clamp(3.5rem,12vw,9rem);font-weight:900;letter-spacing:.06em;opacity:0;transform:translateY(26px);animation:spIn .9s cubic-bezier(.22,1,.36,1) .2s forwards}
+.sp-logo .c{color:#fff}.sp-logo .l{color:#4f8ef7}
+.sp-tag{font-family:'Outfit',sans-serif;font-size:clamp(.8rem,2.8vw,1.45rem);font-weight:200;letter-spacing:.32em;text-transform:uppercase;color:#3a4d72;opacity:0;animation:spIn .7s ease .7s forwards}
+.sp-tag span{color:#4f8ef7}
+.sp-track{width:200px;height:2px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:2.2rem;overflow:hidden;opacity:0;animation:spIn .4s ease 1.1s forwards}
+.sp-fill{height:100%;width:0;background:linear-gradient(90deg,#4f8ef7,#a78bfa);border-radius:99px;animation:spBar 1.6s cubic-bezier(.4,0,.2,1) 1.2s forwards}
+.sp-hint{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:#232d46;margin-top:.7rem;opacity:0;animation:spIn .5s ease 1.5s forwards}
+@keyframes spIn{to{opacity:1;transform:none}}
+@keyframes spBar{to{width:100%}}
+
+/* ── APP ─────────────────────────────────────────── */
+#app{opacity:0;transition:opacity .7s ease}
+#app.show{opacity:1}
+
+/* ── TOPBAR ──────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:600;
+  background:rgba(6,8,17,.85);backdrop-filter:blur(22px) saturate(160%);
+  border-bottom:1px solid var(--brd);padding:.65rem 2rem;
+  transition:background .45s,border-color .45s;
 }
-.panel-close {
-  position: absolute; top: 0.6rem; right: 0.8rem;
-  background: none; border: none; color: #555;
-  font-size: 1.1rem; cursor: pointer;
+[data-theme="day"] .topbar{background:rgba(236,239,248,.9)}
+.topbar-in{max-width:1700px;margin:0 auto;display:flex;align-items:center;gap:1.2rem}
+.logo{font-family:'Outfit',sans-serif!important;font-size:1.6rem;font-weight:900;letter-spacing:.04em;flex-shrink:0;text-decoration:none;cursor:default}
+[data-theme="night"] .logo .c{color:#fff}
+[data-theme="night"] .logo .l{color:#4f8ef7}
+[data-theme="day"]   .logo .c{color:#0c1530}
+[data-theme="day"]   .logo .l{color:#1d53d4}
+.tb-right{display:flex;align-items:center;gap:.5rem;margin-left:auto}
+.tb-btn{background:var(--surf2);border:1px solid var(--brd2);border-radius:8px;color:var(--txt2);font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:600;letter-spacing:.06em;padding:.46rem .9rem;cursor:pointer;white-space:nowrap;transition:all .2s;position:relative;overflow:hidden}
+.tb-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--acc-rgb),.14),transparent);opacity:0;transition:opacity .2s}
+.tb-btn:hover{border-color:var(--brd3);color:var(--txt);transform:translateY(-1px)}.tb-btn:hover::before{opacity:1}
+
+/* ── DROPDOWN MENUS ──────────────────────────────── */
+.fd-wrap{position:relative}
+.fd-menu{display:none;position:absolute;top:calc(100% + 7px);right:0;background:var(--surf);border:1px solid var(--brd2);border-radius:12px;overflow:hidden;min-width:185px;z-index:700;box-shadow:0 22px 60px var(--shadow);animation:fdIn .18s ease}
+@keyframes fdIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.fd-menu.open{display:block}
+.fd-opt{padding:.62rem 1rem;cursor:pointer;font-size:.8rem;color:var(--txt2);border-bottom:1px solid var(--brd);transition:all .14s;display:flex;align-items:center;gap:.45rem}
+.fd-opt:last-child{border:none}.fd-opt:hover{background:var(--surf2);color:var(--txt)}.fd-opt.sel{color:var(--acc)}
+.fd-opt.sel::before{content:'✓';font-size:.66rem;width:.7rem}.fd-opt:not(.sel)::before{content:'';display:inline-block;width:.7rem}
+
+/* Effect dropdown special styling */
+.fd-opt .fx-icon{font-size:.72rem;opacity:.6}
+.fd-opt.sel .fx-icon{opacity:1}
+.fx-preview{display:inline-flex;gap:2px;align-items:center}
+.fx-preview span{width:5px;height:5px;border-radius:1px;background:var(--acc);display:inline-block}
+
+/* ── HERO / AI ───────────────────────────────────── */
+.hero{position:relative;z-index:1;padding:3.5rem 2rem 2rem;max-width:1700px;margin:0 auto}
+.hero-top{text-align:center;margin-bottom:2.8rem;opacity:0;transform:translateY(20px);animation:heroin .8s ease .1s forwards}
+@keyframes heroin{to{opacity:1;transform:none}}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:linear-gradient(135deg,rgba(var(--acc-rgb),.14),rgba(var(--acc-rgb),.04));
+  border:1px solid var(--brd2);border-radius:99px;
+  padding:.3rem .9rem;margin-bottom:1.2rem;
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
 }
-.panel-close:hover { color: #ccc; }
-#panel-symbol {
-  font-family: var(--font-head);
-  font-size: 4.2rem;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.04em;
-  text-align: center;
+.hero-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.hero-h1{font-family:'Outfit',sans-serif!important;font-size:clamp(2rem,5.5vw,4rem);font-weight:800;line-height:1.05;letter-spacing:-.01em}
+[data-theme="night"] .hero-h1 .hl{background:linear-gradient(130deg,#4f8ef7 20%,#a78bfa 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+[data-theme="day"]   .hero-h1 .hl{background:linear-gradient(130deg,#1d53d4 20%,#6d2fd8 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{margin-top:.8rem;font-size:clamp(.82rem,1.7vw,.98rem);color:var(--txt3);font-weight:300;letter-spacing:.04em}
+
+.ai-wrap{max-width:760px;margin:0 auto;opacity:0;transform:translateY(16px);animation:heroin .75s ease .3s forwards}
+.ai-box{
+  position:relative;background:var(--surf);border:1.5px solid var(--brd2);
+  border-radius:20px;padding:1.3rem 1.4rem;
+  transition:border-color .3s,box-shadow .3s;overflow:hidden;
 }
-#shell-wrap {
-  position: relative;
-  width: 130px; height: 130px;
-  margin: 0.6rem auto 0;
+.ai-box::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(var(--acc-rgb),.06),transparent 55%);pointer-events:none}
+.ai-box:focus-within{border-color:var(--brd3);box-shadow:0 0 0 4px rgba(var(--acc-rgb),.07),0 24px 70px var(--shadow)}
+.ask-lbl{font-family:'IBM Plex Mono',monospace;font-size:.63rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);margin-bottom:.75rem;display:flex;align-items:center;gap:.35rem}
+.ask-lbl::before{content:'⬡';font-size:.7rem}
+.ai-row{display:flex;align-items:center;gap:.75rem}
+.ai-in{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-family:'Outfit',sans-serif;font-size:.98rem;font-weight:400;caret-color:var(--acc)}
+.ai-in::placeholder{color:var(--txt3)}
+.ask-btn{
+  flex-shrink:0;background:linear-gradient(135deg,var(--acc),#7b6cf6);border:none;
+  border-radius:12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;
+  letter-spacing:.06em;padding:.7rem 1.4rem;cursor:pointer;white-space:nowrap;
+  transition:transform .2s,box-shadow .2s,opacity .2s;position:relative;overflow:hidden;
 }
-.shell-orbit {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  opacity: 0.4;
-  top:50%; left:50%;
-  transform: translate(-50%,-50%);
+.ask-btn::after{content:'';position:absolute;inset:0;border-radius:12px;background:rgba(255,255,255,.14);opacity:0;transition:opacity .2s}
+.ask-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(var(--acc-rgb),.4)}.ask-btn:hover::after{opacity:1}
+.ask-btn:active{transform:translateY(0)}.ask-btn:disabled{opacity:.5;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--brd)}
+.chip{background:var(--surf2);border:1px solid var(--brd);border-radius:99px;color:var(--txt3);font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:500;letter-spacing:.03em;padding:.24rem .68rem;cursor:pointer;transition:all .16s}
+.chip:hover{background:var(--surf3);color:var(--txt2);border-color:var(--brd2)}
+
+.ai-ans-wrap{max-width:760px;margin:.85rem auto 0;display:none;animation:ansin .32s ease}
+@keyframes ansin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.ai-ans-wrap.show{display:block}
+.ai-card{background:var(--surf);border:1.5px solid var(--brd2);border-radius:16px;overflow:hidden;position:relative}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),#a78bfa,var(--acc));background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:16px 16px 0 0}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ai-head{padding:.85rem 1.15rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.ai-head-l{display:flex;align-items:center;gap:.55rem}
+.ai-badge{background:linear-gradient(135deg,var(--acc),#7b6cf6);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:.58rem;font-weight:600;letter-spacing:.12em;padding:.18rem .5rem;border-radius:5px}
+.ai-qtxt{font-size:.78rem;color:var(--txt2);font-style:italic;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-close{background:var(--surf2);border:1px solid var(--brd);border-radius:7px;color:var(--txt3);width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.74rem;transition:all .16s}
+.ai-close:hover{color:var(--txt);border-color:var(--brd2)}
+.ai-body{padding:1.15rem;min-height:56px}
+.ld-row{display:flex;align-items:center;gap:.7rem;color:var(--txt2);font-family:'Outfit',sans-serif;font-size:.83rem}
+.ld-dots{display:flex;gap:4px}.ld-d{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:ldb 1.4s ease-in-out infinite}
+.ld-d:nth-child(2){animation-delay:.2s}.ld-d:nth-child(3){animation-delay:.4s}
+@keyframes ldb{0%,80%,100%{transform:scale(.5);opacity:.35}40%{transform:scale(1);opacity:1}}
+.ai-resp{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:400;line-height:1.82;color:var(--txt)}
+.ai-resp strong{font-weight:700;color:var(--acc2)}.ai-resp em{font-style:italic;color:var(--txt2)}
+.ai-resp h3{font-size:.84rem;font-weight:700;color:var(--txt);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;margin:.9rem 0 .3rem;text-transform:uppercase}
+.ai-resp ul{padding-left:1.35rem;margin:.4rem 0}.ai-resp li{margin:.25rem 0;color:var(--txt2)}.ai-resp li::marker{color:var(--acc)}
+
+/* ── PT HEADER ───────────────────────────────────── */
+.pt-hdr{
+  position:relative;z-index:1;max-width:1700px;margin:0 auto;
+  padding:.6rem 2rem 0;display:flex;align-items:flex-end;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;opacity:0;transform:translateY(12px);animation:heroin .7s ease .5s forwards;
 }
-.shell-nucleus {
-  position: absolute; top:50%; left:50%;
-  transform: translate(-50%,-50%);
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 10px 4px currentColor;
+.pt-title{font-family:'Outfit',sans-serif!important;font-size:clamp(1.35rem,3vw,2.1rem);font-weight:700;letter-spacing:.01em;line-height:1}
+[data-theme="day"]   .pt-title .t2{color:#1d53d4}
+[data-theme="night"] .pt-title .t2{color:#4f8ef7}
+.pt-sub{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--txt3);letter-spacing:.14em;text-transform:uppercase;margin-top:.3rem}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem .7rem}
+.leg-it{display:flex;align-items:center;gap:.32rem;font-size:.67rem;color:var(--txt2);cursor:pointer;padding:.2rem .5rem;border-radius:6px;border:1px solid transparent;transition:all .17s}
+.leg-it:hover{color:var(--txt);background:var(--surf2);border-color:var(--brd)}.leg-it.act{background:var(--surf2);border-color:var(--brd2);color:var(--txt)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── GRID ────────────────────────────────────────── */
+.pt-wrap{position:relative;z-index:1;padding:.7rem 2rem 2rem;overflow-x:auto}
+.pt-inner{max-width:1700px;margin:0 auto}
+.pt-grid{display:grid;grid-template-columns:repeat(18,minmax(53px,1fr));grid-template-rows:repeat(10,minmax(57px,auto));gap:3px;min-width:1000px}
+
+.el{
+  background:var(--surf);border:1px solid var(--brd);border-radius:7px;
+  padding:5px 6px 4px;cursor:pointer;position:relative;
+  display:flex;flex-direction:column;justify-content:space-between;min-height:57px;overflow:hidden;
+  transition:transform .18s cubic-bezier(.34,1.4,.64,1),border-color .18s,box-shadow .18s,opacity .22s,filter .22s;
 }
-.shell-electron {
-  position: absolute;
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 5px 2px currentColor;
+.el::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cat-color);border-radius:7px 0 0 7px}
+.el:hover{transform:scale(1.12) translateY(-2px);border-color:var(--cat-color);box-shadow:0 0 20px -4px var(--cat-color),0 8px 24px rgba(0,0,0,.4);z-index:80}
+.el.acel{border-color:var(--cat-color);box-shadow:0 0 0 2px var(--cat-color)}
+.el-num{font-family:var(--el-num-font);font-size:var(--el-num-size);color:var(--el-num-color);line-height:1;font-weight:var(--el-num-weight)}
+.el-sym{font-family:var(--el-sym-font)!important;font-size:var(--el-sym-size);color:var(--cat-color);font-weight:var(--el-sym-weight);line-height:1;letter-spacing:var(--el-sym-spacing)}
+.el-name{font-size:var(--el-name-size);color:var(--el-name-color);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em;font-weight:var(--el-name-weight);line-height:1.2}
+.el-mass{font-family:var(--el-mass-font);font-size:var(--el-mass-size);color:var(--el-mass-color)}
+.sp{background:transparent;border:none;pointer-events:none}
+.gc{background:var(--surf);border:1px dashed var(--brd);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:default}
+.gc span{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:var(--txt3);text-align:center;line-height:1.5}
+.gc-series{background:var(--surf);border:1px solid var(--brd);border-radius:7px;padding:5px 6px 4px;display:flex;flex-direction:column;justify-content:center;gap:.18rem;cursor:default;overflow:hidden}
+.gc-series::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cat-color);border-radius:7px 0 0 7px}
+
+/* ════════════════════════════════════════════════════
+   EFFECT STYLES
+═══════════════════════════════════════════════════ */
+
+/* ── EFFECT 1: Fade (Original) ───────────────────── */
+.fx1 .el.hi{opacity:1!important;filter:none!important;border-color:var(--cat-color)}
+.fx1 .el.dm{opacity:.11;filter:grayscale(.5)}
+
+/* ── EFFECT 2: Domino Glow ───────────────────────── */
+@keyframes dominoGrow{
+  from{transform:scale(1);opacity:.6}
+  to{transform:scale(1.12);opacity:1}
 }
-#panel-shells-str {
-  text-align: center;
-  font-size: 0.65rem;
-  opacity: 0.6;
-  margin-top: 0.25rem;
-  letter-spacing: 0.1em;
+@keyframes dominoShrink{
+  from{transform:scale(1.12);opacity:1}
+  to{transform:scale(1);opacity:.6}
 }
-#panel-name {
-  font-family: var(--font-head);
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: 0.08em;
-  margin-top: 0.5rem;
+.fx2 .el.dm{
+  opacity:.13;filter:grayscale(.7) brightness(.6);
+  transition:opacity .3s ease,filter .3s ease;
 }
-#panel-num {
-  text-align: center; font-size: 0.68rem;
-  color: #555; margin-top: 0.15rem; letter-spacing: 0.04em;
+.fx2 .el.hi{
+  border-color:var(--cat-color);
+  box-shadow:0 0 14px var(--cat-color),0 0 24px var(--cat-color),inset 0 0 8px rgba(255,255,255,.07);
+  z-index:50;
+  animation:dominoGrow .4s ease-out forwards;
+  filter:brightness(1.18) saturate(1.25);
 }
-.panel-divider { height: 1px; margin: 0.8rem 0; opacity: 0.2; }
-.panel-row {
-  display: flex; justify-content: space-between;
-  align-items: baseline; margin-bottom: 0.4rem;
+.fx2 .el.shrink{
+  animation:dominoShrink .4s ease-out forwards;
 }
-.panel-lbl { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 0.1em; }
-.panel-val { font-size: 0.78rem; }
-#panel-config { font-size: 0.68rem; text-align: center; margin-top: 0.3rem; opacity: 0.65; }
-.panel-badge {
-  display: inline-block; padding: 0.15rem 0.55rem;
-  border-radius: 2px; font-size: 0.62rem;
-  letter-spacing: 0.09em; text-transform: uppercase;
-  margin-top: 0.55rem; border: 1px solid currentColor;
+
+/* ── EFFECT 3: Ring Glow (Thick outline + domino) ── */
+@keyframes ringGrow{
+  from{transform:scale(1);opacity:.6}
+  to  {transform:scale(1.15);opacity:1}
 }
+@keyframes ringShrink{
+  from{transform:scale(1.15);opacity:1}
+  to  {transform:scale(1);opacity:.6}
+}
+.fx3 .el.dm{
+  opacity:.15;filter:grayscale(.7) brightness(.6);
+  transition:opacity .3s ease,filter .3s ease;
+}
+.fx3 .el.hi{
+  border-color:var(--cat-color);
+  box-shadow:0 0 0 5px var(--cat-color),0 0 20px var(--cat-color),0 0 30px rgba(var(--cat-color),.4);
+  z-index:50;
+  animation:ringGrow .4s ease-out forwards;
+}
+.fx3 .el.shrink{
+  animation:ringShrink .4s ease-out forwards;
+}
+/* instant-clear variant used when clicking a non-matching element */
+.fx3 .el.instant-clear{
+  animation:none !important;
+  transform:scale(1) !important;
+  opacity:1 !important;
+}
+
+/* ── INFO PANEL ──────────────────────────────────── */
+#info-panel{
+  position:fixed;right:1.5rem;bottom:1.5rem;width:320px;max-height:92vh;
+  background:var(--surf);border:1.5px solid var(--brd2);border-radius:18px;z-index:800;
+  transform:translateY(calc(100% + 2.5rem));
+  transition:transform .42s cubic-bezier(.34,1.3,.64,1),background .45s,border-color .45s;
+  box-shadow:0 30px 80px var(--shadow);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+}
+#info-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pc,var(--acc)),transparent 65%);border-radius:18px 18px 0 0}
+#info-panel.show{transform:translateY(0)}
+.pan-hdr{padding:1.1rem 1.1rem .4rem;flex-shrink:0;position:relative}
+.pan-close{position:absolute;top:.82rem;right:.82rem;background:var(--surf2);border:1px solid var(--brd);border-radius:7px;color:var(--txt3);width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.76rem;cursor:pointer;transition:all .16s}
+.pan-close:hover{color:var(--txt);border-color:var(--brd2)}
+.pan-el-row{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:.9rem}
+.e-stage{flex-shrink:0;width:140px;height:140px;border:1.5px solid var(--brd2);border-radius:12px;background:var(--bg2);overflow:hidden}
+.e-cv{width:100%;height:100%;display:block}
+.pan-info{flex:1}
+.p-sym{font-family:'Outfit',sans-serif!important;font-size:2.75rem;font-weight:800;line-height:1;letter-spacing:.01em}
+.p-name{font-family:'Outfit',sans-serif!important;font-size:.93rem;font-weight:600;margin-top:.1rem}
+.p-num{font-family:'IBM Plex Mono',monospace;font-size:.63rem;color:var(--txt3);margin-top:.1rem}
+.p-badge{display:inline-block;padding:.17rem .52rem;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:.59rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.45rem}
+.p-div{height:1px;background:var(--brd);margin:.7rem 0}
+.pan-body{overflow-y:visible;padding:0 1.1rem 1.1rem;flex-shrink:0;scrollbar-width:thin;scrollbar-color:var(--brd2) transparent}
+.ps-ttl{font-family:'IBM Plex Mono',monospace;font-size:.57rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);margin-bottom:.32rem}
+.ps-sec{margin-bottom:.8rem}
+.p-row{display:flex;justify-content:space-between;align-items:baseline;padding:.28rem 0;border-bottom:1px solid var(--brd)}
+.p-row:last-child{border:none}
+.p-lbl{font-family:'Outfit',sans-serif!important;font-size:.7rem;font-weight:400;color:var(--txt2)}
+.p-val{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--txt);text-align:right;max-width:57%}
+
+/* ── FOOTER ──────────────────────────────────────── */
+footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35rem 2rem;margin-top:.5rem;transition:border-color .45s}
+.ft-in{max-width:1700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.ft-logo{font-family:'Outfit',sans-serif!important;font-size:1.1rem;font-weight:900;letter-spacing:.04em}
+[data-theme="night"] .ft-logo .c{color:#fff}
+[data-theme="night"] .ft-logo .l{color:#4f8ef7}
+[data-theme="day"]   .ft-logo .c{color:#0c1530}
+[data-theme="day"]   .ft-logo .l{color:#1d53d4}
+.ft-copy{font-family:'Outfit',sans-serif!important;font-size:.72rem;font-weight:400;letter-spacing:.05em}
+[data-theme="night"] .ft-copy{color:#ffffff}
+[data-theme="day"]   .ft-copy{color:#0c1530}
+
+/* ── RESPONSIVE ──────────────────────────────────── */
+@media(max-width:768px){
+  .topbar{padding:.6rem 1rem}.topbar-in{gap:.5rem}
+  .hero{padding:2rem 1rem 1.5rem}
+  .pt-hdr{padding:.5rem 1rem 0}
+  .pt-wrap{padding:.65rem 1rem 1.5rem}
+  #info-panel{right:.55rem;bottom:.55rem;width:calc(100vw - 1.1rem);max-width:390px}
+  footer{padding:1rem}
+}
+
+/* ═══════════════════════════════════════════════
+   ELEMENT DETAIL PAGE  ·  Full-screen overlay
+═══════════════════════════════════════════════ */
+/* Mini-panel "View Details" button */
+.pan-view-btn{
+  display:flex;align-items:center;justify-content:center;gap:.45rem;
+  margin:.15rem 1.1rem .9rem;padding:.55rem;
+  background:var(--surf2);border:1.5px solid var(--brd2);border-radius:11px;
+  font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);
+  cursor:pointer;transition:all .18s;flex-shrink:0;
+}
+.pan-view-btn:hover{border-color:var(--pc,var(--acc));color:var(--pc,var(--acc));background:var(--surf3)}
+
+/* Full-screen detail page */
+#dp{
+  position:fixed;inset:0;z-index:1200;
+  background:var(--bg);
+  transform:translateX(100%);
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#dp.open{transform:translateX(0)}
+
+/* Top bar */
+.dp-bar{
+  flex-shrink:0;display:flex;align-items:center;gap:.85rem;
+  padding:.65rem 1.3rem;
+  background:var(--surf);border-bottom:1px solid var(--brd);
+  position:relative;z-index:2;
+}
+.dp-back{
+  display:flex;align-items:center;gap:.35rem;
+  background:var(--surf2);border:1px solid var(--brd2);border-radius:9px;
+  color:var(--txt2);font-family:'IBM Plex Mono',monospace;font-size:.65rem;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.38rem .8rem;cursor:pointer;transition:all .16s;flex-shrink:0;
+}
+.dp-back:hover{border-color:var(--brd3);color:var(--txt)}
+.dp-bar-sym{
+  font-family:'Outfit',sans-serif!important;font-size:2.1rem;
+  font-weight:900;line-height:1;flex-shrink:0;
+}
+.dp-bar-info{flex:1;min-width:0}
+.dp-bar-name{font-family:'Outfit',sans-serif!important;font-size:1.05rem;font-weight:700;line-height:1.1}
+.dp-bar-sub{font-family:'IBM Plex Mono',monospace;font-size:.59rem;color:var(--txt3);margin-top:.12rem}
+.dp-bar-badge{
+  display:inline-flex;align-items:center;padding:.17rem .52rem;
+  border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:.55rem;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:.3rem;
+}
+
+/* Category nav strip */
+.dp-nav-wrap{
+  flex-shrink:0;background:var(--surf);
+  border-bottom:1px solid var(--brd);overflow-x:auto;
+  scrollbar-width:none;
+}
+.dp-nav-wrap::-webkit-scrollbar{display:none}
+.dp-nav{display:flex;padding:0 1rem;min-width:max-content}
+.dp-tab{
+  padding:.65rem 1rem;font-family:'IBM Plex Mono',monospace;
+  font-size:.59rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  border:none;background:transparent;cursor:pointer;color:var(--txt3);
+  border-bottom:2.5px solid transparent;white-space:nowrap;
+  transition:color .16s,border-color .16s;
+}
+.dp-tab:hover{color:var(--txt2)}
+.dp-tab.act{color:var(--dpacc,var(--acc));border-bottom-color:var(--dpacc,var(--acc))}
+
+/* Scrolling body */
+.dp-body{
+  flex:1;overflow-y:auto;padding:1.4rem 1.8rem 4rem;
+  scrollbar-width:thin;scrollbar-color:var(--brd2) transparent;
+}
+@media(max-width:760px){.dp-body{padding:1rem 1rem 3rem}.dp-bar{padding:.55rem .9rem}}
+
+/* Section heading */
+.dp-sh{
+  font-family:'IBM Plex Mono',monospace;font-size:.55rem;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--txt3);
+  padding-bottom:.4rem;border-bottom:1px solid var(--brd);margin:.05rem 0 .55rem;
+}
+
+/* Property grid */
+.dp-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:1px;background:var(--brd);
+  border:1px solid var(--brd);border-radius:11px;
+  overflow:hidden;margin-bottom:1.2rem;
+}
+.dp-grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:560px){.dp-grid,.dp-grid-3{grid-template-columns:1fr 1fr}}
+.dp-cell{
+  background:var(--surf);padding:.55rem .8rem;
+  display:flex;flex-direction:column;gap:.14rem;
+}
+.dp-cl{
+  font-family:'IBM Plex Mono',monospace;font-size:.51rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);
+}
+.dp-cv{
+  font-family:'Outfit',sans-serif!important;font-size:.83rem;
+  font-weight:600;color:var(--txt);line-height:1.25;
+}
+.dp-cu{font-size:.58rem;color:var(--txt2);font-weight:400}
+
+/* Key hero numbers */
+.dp-heroes{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:.55rem;margin-bottom:1.3rem;
+}
+@media(max-width:480px){.dp-heroes{grid-template-columns:1fr 1fr}}
+.dp-hero{
+  background:var(--surf2);border:1px solid var(--brd2);
+  border-radius:12px;padding:.82rem .9rem;text-align:center;
+}
+.dp-hv{
+  font-family:'Outfit',sans-serif!important;font-size:1.32rem;
+  font-weight:800;color:var(--dpacc,var(--acc));line-height:1;
+}
+.dp-hl{
+  font-family:'IBM Plex Mono',monospace;font-size:.5rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-top:.28rem;
+}
+
+/* Bohr model panel */
+.dp-bohr{
+  display:flex;gap:1.2rem;align-items:flex-start;
+  background:var(--surf);border:1px solid var(--brd);border-radius:12px;
+  padding:1rem;margin-bottom:1.2rem;
+}
+@media(max-width:480px){.dp-bohr{flex-direction:column;align-items:center}}
+#dp-cv-wrap{
+  flex-shrink:0;width:180px;height:180px;
+  background:var(--bg2);border:1.5px solid var(--brd2);
+  border-radius:12px;overflow:hidden;
+}
+#dp-cv{width:100%;height:100%;display:block}
+.dp-shells{flex:1;min-width:0}
+.dp-shell-row{
+  display:flex;align-items:center;gap:.55rem;padding:.28rem 0;
+  border-bottom:1px solid var(--brd);
+}
+.dp-shell-row:last-child{border:none}
+.dp-sn{
+  font-family:'IBM Plex Mono',monospace;font-weight:700;
+  color:var(--dpacc,var(--acc));width:22px;flex-shrink:0;font-size:.64rem;
+}
+.dp-sdots{display:flex;flex-wrap:wrap;gap:3px;flex:1}
+.dp-sdot{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--dpacc,var(--acc));opacity:.75;
+}
+.dp-sc{
+  font-family:'IBM Plex Mono',monospace;color:var(--txt3);
+  font-size:.58rem;width:26px;text-align:right;flex-shrink:0;
+}
+
+/* Tables */
+.dp-tbl{width:100%;border-collapse:collapse;font-size:.72rem;margin-top:.3rem}
+.dp-tbl th{
+  font-family:'IBM Plex Mono',monospace;font-size:.5rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);
+  padding:.38rem .55rem;border-bottom:1px solid var(--brd);
+  background:var(--surf2);text-align:left;
+}
+.dp-tbl td{
+  padding:.3rem .55rem;border-bottom:1px solid var(--brd);
+  color:var(--txt2);font-family:'IBM Plex Mono',monospace;font-size:.67rem;
+}
+.dp-tbl tr:last-child td{border:none}
+.dp-tbl tr:hover td{background:var(--surf2)}
+.iso-s{color:#2dd4bf;font-weight:700}
+.iso-u{color:#f87171}
+
+/* Oxidation state badges */
+.dp-oxwrap{display:flex;flex-wrap:wrap;gap:.35rem;margin:.45rem 0 .8rem}
+.dp-oxb{
+  padding:.2rem .55rem;border-radius:20px;
+  font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:700;border:1px solid;
+}
+
+/* Abundance bars */
+.dp-ab-row{display:flex;align-items:center;gap:.7rem;margin:.42rem 0}
+.dp-ab-lbl{
+  font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--txt2);
+  width:95px;flex-shrink:0;
+}
+.dp-ab-bar{flex:1;height:5px;border-radius:3px;background:var(--surf3);overflow:hidden}
+.dp-ab-fill{height:100%;border-radius:3px;background:var(--dpacc,var(--acc));transition:width .6s .1s ease}
+.dp-ab-val{
+  font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+  color:var(--txt3);width:85px;text-align:right;flex-shrink:0;
+}
+
+/* EN bar */
+.dp-en-bar{
+  display:flex;align-items:center;gap:.7rem;margin:.45rem 0 .9rem;
+}
+.dp-en-track{
+  flex:1;height:8px;border-radius:4px;background:var(--surf3);overflow:hidden;
+}
+.dp-en-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--dpacc,var(--acc)),var(--dpacc,var(--acc)));transition:width .6s ease}
+
+/* Highlight card */
+.dp-card{
+  background:var(--surf2);border:1px solid var(--brd2);
+  border-left:3px solid var(--dpacc,var(--acc));
+  border-radius:0 10px 10px 0;
+  padding:.75rem 1rem;margin:.7rem 0;
+  font-size:.8rem;line-height:1.76;color:var(--txt2);
+  font-family:'Outfit',sans-serif!important;
+}
+.dp-card strong{
+  display:block;font-family:'IBM Plex Mono',monospace;font-size:.52rem;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dpacc,var(--acc));margin-bottom:.22rem;font-weight:700;
+}
+
+/* Prose text */
+.dp-prose{
+  font-family:'Outfit',sans-serif!important;font-size:.82rem;
+  line-height:1.78;color:var(--txt2);margin-bottom:.8rem;
+}
+.dp-prose strong{color:var(--txt);font-weight:600}
+
+/* List of uses */
+.dp-use-row{
+  padding:.35rem 0;border-bottom:1px solid var(--brd);
+  font-family:'Outfit',sans-serif!important;font-size:.8rem;color:var(--txt2);
+  display:flex;gap:.6rem;align-items:baseline;
+}
+.dp-use-row:last-child{border:none}
+.dp-use-row::before{content:'•';color:var(--dpacc,var(--acc));flex-shrink:0;font-size:.9rem}
+
+/* Wikipedia link */
+.dp-wiki{
+  display:inline-flex;align-items:center;gap:.4rem;
+  margin:.8rem 0 .3rem;padding:.44rem .82rem;
+  border-radius:9px;background:var(--surf2);
+  border:1px solid var(--brd2);color:var(--txt2);
+  font-size:.72rem;text-decoration:none;
+  transition:all .16s;font-family:'Outfit',sans-serif!important;
+}
+.dp-wiki:hover{border-color:var(--dpacc,var(--acc));color:var(--dpacc,var(--acc))}
+.dp-wiki+.dp-wiki{margin-left:.5rem}
+
+/* Single prop row */
+.dp-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:.36rem 0;border-bottom:1px solid var(--brd);
+}
+.dp-row:last-child{border:none}
+.dp-rl{font-family:'Outfit',sans-serif!important;font-size:.77rem;color:var(--txt2)}
+.dp-rv{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--txt);
+  text-align:right;max-width:58%;
+}
+
 </style>
 </head>
 <body>
 
-<div class="legend" id="legend"></div>
-<div class="pt-wrap"><div class="pt-grid" id="pt-grid"></div></div>
-
-<div id="info-overlay">
-  <div id="info-backdrop" onclick="closePanel()"></div>
-  <div id="info-panel">
-    <button class="panel-close" onclick="closePanel()">✕</button>
-    <div id="panel-symbol"></div>
-    <div id="shell-wrap"></div>
-    <div id="panel-shells-str"></div>
-    <div id="panel-name"></div>
-    <div id="panel-num"></div>
-    <div class="panel-divider" id="panel-div" style="background:#fff"></div>
-    <div id="panel-rows"></div>
-    <div id="panel-config"></div>
-    <div id="panel-badge-wrap"></div>
-  </div>
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo"><span class="c">Chem</span><span class="l">Lab</span></div>
+  <div class="sp-tag">Designed <span> By </span> ChemLab Team! </div>
+  <div class="sp-track"><div class="sp-fill"></div></div>
+  <div class="sp-hint">LOADING</div>
 </div>
 
+<!-- APP -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <div class="topbar-in">
+      <div class="logo"><span class="c">Chem</span><span class="l">Lab</span></div>
+      <div class="tb-right">
+
+        <!-- EFFECT PICKER -->
+        <div class="fd-wrap" id="fx-wrap">
+          <button class="tb-btn" onclick="toggleFxMenu()" id="fx-btn">✦ Effect: Fade</button>
+          <div class="fd-menu" id="fx-menu">
+            <div class="fd-opt sel" data-fx="1" onclick="setEffect(1,this)">
+              <span class="fx-icon">◐</span> Fade
+            </div>
+            <div class="fd-opt" data-fx="2" onclick="setEffect(2,this)">
+              <span class="fx-icon">◈</span> Domino Glow
+            </div>
+            <div class="fd-opt" data-fx="3" onclick="setEffect(3,this)">
+              <span class="fx-icon">◉</span> Ring Glow
+            </div>
+          </div>
+        </div>
+
+        <!-- FONT PICKER -->
+        <div class="fd-wrap" id="fd-wrap">
+          <button class="tb-btn" onclick="toggleFd()">Font</button>
+          <div class="fd-menu" id="fd-menu">
+            <div class="fd-opt sel" data-f="'Outfit',sans-serif" onclick="setFont(this)" style="font-family:'Outfit',sans-serif">Outfit</div>
+            <div class="fd-opt" data-f="'DM Sans',sans-serif" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif">DM Sans</div>
+            <div class="fd-opt" data-f="'Raleway',sans-serif" onclick="setFont(this)" style="font-family:'Raleway',sans-serif">Raleway</div>
+            <div class="fd-opt" data-f="'Josefin Sans',sans-serif" onclick="setFont(this)" style="font-family:'Josefin Sans',sans-serif">Josefin Sans</div>
+            <div class="fd-opt" data-f="'Exo 2',sans-serif" onclick="setFont(this)" style="font-family:'Exo 2',sans-serif">Exo 2</div>
+            <div class="fd-opt" data-f="'Playfair Display',serif" onclick="setFont(this)" style="font-family:'Playfair Display',serif">Playfair Display</div>
+            <div class="fd-opt" data-f="'Cormorant Garamond',serif" onclick="setFont(this)" style="font-family:'Cormorant Garamond',serif">Cormorant Garamond</div>
+            <div class="fd-opt" data-f="'Source Serif 4',serif" onclick="setFont(this)" style="font-family:'Source Serif 4',serif">Source Serif 4</div>
+            <div class="fd-opt" data-f="'Bebas Neue',sans-serif" onclick="setFont(this)" style="font-family:'Bebas Neue',sans-serif">Bebas Neue</div>
+            <div class="fd-opt" data-f="'Space Mono',monospace" onclick="setFont(this)" style="font-family:'Space Mono',monospace">Space Mono</div>
+            <div class="fd-opt" data-f="'IBM Plex Mono',monospace" onclick="setFont(this)" style="font-family:'IBM Plex Mono',monospace">IBM Plex Mono</div>
+            <div class="fd-opt" data-f="__pro__" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif;border-top:1px solid var(--brd2);margin-top:.2rem;padding-top:.7rem;color:var(--acc)">✦ Pro Style</div>
+          </div>
+        </div>
+
+        <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">Day</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO + AI SEARCH -->
+  <section class="hero">
+    <div class="hero-top">
+      <div class="hero-pill">UNDER MAINTENANCE</div>
+      <h1 class="hero-h1">Ask <span class="hl">Anything!</span></h1>
+    </div>
+
+    <div class="ai-wrap">
+      <div class="ai-box" id="ai-box">
+        <div class="ask-lbl">Ask ChemLab AI</div>
+        <div class="ai-row">
+          <input class="ai-in" id="ai-in" type="text"
+            placeholder="e.g. Boiling point of tungsten? History of plutonium?"
+            autocomplete="off" />
+          <button class="ask-btn" id="ask-btn" onclick="triggerAsk()">Ask AI</button>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="fillQ('Melting point of iron')">Melting point of iron</span>
+          <span class="chip" onclick="fillQ('History of uranium')">History of uranium</span>
+          <span class="chip" onclick="fillQ('Isotopes of carbon')">Isotopes of carbon</span>
+          <span class="chip" onclick="fillQ('Industrial production of aluminium')">Industrial aluminium</span>
+          <span class="chip" onclick="fillQ('Chemical properties of gold')">Chemical properties of gold</span>
+          <span class="chip" onclick="fillQ('Nuclear characteristics of plutonium')">Nuclear characteristics of Pu</span>
+        </div>
+      </div>
+
+      <div class="ai-ans-wrap" id="ai-ans-wrap">
+        <div class="ai-card">
+          <div class="ai-head">
+            <div class="ai-head-l">
+              <span class="ai-badge">ChemLab AI</span>
+              <span class="ai-qtxt" id="ai-qtxt"></span>
+            </div>
+            <button class="ai-close" onclick="closeAns()">✕</button>
+          </div>
+          <div class="ai-body" id="ai-body"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PT HEADER + LEGEND -->
+  <div class="pt-hdr">
+    <div>
+      <div class="pt-title"><span>Periodic </span><span class="t2">Table</span></div>
+      <div class="pt-sub"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <!-- GRID -->
+  <div class="pt-wrap">
+    <div class="pt-inner">
+      <div class="pt-grid fx1" id="pt-grid"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="ft-in">
+      <div class="ft-logo"><span class="c">Chem</span><span class="l">Lab</span></div>
+      <div class="ft-copy">© 2026 All Rights Reserved · Kabya Saha</div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- INFO PANEL -->
+<div id="info-panel">
+  <div class="pan-hdr">
+    <button class="pan-close" onclick="closePanel()">✕</button>
+    <div class="pan-el-row">
+      <div class="e-stage"><canvas class="e-cv" id="e-cv" width="140" height="140"></canvas></div>
+      <div class="pan-info">
+        <div class="p-sym" id="p-sym"></div>
+        <div class="p-name" id="p-name"></div>
+        <div class="p-num" id="p-num"></div>
+        <div class="p-badge" id="p-badge"></div>
+      </div>
+    </div>
+    <div class="p-div"></div>
+  </div>
+  <div class="pan-body" id="pan-body"></div>
+
+  <button class="pan-view-btn" onclick="openDp(aEl)">⊞ View Full Details →</button>
+
 <script>
-const CATS = {
-  alkali:       { label:'Alkali Metals',          color:'#c8ff00' },
-  alkaline:     { label:'Alkaline Earth Metals',  color:'#ffdd00' },
-  lanthanide:   { label:'Lanthanoids',            color:'#ff69b4' },
-  actinide:     { label:'Aktinoids',              color:'#ff4499' },
-  transition:   { label:'Transition Metals',      color:'#00cfff' },
-  'post-trans': { label:'Post-Transition Metals', color:'#00ff99' },
-  metalloid:    { label:'Metalloids',             color:'#00ff66' },
-  nonmetal:     { label:'Other Nonmetals',        color:'#ff6600' },
-  halogen:      { label:'Halogens',               color:'#ff3366' },
-  noble:        { label:'Noble Gasses',           color:'#cc66ff' },
-  unknown:      { label:'Unknown',                color:'#888888' },
+/* ── DATA ────────────────────────────────────────── */
+const CATS={
+  alkali:          {label:'Alkali Metal',      cv:'var(--alkali)'},
+  alkaline:        {label:'Alkaline Earth',    cv:'var(--alkaline)'},
+  transition:      {label:'Transition Metal',  cv:'var(--transition)'},
+  'post-transition':{label:'Post-Transition',  cv:'var(--post-transition)'},
+  metalloid:       {label:'Metalloid',         cv:'var(--metalloid)'},
+  nonmetal:        {label:'Reactive Nonmetal', cv:'var(--nonmetal)'},
+  halogen:         {label:'Halogen',           cv:'var(--halogen)'},
+  noble:           {label:'Noble Gas',         cv:'var(--noble)'},
+  lanthanide:      {label:'Lanthanide',        cv:'var(--lanthanide)'},
+  actinide:        {label:'Actinide',          cv:'var(--actinide)'},
+  unknown:         {label:'Unknown',           cv:'var(--unknown)'},
 };
 
-// [num, symbol, name, mass, cat, group, period, state, config, shells_per_orbit]
-const ELEMENTS = [
-  [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹',[1]],
-  [2,'He','Helium','4.00028','noble',18,1,'Gas','1s²',[2]],
-  [3,'Li','Lithium','6.94','alkali',1,2,'Solid','[He] 2s¹',[2,1]],
-  [4,'Be','Beryllium','9.0122','alkaline',2,2,'Solid','[He] 2s²',[2,2]],
-  [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹',[2,3]],
-  [6,'C','Carbon','12.011','nonmetal',14,2,'Solid','[He] 2s²2p²',[2,4]],
-  [7,'N','Nitrogen','14.007','nonmetal',15,2,'Gas','[He] 2s²2p³',[2,5]],
-  [8,'O','Oxygen','15.999','nonmetal',16,2,'Gas','[He] 2s²2p⁴',[2,6]],
-  [9,'F','Flourine','18.998','halogen',17,2,'Gas','[He] 2s²2p⁵',[2,7]],
-  [10,'Ne','Neon','20.18','noble',18,2,'Gas','[He] 2s²2p⁶',[2,8]],
-  [11,'Na','Sodium','22.99','alkali',1,3,'Solid','[Ne] 3s¹',[2,8,1]],
-  [12,'Mg','Magnesium','24.305','alkaline',2,3,'Solid','[Ne] 3s²',[2,8,2]],
-  [13,'Al','Aluminium','26.982','post-trans',13,3,'Solid','[Ne] 3s²3p¹',[2,8,3]],
-  [14,'Si','Silicon','28.085','metalloid',14,3,'Solid','[Ne] 3s²3p²',[2,8,4]],
-  [15,'P','Phosphorus','30.974','nonmetal',15,3,'Solid','[Ne] 3s²3p³',[2,8,5]],
-  [16,'S','Sulfur','32.06','nonmetal',16,3,'Solid','[Ne] 3s²3p⁴',[2,8,6]],
-  [17,'Cl','Chlorine','35.45','halogen',17,3,'Gas','[Ne] 3s²3p⁵',[2,8,7]],
-  [18,'Ar','Argon','39.948','noble',18,3,'Gas','[Ne] 3s²3p⁶',[2,8,8]],
-  [19,'K','Potassium','39.098','alkali',1,4,'Solid','[Ar] 4s¹',[2,8,8,1]],
-  [20,'Ca','Calcium','40.078','alkaline',2,4,'Solid','[Ar] 4s²',[2,8,8,2]],
-  [21,'Sc','Scandium','44.956','transition',3,4,'Solid','[Ar] 3d¹4s²',[2,8,9,2]],
-  [22,'Ti','Titanium','47.867','transition',4,4,'Solid','[Ar] 3d²4s²',[2,8,10,2]],
-  [23,'V','Vanadium','50.942','transition',5,4,'Solid','[Ar] 3d³4s²',[2,8,11,2]],
-  [24,'Cr','Chromium','52.00','transition',6,4,'Solid','[Ar] 3d⁵4s¹',[2,8,13,1]],
-  [25,'Mn','Manganese','54.938','transition',7,4,'Solid','[Ar] 3d⁵4s²',[2,8,13,2]],
-  [26,'Fe','Iron','55.845','transition',8,4,'Solid','[Ar] 3d⁶4s²',[2,8,14,2]],
-  [27,'Co','Cobalt','58.933','transition',9,4,'Solid','[Ar] 3d⁷4s²',[2,8,15,2]],
-  [28,'Ni','Nickel','58.693','transition',10,4,'Solid','[Ar] 3d⁸4s²',[2,8,16,2]],
-  [29,'Cu','Copper','63.546','transition',11,4,'Solid','[Ar] 3d¹⁰4s¹',[2,8,18,1]],
-  [30,'Zn','Zinc','65.38','transition',12,4,'Solid','[Ar] 3d¹⁰4s²',[2,8,18,2]],
-  [31,'Ga','Gallium','69.723','post-trans',13,4,'Solid','[Ar] 3d¹⁰4s²4p¹',[2,8,18,3]],
-  [32,'Ge','Germanium','72.63','metalloid',14,4,'Solid','[Ar] 3d¹⁰4s²4p²',[2,8,18,4]],
-  [33,'As','Arsenic','74.922','metalloid',15,4,'Solid','[Ar] 3d¹⁰4s²4p³',[2,8,18,5]],
-  [34,'Se','Selenium','78.971','nonmetal',16,4,'Solid','[Ar] 3d¹⁰4s²4p⁴',[2,8,18,6]],
-  [35,'Br','Bromine','79.904','halogen',17,4,'Liquid','[Ar] 3d¹⁰4s²4p⁵',[2,8,18,7]],
-  [36,'Kr','Krypton','83.798','noble',18,4,'Gas','[Ar] 3d¹⁰4s²4p⁶',[2,8,18,8]],
-  [37,'Rb','Rubidium','85.468','alkali',1,5,'Solid','[Kr] 5s¹',[2,8,18,8,1]],
-  [38,'Sr','Strontium','87.62','alkaline',2,5,'Solid','[Kr] 5s²',[2,8,18,8,2]],
-  [39,'Y','Yttrium','88.906','transition',3,5,'Solid','[Kr] 4d¹5s²',[2,8,18,9,2]],
-  [40,'Zr','Zirconium','91.224','transition',4,5,'Solid','[Kr] 4d²5s²',[2,8,18,10,2]],
-  [41,'Nb','Niobium','92.906','transition',5,5,'Solid','[Kr] 4d⁴5s¹',[2,8,18,12,1]],
-  [42,'Mo','Molybdenum','95.95','transition',6,5,'Solid','[Kr] 4d⁵5s¹',[2,8,18,13,1]],
-  [43,'Tc','Technetium','(88)','transition',7,5,'Solid','[Kr] 4d⁵5s²',[2,8,18,13,2]],
-  [44,'Ru','Ruthenium','101.07','transition',8,5,'Solid','[Kr] 4d⁷5s¹',[2,8,18,15,1]],
-  [45,'Rh','Rhodium','102.91','transition',9,5,'Solid','[Kr] 4d⁸5s¹',[2,8,18,16,1]],
-  [46,'Pd','Palladium','106.42','transition',10,5,'Solid','[Kr] 4d¹⁰',[2,8,18,18]],
-  [47,'Ag','Silver','107.87','transition',11,5,'Solid','[Kr] 4d¹⁰5s¹',[2,8,18,18,1]],
-  [48,'Cd','Cadmium','112.41','transition',12,5,'Solid','[Kr] 4d¹⁰5s²',[2,8,18,18,2]],
-  [49,'In','Indium','114.82','post-trans',13,5,'Solid','[Kr] 4d¹⁰5s²5p¹',[2,8,18,18,3]],
-  [50,'Sn','Tin','118.71','post-trans',14,5,'Solid','[Kr] 4d¹⁰5s²5p²',[2,8,18,18,4]],
-  [51,'Sb','Antimony','121.76','metalloid',15,5,'Solid','[Kr] 4d¹⁰5s²5p³',[2,8,18,18,5]],
-  [52,'Te','Tellurium','127.6','metalloid',16,5,'Solid','[Kr] 4d¹⁰5s²5p⁴',[2,8,18,18,6]],
-  [53,'I','Iodine','126.9','halogen',17,5,'Solid','[Kr] 4d¹⁰5s²5p⁵',[2,8,18,18,7]],
-  [54,'Xe','Xenon','131.29','noble',18,5,'Gas','[Kr] 4d¹⁰5s²5p⁶',[2,8,18,18,8]],
-  [55,'Cs','Caesium','132.91','alkali',1,6,'Solid','[Xe] 6s¹',[2,8,18,18,8,1]],
-  [56,'Ba','Barium','137.33','alkaline',2,6,'Solid','[Xe] 6s²',[2,8,18,18,8,2]],
-  [57,'La','Lanthanum','138.91','lanthanide',3,6,'Solid','[Xe] 5d¹6s²',[2,8,18,18,9,2]],
-  [58,'Ce','Cerium','140.12','lanthanide',null,null,'Solid','[Xe] 4f¹5d¹6s²',[2,8,18,19,9,2]],
-  [59,'Pr','Praseodymium','140.91','lanthanide',null,null,'Solid','[Xe] 4f³6s²',[2,8,18,21,8,2]],
-  [60,'Nd','Neodymium','144.24','lanthanide',null,null,'Solid','[Xe] 4f⁴6s²',[2,8,18,22,8,2]],
-  [61,'Pm','Promethium','144.24','lanthanide',null,null,'Solid','[Xe] 4f⁵6s²',[2,8,18,23,8,2]],
-  [62,'Sm','Samarium','150.36','lanthanide',null,null,'Solid','[Xe] 4f⁶6s²',[2,8,18,24,8,2]],
-  [63,'Eu','Europium','151.96','lanthanide',null,null,'Solid','[Xe] 4f⁷6s²',[2,8,18,25,8,2]],
-  [64,'Gd','Gadolinium','157.25','lanthanide',null,null,'Solid','[Xe] 4f⁷5d¹6s²',[2,8,18,25,9,2]],
-  [65,'Tb','Terbium','158.93','lanthanide',null,null,'Solid','[Xe] 4f⁹6s²',[2,8,18,27,8,2]],
-  [66,'Dy','Dysprosium','162.5','lanthanide',null,null,'Solid','[Xe] 4f¹⁰6s²',[2,8,18,28,8,2]],
-  [67,'Ho','Holmium','164.93','lanthanide',null,null,'Solid','[Xe] 4f¹¹6s²',[2,8,18,29,8,2]],
-  [68,'Er','Erbium','167.26','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²',[2,8,18,30,8,2]],
-  [69,'Tm','Thulium','168.93','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²',[2,8,18,31,8,2]],
-  [70,'Yb','Ytterbium','173.05','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²',[2,8,18,32,8,2]],
-  [71,'Lu','Lutetium','174.97','lanthanide',3,6,'Solid','[Xe] 4f¹⁴5d¹6s²',[2,8,18,32,9,2]],
-  [72,'Hf','Hafnium','178.49','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²',[2,8,18,32,10,2]],
-  [73,'Ta','Tantalum','180.95','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²',[2,8,18,32,11,2]],
-  [74,'W','Tungsten','183.84','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²',[2,8,18,32,12,2]],
-  [75,'Re','Rhenium','186.21','transition',7,6,'Solid','[Xe] 4f¹⁴5d⁵6s²',[2,8,18,32,13,2]],
-  [76,'Os','Osmium','190.23','transition',8,6,'Solid','[Xe] 4f¹⁴5d⁶6s²',[2,8,18,32,14,2]],
-  [77,'Ir','Iridium','192.22','transition',9,6,'Solid','[Xe] 4f¹⁴5d⁷6s²',[2,8,18,32,15,2]],
-  [78,'Pt','Platinum','195.08','transition',10,6,'Solid','[Xe] 4f¹⁴5d⁹6s¹',[2,8,18,32,17,1]],
-  [79,'Au','Gold','196.97','transition',11,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s¹',[2,8,18,32,18,1]],
-  [80,'Hg','Mercury','200.59','transition',12,6,'Liquid','[Xe] 4f¹⁴5d¹⁰6s²',[2,8,18,32,18,2]],
-  [81,'Tl','Thallium','204.38','post-trans',13,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p¹',[2,8,18,32,18,3]],
-  [82,'Pb','Lead','207.2','post-trans',14,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p²',[2,8,18,32,18,4]],
-  [83,'Bi','Bismuth','208.98','post-trans',15,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p³',[2,8,18,32,18,5]],
-  [84,'Po','Polonium','(209)','post-trans',16,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁴',[2,8,18,32,18,6]],
-  [85,'At','Astatine','(210)','halogen',17,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁵',[2,8,18,32,18,7]],
-  [86,'Rn','Radon','(222)','noble',18,6,'Gas','[Xe] 4f¹⁴5d¹⁰6s²6p⁶',[2,8,18,32,18,8]],
-  [87,'Fr','Francium','(223)','alkali',1,7,'Solid','[Rn] 7s¹',[2,8,18,32,18,8,1]],
-  [88,'Ra','Radium','(226)','alkaline',2,7,'Solid','[Rn] 7s²',[2,8,18,32,18,8,2]],
-  [89,'Ac','Actinium','(227)','actinide',3,7,'Solid','[Rn] 6d¹7s²',[2,8,18,32,18,9,2]],
-  [90,'Th','Thorium','232.04','actinide',null,null,'Solid','[Rn] 6d²7s²',[2,8,18,32,18,10,2]],
-  [91,'Pa','Protactinium','231.04','actinide',null,null,'Solid','[Rn] 5f²6d¹7s²',[2,8,18,32,20,9,2]],
-  [92,'U','Uranium','238.03','actinide',null,null,'Solid','[Rn] 5f³6d¹7s²',[2,8,18,32,21,9,2]],
-  [93,'Np','Neptunium','(237)','actinide',null,null,'Solid','[Rn] 5f⁴6d¹7s²',[2,8,18,32,22,9,2]],
-  [94,'Pu','Plutonium','(244)','actinide',null,null,'Solid','[Rn] 5f⁶7s²',[2,8,18,32,24,8,2]],
-  [95,'Am','Americium','(243)','actinide',null,null,'Solid','[Rn] 5f⁷7s²',[2,8,18,32,25,8,2]],
-  [96,'Cm','Curium','(247)','actinide',null,null,'Solid','[Rn] 5f⁷6d¹7s²',[2,8,18,32,25,9,2]],
-  [97,'Bk','Berkelium','(247)','actinide',null,null,'Solid','[Rn] 5f⁹7s²',[2,8,18,32,27,8,2]],
-  [98,'Cf','Californium','(251)','actinide',null,null,'Solid','[Rn] 5f¹⁰7s²',[2,8,18,32,28,8,2]],
-  [99,'Es','Einsteinium','(252)','actinide',null,null,'Solid','[Rn] 5f¹¹7s²',[2,8,18,32,29,8,2]],
-  [100,'Fm','Fermium','(257)','actinide',null,null,'Solid','[Rn] 5f¹²7s²',[2,8,18,32,30,8,2]],
-  [101,'Md','Mendelevium','(258)','actinide',null,null,'Solid','[Rn] 5f¹³7s²',[2,8,18,32,31,8,2]],
-  [102,'No','Nobelium','(259)','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²',[2,8,18,32,32,8,2]],
-  [103,'Lr','Lawrencium','(266)','actinide',3,7,'Solid','[Rn] 5f¹⁴7s²7p¹',[2,8,18,32,32,8,3]],
-  [104,'Rf','Rutherfordium','(267)','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²',[2,8,18,32,32,10,2]],
-  [105,'Db','Dubnium','(268)','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²',[2,8,18,32,32,11,2]],
-  [106,'Sg','Seaborgium','(271)','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²',[2,8,18,32,32,12,2]],
-  [107,'Bh','Bohrium','(272)','transition',7,7,'Solid','[Rn] 5f¹⁴6d⁵7s²',[2,8,18,32,32,13,2]],
-  [108,'Hs','Hassium','(270)','transition',8,7,'Solid','[Rn] 5f¹⁴6d⁶7s²',[2,8,18,32,32,14,2]],
-  [109,'Mt','Meitnerium','(278)','unknown',9,7,'Unknown','[Rn] 5f¹⁴6d⁷7s²',[2,8,18,32,32,15,2]],
-  [110,'Ds','Darmstadtium','(281)','unknown',10,7,'Unknown','[Rn] 5f¹⁴6d⁸7s²',[2,8,18,32,32,16,2]],
-  [111,'Rg','Roentgenium','(282)','unknown',11,7,'Unknown','[Rn] 5f¹⁴6d⁹7s²',[2,8,18,32,32,17,2]],
-  [112,'Cn','Copernicium','(285)','transition',12,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²',[2,8,18,32,32,18,2]],
-  [113,'Nh','Nihonium','(286)','unknown',13,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p¹',[2,8,18,32,32,18,3]],
-  [114,'Fl','Flerovium','(289)','unknown',14,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p²',[2,8,18,32,32,18,4]],
-  [115,'Mc','Moscovium','(290)','unknown',15,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p³',[2,8,18,32,32,18,5]],
-  [116,'Lv','Livermorium','(293)','unknown',16,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p⁴',[2,8,18,32,32,18,6]],
-  [117,'Ts','Tennessine','(294)','unknown',17,7,'Unknown','[Rn] 5f¹⁴6d¹⁰7s²7p⁵',[2,8,18,32,32,18,7]],
-  [118,'Og','Oganesson','(294)','noble',18,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²7p⁶',[2,8,18,32,32,18,8]],
+const ELS=[
+  [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹',14,20,'0.0000899 g/L','1'],
+  [2,'He','Helium','4.003','noble',18,1,'Gas','1s²',0.95,4.22,'0.0001785 g/L','2'],
+  [3,'Li','Lithium','6.941','alkali',1,2,'Solid','[He] 2s¹',453.7,1615,'0.534 g/cm³','2,1'],
+  [4,'Be','Beryllium','9.012','alkaline',2,2,'Solid','[He] 2s²',1560,2742,'1.85 g/cm³','2,2'],
+  [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹',2349,4200,'2.34 g/cm³','2,3'],
+  [6,'C','Carbon','12.01','nonmetal',14,2,'Solid','[He] 2s²2p²',3823,4098,'2.267 g/cm³','2,4'],
+  [7,'N','Nitrogen','14.01','nonmetal',15,2,'Gas','[He] 2s²2p³',63,77,'0.0012506 g/L','2,5'],
+  [8,'O','Oxygen','15.99','nonmetal',16,2,'Gas','[He] 2s²2p⁴',54,90,'0.001429 g/L','2,6'],
+  [9,'F','Fluorine','18.99','halogen',17,2,'Gas','[He] 2s²2p⁵',53,85,'0.001696 g/L','2,7'],
+  [10,'Ne','Neon','20.18','noble',18,2,'Gas','[He] 2s²2p⁶',24.6,27.1,'0.0009002 g/L','2,8'],
+  [11,'Na','Sodium','22.99','alkali',1,3,'Solid','[Ne] 3s¹',370.9,1156,'0.968 g/cm³','2,8,1'],
+  [12,'Mg','Magnesium','24.31','alkaline',2,3,'Solid','[Ne] 3s²',923,1363,'1.738 g/cm³','2,8,2'],
+  [13,'Al','Aluminium','26.98','post-transition',13,3,'Solid','[Ne] 3s²3p¹',933,2792,'2.70 g/cm³','2,8,3'],
+  [14,'Si','Silicon','28.09','metalloid',14,3,'Solid','[Ne] 3s²3p²',1687,3538,'2.329 g/cm³','2,8,4'],
+  [15,'P','Phosphorus','30.97','nonmetal',15,3,'Solid','[Ne] 3s²3p³',317,554,'1.823 g/cm³','2,8,5'],
+  [16,'S','Sulfur','32.06','nonmetal',16,3,'Solid','[Ne] 3s²3p⁴',388,718,'2.07 g/cm³','2,8,6'],
+  [17,'Cl','Chlorine','35.45','halogen',17,3,'Gas','[Ne] 3s²3p⁵',172,239,'0.003214 g/L','2,8,7'],
+  [18,'Ar','Argon','39.95','noble',18,3,'Gas','[Ne] 3s²3p⁶',83.8,87.3,'0.001784 g/L','2,8,8'],
+  [19,'K','Potassium','39.10','alkali',1,4,'Solid','[Ar] 4s¹',336.5,1032,'0.862 g/cm³','2,8,8,1'],
+  [20,'Ca','Calcium','40.08','alkaline',2,4,'Solid','[Ar] 4s²',1115,1757,'1.55 g/cm³','2,8,8,2'],
+  [21,'Sc','Scandium','44.96','transition',3,4,'Solid','[Ar] 3d¹4s²',1814,3109,'2.985 g/cm³','2,8,9,2'],
+  [22,'Ti','Titanium','47.87','transition',4,4,'Solid','[Ar] 3d²4s²',1941,3560,'4.506 g/cm³','2,8,10,2'],
+  [23,'V','Vanadium','50.94','transition',5,4,'Solid','[Ar] 3d³4s²',2183,3680,'6.0 g/cm³','2,8,11,2'],
+  [24,'Cr','Chromium','52.00','transition',6,4,'Solid','[Ar] 3d⁵4s¹',2180,2944,'7.19 g/cm³','2,8,13,1'],
+  [25,'Mn','Manganese','54.94','transition',7,4,'Solid','[Ar] 3d⁵4s²',1519,2334,'7.21 g/cm³','2,8,13,2'],
+  [26,'Fe','Iron','55.85','transition',8,4,'Solid','[Ar] 3d⁶4s²',1811,3134,'7.874 g/cm³','2,8,14,2'],
+  [27,'Co','Cobalt','58.93','transition',9,4,'Solid','[Ar] 3d⁷4s²',1768,3200,'8.9 g/cm³','2,8,15,2'],
+  [28,'Ni','Nickel','58.69','transition',10,4,'Solid','[Ar] 3d⁸4s²',1728,3186,'8.908 g/cm³','2,8,16,2'],
+  [29,'Cu','Copper','63.55','transition',11,4,'Solid','[Ar] 3d¹⁰4s¹',1358,2835,'8.96 g/cm³','2,8,18,1'],
+  [30,'Zn','Zinc','65.38','transition',12,4,'Solid','[Ar] 3d¹⁰4s²',693,1180,'7.14 g/cm³','2,8,18,2'],
+  [31,'Ga','Gallium','69.72','post-transition',13,4,'Solid','[Ar] 3d¹⁰4s²4p¹',303,2477,'5.91 g/cm³','2,8,18,3'],
+  [32,'Ge','Germanium','72.63','metalloid',14,4,'Solid','[Ar] 3d¹⁰4s²4p²',1211,3106,'5.323 g/cm³','2,8,18,4'],
+  [33,'As','Arsenic','74.92','metalloid',15,4,'Solid','[Ar] 3d¹⁰4s²4p³',1090,887,'5.727 g/cm³','2,8,18,5'],
+  [34,'Se','Selenium','78.97','nonmetal',16,4,'Solid','[Ar] 3d¹⁰4s²4p⁴',494,958,'4.81 g/cm³','2,8,18,6'],
+  [35,'Br','Bromine','79.90','halogen',17,4,'Liquid','[Ar] 3d¹⁰4s²4p⁵',266,332,'3.1028 g/cm³','2,8,18,7'],
+  [36,'Kr','Krypton','83.80','noble',18,4,'Gas','[Ar] 3d¹⁰4s²4p⁶',116,120,'0.003749 g/L','2,8,18,8'],
+  [37,'Rb','Rubidium','85.47','alkali',1,5,'Solid','[Kr] 5s¹',312.5,961,'1.532 g/cm³','2,8,18,8,1'],
+  [38,'Sr','Strontium','87.62','alkaline',2,5,'Solid','[Kr] 5s²',1050,1655,'2.64 g/cm³','2,8,18,8,2'],
+  [39,'Y','Yttrium','88.91','transition',3,5,'Solid','[Kr] 4d¹5s²',1799,3609,'4.472 g/cm³','2,8,18,9,2'],
+  [40,'Zr','Zirconium','91.22','transition',4,5,'Solid','[Kr] 4d²5s²',2128,4682,'6.52 g/cm³','2,8,18,10,2'],
+  [41,'Nb','Niobium','92.91','transition',5,5,'Solid','[Kr] 4d⁴5s¹',2750,5017,'8.57 g/cm³','2,8,18,12,1'],
+  [42,'Mo','Molybdenum','95.96','transition',6,5,'Solid','[Kr] 4d⁵5s¹',2896,4912,'10.22 g/cm³','2,8,18,13,1'],
+  [43,'Tc','Technetium','[98]','transition',7,5,'Solid','[Kr] 4d⁵5s²',2430,4538,'11 g/cm³','2,8,18,13,2'],
+  [44,'Ru','Ruthenium','101.1','transition',8,5,'Solid','[Kr] 4d⁷5s¹',2607,4423,'12.45 g/cm³','2,8,18,15,1'],
+  [45,'Rh','Rhodium','102.9','transition',9,5,'Solid','[Kr] 4d⁸5s¹',2237,3968,'12.41 g/cm³','2,8,18,16,1'],
+  [46,'Pd','Palladium','106.4','transition',10,5,'Solid','[Kr] 4d¹⁰',1828,3236,'12.023 g/cm³','2,8,18,18'],
+  [47,'Ag','Silver','107.9','transition',11,5,'Solid','[Kr] 4d¹⁰5s¹',1235,2435,'10.49 g/cm³','2,8,18,18,1'],
+  [48,'Cd','Cadmium','112.4','transition',12,5,'Solid','[Kr] 4d¹⁰5s²',594,1040,'8.65 g/cm³','2,8,18,18,2'],
+  [49,'In','Indium','114.8','post-transition',13,5,'Solid','[Kr] 4d¹⁰5s²5p¹',430,2345,'7.31 g/cm³','2,8,18,18,3'],
+  [50,'Sn','Tin','118.7','post-transition',14,5,'Solid','[Kr] 4d¹⁰5s²5p²',505,2875,'7.265 g/cm³','2,8,18,18,4'],
+  [51,'Sb','Antimony','121.8','metalloid',15,5,'Solid','[Kr] 4d¹⁰5s²5p³',904,1860,'6.697 g/cm³','2,8,18,18,5'],
+  [52,'Te','Tellurium','127.6','metalloid',16,5,'Solid','[Kr] 4d¹⁰5s²5p⁴',723,1261,'6.24 g/cm³','2,8,18,18,6'],
+  [53,'I','Iodine','126.9','halogen',17,5,'Solid','[Kr] 4d¹⁰5s²5p⁵',387,457,'4.933 g/cm³','2,8,18,18,7'],
+  [54,'Xe','Xenon','131.3','noble',18,5,'Gas','[Kr] 4d¹⁰5s²5p⁶',161,165,'0.005887 g/L','2,8,18,18,8'],
+  [55,'Cs','Caesium','132.9','alkali',1,6,'Solid','[Xe] 6s¹',302,944,'1.873 g/cm³','2,8,18,18,8,1'],
+  [56,'Ba','Barium','137.3','alkaline',2,6,'Solid','[Xe] 6s²',1000,2170,'3.51 g/cm³','2,8,18,18,8,2'],
+  [57,'La','Lanthanum','138.9','lanthanide',3,6,'Solid','[Xe] 5d¹6s²',1193,3737,'6.162 g/cm³','2,8,18,18,9,2'],
+  [58,'Ce','Cerium','140.1','lanthanide',null,null,'Solid','[Xe] 4f¹5d¹6s²',1068,3716,'6.77 g/cm³','2,8,18,19,9,2'],
+  [59,'Pr','Praseodymium','140.9','lanthanide',null,null,'Solid','[Xe] 4f³6s²',1208,3793,'6.77 g/cm³','2,8,18,21,8,2'],
+  [60,'Nd','Neodymium','144.2','lanthanide',null,null,'Solid','[Xe] 4f⁴6s²',1297,3347,'7.01 g/cm³','2,8,18,22,8,2'],
+  [61,'Pm','Promethium','[145]','lanthanide',null,null,'Solid','[Xe] 4f⁵6s²',1315,3273,'7.26 g/cm³','2,8,18,23,8,2'],
+  [62,'Sm','Samarium','150.4','lanthanide',null,null,'Solid','[Xe] 4f⁶6s²',1345,2067,'7.52 g/cm³','2,8,18,24,8,2'],
+  [63,'Eu','Europium','152.0','lanthanide',null,null,'Solid','[Xe] 4f⁷6s²',1099,1802,'5.244 g/cm³','2,8,18,25,8,2'],
+  [64,'Gd','Gadolinium','157.3','lanthanide',null,null,'Solid','[Xe] 4f⁷5d¹6s²',1585,3546,'7.9 g/cm³','2,8,18,25,9,2'],
+  [65,'Tb','Terbium','158.9','lanthanide',null,null,'Solid','[Xe] 4f⁹6s²',1629,3503,'8.23 g/cm³','2,8,18,27,8,2'],
+  [66,'Dy','Dysprosium','162.5','lanthanide',null,null,'Solid','[Xe] 4f¹⁰6s²',1680,2840,'8.551 g/cm³','2,8,18,28,8,2'],
+  [67,'Ho','Holmium','164.9','lanthanide',null,null,'Solid','[Xe] 4f¹¹6s²',1734,2993,'8.795 g/cm³','2,8,18,29,8,2'],
+  [68,'Er','Erbium','167.3','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²',1802,3141,'9.066 g/cm³','2,8,18,30,8,2'],
+  [69,'Tm','Thulium','168.9','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²',1818,2223,'9.321 g/cm³','2,8,18,31,8,2'],
+  [70,'Yb','Ytterbium','173.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²',1097,1469,'6.965 g/cm³','2,8,18,32,8,2'],
+  [71,'Lu','Lutetium','175.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴5d¹6s²',1925,3675,'9.841 g/cm³','2,8,18,32,9,2'],
+  [72,'Hf','Hafnium','178.5','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²',2506,4876,'13.31 g/cm³','2,8,18,32,10,2'],
+  [73,'Ta','Tantalum','180.9','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²',3290,5731,'16.69 g/cm³','2,8,18,32,11,2'],
+  [74,'W','Tungsten','183.8','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²',3695,5828,'19.25 g/cm³','2,8,18,32,12,2'],
+  [75,'Re','Rhenium','186.2','transition',7,6,'Solid','[Xe] 4f¹⁴5d⁵6s²',3459,5869,'21.02 g/cm³','2,8,18,32,13,2'],
+  [76,'Os','Osmium','190.2','transition',8,6,'Solid','[Xe] 4f¹⁴5d⁶6s²',3306,5285,'22.59 g/cm³','2,8,18,32,14,2'],
+  [77,'Ir','Iridium','192.2','transition',9,6,'Solid','[Xe] 4f¹⁴5d⁷6s²',2719,4701,'22.56 g/cm³','2,8,18,32,15,2'],
+  [78,'Pt','Platinum','195.1','transition',10,6,'Solid','[Xe] 4f¹⁴5d⁹6s¹',2041,4098,'21.45 g/cm³','2,8,18,32,17,1'],
+  [79,'Au','Gold','197.0','transition',11,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s¹',1337,3129,'19.30 g/cm³','2,8,18,32,18,1'],
+  [80,'Hg','Mercury','200.6','transition',12,6,'Liquid','[Xe] 4f¹⁴5d¹⁰6s²',234,630,'13.534 g/cm³','2,8,18,32,18,2'],
+  [81,'Tl','Thallium','204.4','post-transition',13,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p¹',577,1746,'11.85 g/cm³','2,8,18,32,18,3'],
+  [82,'Pb','Lead','207.2','post-transition',14,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p²',601,2022,'11.34 g/cm³','2,8,18,32,18,4'],
+  [83,'Bi','Bismuth','209.0','post-transition',15,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p³',544,1837,'9.78 g/cm³','2,8,18,32,18,5'],
+  [84,'Po','Polonium','[209]','post-transition',16,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁴',527,1235,'9.196 g/cm³','2,8,18,32,18,6'],
+  [85,'At','Astatine','[210]','halogen',17,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁵',575,610,'~7 g/cm³','2,8,18,32,18,7'],
+  [86,'Rn','Radon','[222]','noble',18,6,'Gas','[Xe] 4f¹⁴5d¹⁰6s²6p⁶',202,211,'0.00973 g/L','2,8,18,32,18,8'],
+  [87,'Fr','Francium','[223]','alkali',1,7,'Solid','[Rn] 7s¹',300,950,'~1.87 g/cm³','2,8,18,32,18,8,1'],
+  [88,'Ra','Radium','[226]','alkaline',2,7,'Solid','[Rn] 7s²',973,2010,'5.5 g/cm³','2,8,18,32,18,8,2'],
+  [89,'Ac','Actinium','[227]','actinide',3,7,'Solid','[Rn] 6d¹7s²',1323,3471,'10.07 g/cm³','2,8,18,32,18,9,2'],
+  [90,'Th','Thorium','232.0','actinide',null,null,'Solid','[Rn] 6d²7s²',2023,5061,'11.72 g/cm³','2,8,18,32,18,10,2'],
+  [91,'Pa','Protactinium','231.0','actinide',null,null,'Solid','[Rn] 5f²6d¹7s²',1841,4300,'15.37 g/cm³','2,8,18,32,20,9,2'],
+  [92,'U','Uranium','238.0','actinide',null,null,'Solid','[Rn] 5f³6d¹7s²',1405,4404,'19.1 g/cm³','2,8,18,32,21,9,2'],
+  [93,'Np','Neptunium','[237]','actinide',null,null,'Solid','[Rn] 5f⁴6d¹7s²',917,4273,'20.45 g/cm³','2,8,18,32,22,9,2'],
+  [94,'Pu','Plutonium','[244]','actinide',null,null,'Solid','[Rn] 5f⁶7s²',913,3501,'19.816 g/cm³','2,8,18,32,24,8,2'],
+  [95,'Am','Americium','[243]','actinide',null,null,'Solid','[Rn] 5f⁷7s²',1449,2284,'12 g/cm³','2,8,18,32,25,8,2'],
+  [96,'Cm','Curium','[247]','actinide',null,null,'Solid','[Rn] 5f⁷6d¹7s²',1613,3383,'13.51 g/cm³','2,8,18,32,25,9,2'],
+  [97,'Bk','Berkelium','[247]','actinide',null,null,'Solid','[Rn] 5f⁹7s²',1259,2900,'14.78 g/cm³','2,8,18,32,27,8,2'],
+  [98,'Cf','Californium','[251]','actinide',null,null,'Solid','[Rn] 5f¹⁰7s²',1173,1743,'15.1 g/cm³','2,8,18,32,28,8,2'],
+  [99,'Es','Einsteinium','[252]','actinide',null,null,'Solid','[Rn] 5f¹¹7s²',1133,1269,'~8.84 g/cm³','2,8,18,32,29,8,2'],
+  [100,'Fm','Fermium','[257]','actinide',null,null,'Solid','[Rn] 5f¹²7s²',1800,'N/A','~9.7 g/cm³','2,8,18,32,30,8,2'],
+  [101,'Md','Mendelevium','[258]','actinide',null,null,'Solid','[Rn] 5f¹³7s²',1100,'N/A','~10.3 g/cm³','2,8,18,32,31,8,2'],
+  [102,'No','Nobelium','[259]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²',1100,'N/A','~9.9 g/cm³','2,8,18,32,32,8,2'],
+  [103,'Lr','Lawrencium','[266]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²7p¹',1900,'N/A','~15.6 g/cm³','2,8,18,32,32,8,3'],
+  [104,'Rf','Rutherfordium','[267]','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²',2400,'N/A','~23.2 g/cm³','2,8,18,32,32,10,2'],
+  [105,'Db','Dubnium','[268]','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²','N/A','N/A','~29.3 g/cm³','2,8,18,32,32,11,2'],
+  [106,'Sg','Seaborgium','[271]','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²','N/A','N/A','~35.0 g/cm³','2,8,18,32,32,12,2'],
+  [107,'Bh','Bohrium','[272]','transition',7,7,'Solid','[Rn] 5f¹⁴6d⁵7s²','N/A','N/A','~37.1 g/cm³','2,8,18,32,32,13,2'],
+  [108,'Hs','Hassium','[270]','transition',8,7,'Solid','[Rn] 5f¹⁴6d⁶7s²','N/A','N/A','~41.0 g/cm³','2,8,18,32,32,14,2'],
+  [109,'Mt','Meitnerium','[278]','unknown',9,7,'Solid','[Rn] 5f¹⁴6d⁷7s²','N/A','N/A','~37.4 g/cm³','2,8,18,32,32,15,2'],
+  [110,'Ds','Darmstadtium','[281]','unknown',10,7,'Solid','[Rn] 5f¹⁴6d⁸7s²','N/A','N/A','~34.8 g/cm³','2,8,18,32,32,16,2'],
+  [111,'Rg','Roentgenium','[282]','unknown',11,7,'Solid','[Rn] 5f¹⁴6d⁹7s²','N/A','N/A','~28.7 g/cm³','2,8,18,32,32,17,2'],
+  [112,'Cn','Copernicium','[285]','transition',12,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²','N/A',357,'~14.0 g/cm³','2,8,18,32,32,18,2'],
+  [113,'Nh','Nihonium','[286]','unknown',13,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p¹','N/A','N/A','~16 g/cm³','2,8,18,32,32,18,3'],
+  [114,'Fl','Flerovium','[289]','unknown',14,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p²','N/A','N/A','~14.0 g/cm³','2,8,18,32,32,18,4'],
+  [115,'Mc','Moscovium','[290]','unknown',15,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p³','N/A','N/A','~13.5 g/cm³','2,8,18,32,32,18,5'],
+  [116,'Lv','Livermorium','[293]','unknown',16,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁴','N/A','N/A','~12.9 g/cm³','2,8,18,32,32,18,6'],
+  [117,'Ts','Tennessine','[294]','unknown',17,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁵','N/A','N/A','~7.2 g/cm³','2,8,18,32,32,18,7'],
+  [118,'Og','Oganesson','[294]','noble',18,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²7p⁶','N/A','N/A','~5.0 g/cm³','2,8,18,32,32,18,8'],
 ];
 
-const byNum = {};
-ELEMENTS.forEach(e => byNum[e[0]] = e);
+const byN={};ELS.forEach(e=>byN[e[0]]=e);
 
-/* Legend */
-const legendEl = document.getElementById('legend');
-Object.entries(CATS).forEach(([k,{label,color}]) => {
-  const d = document.createElement('div');
-  d.className = 'legend-item';
-  d.style.color = color;
-  d.style.textShadow = `0 0 8px ${color}88`;
-  d.textContent = label;
-  legendEl.appendChild(d);
+/* ── BOOT ────────────────────────────────────────── */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    document.getElementById('app').classList.add('show');
+    buildLegend();buildGrid();
+    setTimeout(animateIn,200);
+  },3100);
 });
 
-/* Grid */
-function buildGrid() {
+/* ── THEME ───────────────────────────────────────── */
+function toggleTheme(){
+  const h=document.documentElement,isN=h.getAttribute('data-theme')==='night';
+  h.setAttribute('data-theme',isN?'day':'night');
+  document.getElementById('theme-btn').textContent=isN?'Night':'Day';
+  // update mass color for new theme
+  h.style.setProperty('--el-mass-color', isN ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.45)');
+  if(aEl!==null)drawElectrons(byN[aEl]);
+}
+
+/* ── FONT ────────────────────────────────────────── */
+function toggleFd(){
+  document.getElementById('fd-menu').classList.toggle('open');
+  document.getElementById('fx-menu').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('fd-wrap').contains(e.target))document.getElementById('fd-menu').classList.remove('open');
+  if(!document.getElementById('fx-wrap').contains(e.target))document.getElementById('fx-menu').classList.remove('open');
+});
+function setFont(el){
+  document.querySelectorAll('#fd-menu .fd-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  const r = document.documentElement;
+  const isDay = document.documentElement.dataset.theme === 'day';
+  const massDark = 'rgba(255,255,255,0.45)';
+  const massDay  = 'rgba(0,0,0,0.4)';
+  const mono = (f) => ['IBM Plex Mono','Space Mono'].some(m=>f.includes(m));
+
+  if(el.dataset.f === '__pro__'){
+    // Pro Style: DM Sans body + Space Mono for num/mass
+    r.style.setProperty('--font-body',"'DM Sans',sans-serif");
+    r.style.setProperty('--el-sym-font',"'DM Sans',sans-serif");
+    r.style.setProperty('--el-sym-size','1.35rem');
+    r.style.setProperty('--el-sym-weight','400');
+    r.style.setProperty('--el-sym-spacing','0.02em');
+    r.style.setProperty('--el-num-font',"'Space Mono',monospace");
+    r.style.setProperty('--el-mass-font',"'Space Mono',monospace");
+  } else {
+    const f = el.dataset.f;
+    r.style.setProperty('--font-body', f);
+    r.style.setProperty('--el-sym-font', f);
+    // Serif fonts: lighter symbol weight looks better
+    const isSerif = f.includes('Playfair') || f.includes('Cormorant') || f.includes('Source Serif');
+    r.style.setProperty('--el-sym-weight', isSerif ? '400' : '700');
+    r.style.setProperty('--el-sym-size', '1.28rem');
+    r.style.setProperty('--el-sym-spacing', isSerif ? '0.01em' : '0em');
+    // Monospace fonts: use same font for num/mass
+    const isMono = mono(f);
+    r.style.setProperty('--el-num-font', isMono ? f : "'IBM Plex Mono',monospace");
+    r.style.setProperty('--el-mass-font', isMono ? f : "'IBM Plex Mono',monospace");
+  }
+  // Sizes/weights/colors are universal — just fix mass color for day/night
+  r.style.setProperty('--el-mass-color', isDay ? massDay : massDark);
+  document.getElementById('fd-menu').classList.remove('open');
+}
+
+/* ── EFFECT SWITCHER ─────────────────────────────── */
+let currentFx = 1;
+const fxNames = {1:'Fade', 2:'Domino Glow', 3:'Ring Glow'};
+
+function toggleFxMenu(){
+  document.getElementById('fx-menu').classList.toggle('open');
+  document.getElementById('fd-menu').classList.remove('open');
+}
+
+function setEffect(fx, el){
+  // Clear active category first
+  if(aCat !== null) {
+    clearFilter();
+  }
+  currentFx = fx;
+  // Swap grid class
   const grid = document.getElementById('pt-grid');
-  const cells = Array.from({length:7}, () => Array(18).fill(null));
+  grid.classList.remove('fx1','fx2','fx3');
+  grid.classList.add('fx'+fx);
+  // Update button label
+  document.getElementById('fx-btn').textContent = '✦ Effect: ' + fxNames[fx];
+  // Update dropdown selection
+  document.querySelectorAll('#fx-menu .fd-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('fx-menu').classList.remove('open');
+}
 
-  ELEMENTS.forEach(el => {
-    const [num,sym,name,mass,cat,group,period] = el;
-    if (group && period) cells[period-1][group-1] = el;
+/* ── LEGEND ──────────────────────────────────────── */
+function buildLegend(){
+  const w=document.getElementById('legend');
+  Object.entries(CATS).forEach(([k,{label,cv}])=>{
+    const d=document.createElement('div');
+    d.className='leg-it';d.dataset.cat=k;
+    d.innerHTML=`<div class="leg-dot" style="background:${cv}"></div>${label}`;
+    d.addEventListener('click',()=>filterCat(k,d,true));
+    w.appendChild(d);
   });
+}
 
-  const lants = ELEMENTS.filter(e => e[4]==='lanthanide' && !e[6]);
-  const acts  = ELEMENTS.filter(e => e[4]==='actinide'   && !e[6]);
+/* ── GRID ────────────────────────────────────────── */
+function buildGrid(){
+  const g=document.getElementById('pt-grid');
+  const cells=Array.from({length:10},()=>Array(18).fill(null));
+  ELS.forEach(([num,,,,cat,gr,pr])=>{if(gr&&pr)cells[pr-1][gr-1]=byN[num]});
+  // Remove Lu (71) and Lr (103) from group 3 — replace with gap cells below
+  cells[5][2]=null; cells[6][2]=null;
+  ELS.filter(e=>e[4]==='lanthanide').forEach((el,i)=>cells[8][i+2]=el);
+  ELS.filter(e=>e[4]==='actinide').forEach((el,i)=>cells[9][i+2]=el);
 
-  for (let r = 0; r < 7; r++) {
-    for (let c = 0; c < 18; c++) {
-      const el = cells[r][c];
-      if (!el) {
-        const sp = document.createElement('div');
-        if ((r===5||r===6) && c===2) {
-          sp.className = 'gap-cell';
-          sp.innerHTML = `<span>${r===5?'57-71':'89-103'}</span>`;
-        } else { sp.className = 'spacer'; }
-        grid.appendChild(sp);
+  for(let r=0;r<10;r++){
+    if(r===7){for(let c=0;c<18;c++){const s=mk('div','sp');s.style.cssText=`grid-column:${c+1};grid-row:${r+1}`;g.appendChild(s)}continue}
+    for(let c=0;c<18;c++){
+      const el=cells[r][c];
+      if(!el){
+        if((r===5||r===6)&&c===2){
+          const iLan=r===5;
+          const cv=iLan?'var(--lanthanide)':'var(--actinide)';
+          const s=mk('div','el gc-series');
+          s.style.cssText=`grid-column:${c+1};grid-row:${r+1};--cat-color:${cv};pointer-events:none`;
+          s.dataset.cat=iLan?'lanthanide':'actinide';
+          s.innerHTML=`<div class="el-sym" style="font-size:.8rem">${iLan?'La–Lu':'Ac–Lr'}</div><div class="el-name">${iLan?'57–71':'89–103'}</div>`;
+          g.appendChild(s);}
+        else{const s=mk('div','sp');s.style.cssText=`grid-column:${c+1};grid-row:${r+1}`;g.appendChild(s)}
         continue;
       }
-      grid.appendChild(makeCell(el));
+      const[num,sym,name,mass,cat]=el;
+      const cv=CATS[cat]?.cv||'var(--unknown)';
+      const d=mk('div','el');
+      d.dataset.num=num;d.dataset.cat=cat;
+      d.style.cssText=`grid-column:${c+1};grid-row:${r+1};--cat-color:${cv}`;
+      d.innerHTML=`<div class="el-num">${num}</div><div class="el-sym">${sym}</div><div class="el-name">${name}</div><div class="el-mass">${mass}</div>`;
+      d.addEventListener('click',()=>{
+        if(aCat&&d.dataset.cat!==aCat){filterCat(aCat,document.querySelector(`.leg-it[data-cat="${aCat}"]`),false);return}
+        // Smart deselection: clicking the already-active element closes the panel (all effects)
+        if(aEl===num){closePanel();return;}
+        showEl(num);
+      });
+      g.appendChild(d);
+    }
+  }
+}
+function mk(t,c){const e=document.createElement(t);e.className=c;return e}
+
+/* ── FILTER ──────────────────────────────────────── */
+let aCat=null;
+let clearTimer=null;
+
+function clearFilter(instant=false){
+  const aL=document.querySelectorAll('.leg-it');
+  const aE=document.querySelectorAll('.el[data-cat]');
+  aL.forEach(l=>l.classList.remove('act'));
+
+  if(currentFx===1||instant){
+    aE.forEach(e=>{e.classList.remove('hi','dm','shrink');e.style.animationDelay=''});
+  } else {
+    const highlighted=[...document.querySelectorAll('.el.hi')];
+    highlighted.forEach((e,i)=>{
+      e.classList.remove('hi');
+      e.classList.add('shrink');
+      e.style.animationDelay=`${(highlighted.length-1-i)*0.04}s`;
+    });
+    const maxDelay=(highlighted.length-1)*0.04;
+    if(clearTimer) clearTimeout(clearTimer);
+    clearTimer=setTimeout(()=>{
+      aE.forEach(e=>{
+        e.classList.remove('hi','dm','shrink');
+        e.style.animationDelay='';
+      });
+    },(maxDelay+0.45)*1000);
+  }
+  aCat=null;
+}
+
+function filterCat(cat,item,isLegendClick=true){
+  const aL=document.querySelectorAll('.leg-it');
+  const aE=document.querySelectorAll('.el[data-cat]');
+
+  if(aCat===cat){
+    const useInstant=((currentFx===2||currentFx===3)&&!isLegendClick);
+    clearFilter(useInstant);
+    return;
+  }
+
+  if(clearTimer){clearTimeout(clearTimer);clearTimer=null;}
+
+  aE.forEach(e=>{e.classList.remove('hi','dm','shrink');e.style.animationDelay='';});
+
+  aCat=cat;
+  aL.forEach(l=>l.classList.remove('act'));
+  item.classList.add('act');
+
+  if(currentFx===1){
+    aE.forEach(e=>{
+      e.dataset.cat===cat
+        ?(e.classList.add('hi'),e.classList.remove('dm'))
+        :(e.classList.add('dm'),e.classList.remove('hi'));
+    });
+  } else {
+    aE.forEach(e=>e.classList.add('dm'));
+    const sel=[...document.querySelectorAll(`.el[data-cat="${cat}"]`)];
+    sel.forEach((e,i)=>{
+      e.classList.remove('dm');
+      e.classList.add('hi');
+      e.style.animationDelay=`${i*0.045}s`;
+    });
+  }
+}
+
+/* ── ANIMATE IN ──────────────────────────────────── */
+function animateIn(){
+  document.querySelectorAll('.el[data-num]').forEach((el,i)=>{
+    el.style.opacity='0';el.style.transform='scale(0.78)';
+    el.style.transition=`opacity .3s ease ${i*2.4}ms,transform .3s cubic-bezier(.34,1.3,.64,1) ${i*2.4}ms,border-color .18s,box-shadow .18s,filter .22s`;
+    setTimeout(()=>{el.style.opacity='';el.style.transform=''},40+i*2.4);
+  });
+}
+
+/* ── ELEMENT PANEL ───────────────────────────────── */
+let aEl=null,eRAF=null;
+function showEl(num){
+  const el=byN[num];if(!el)return;
+  const[n,sym,name,mass,cat,group,period,state,config,mp,bp,density,shells]=el;
+  const cv=CATS[cat]?.cv||'var(--unknown)';
+  if(aEl!==null)document.querySelector(`.el[data-num="${aEl}"]`)?.classList.remove('acel');
+  aEl=num;document.querySelector(`.el[data-num="${num}"]`)?.classList.add('acel');
+
+  document.getElementById('info-panel').style.setProperty('--pc',cv);
+  const ps=document.getElementById('p-sym');ps.style.color=cv;ps.textContent=sym;
+  document.getElementById('p-name').textContent=name;
+  document.getElementById('p-num').textContent=`Atomic Number ${n}`;
+  const pb=document.getElementById('p-badge');pb.textContent=CATS[cat]?.label||'Unknown';
+  pb.style.cssText=`background:${cv}18;color:${cv};border:1px solid ${cv}42`;
+
+  const fmtK=v=>typeof v==='number'?`${v} K (${(v-273.15).toFixed(1)} °C)`:v;
+  const blk=config.includes('f')?'f-block':config.includes('d')?'d-block':config.includes('p')?'p-block':'s-block';
+
+  document.getElementById('pan-body').innerHTML=`
+    <div class="ps-sec"><div class="ps-ttl">Physical Properties</div>
+      <div class="p-row"><span class="p-lbl">Atomic Mass</span><span class="p-val">${mass} u</span></div>
+      <div class="p-row"><span class="p-lbl">State (STP)</span><span class="p-val">${state}</span></div>
+      <div class="p-row"><span class="p-lbl">Melting Point</span><span class="p-val">${fmtK(mp)}</span></div>
+      <div class="p-row"><span class="p-lbl">Boiling Point</span><span class="p-val">${fmtK(bp)}</span></div>
+      <div class="p-row"><span class="p-lbl">Density</span><span class="p-val">${density}</span></div>
+    </div>
+    <div class="p-div"></div>
+    <div class="ps-sec"><div class="ps-ttl">Atomic Structure</div>
+      <div class="p-row"><span class="p-lbl">Configuration</span><span class="p-val" style="font-size:.59rem">${config}</span></div>
+      <div class="p-row"><span class="p-lbl">Electrons/Shell</span><span class="p-val">${shells||'N/A'}</span></div>
+      ${group?`<div class="p-row"><span class="p-lbl">Group</span><span class="p-val">${group}</span></div>`:''}
+      ${period?`<div class="p-row"><span class="p-lbl">Period</span><span class="p-val">${period}</span></div>`:''}
+      <div class="p-row"><span class="p-lbl">Block</span><span class="p-val">${blk}</span></div>
+    </div>
+    <div class="p-div"></div>
+    <div class="ps-sec"><div class="ps-ttl">Classification</div>
+      <div class="p-row"><span class="p-lbl">Category</span><span class="p-val">${CATS[cat]?.label||'Unknown'}</span></div>
+    </div>`;
+
+  document.getElementById('info-panel').classList.add('show');
+  drawElectrons(el);
+}
+function closePanel(){
+  document.getElementById('info-panel').classList.remove('show');
+  if(aEl!==null){document.querySelector(`.el[data-num="${aEl}"]`)?.classList.remove('acel');aEl=null}
+  if(eRAF)cancelAnimationFrame(eRAF);
+  const dt=document.getElementById('det-toggle'),dp=document.getElementById('det-panel');
+  if(dt)dt.classList.remove('open');if(dp)dp.classList.remove('open');
+}
+
+/* ── ELECTRON CANVAS ─────────────────────────────── */
+const EC_N={alkali:'#ff6b6b',alkaline:'#ff9f4a',transition:'#5ba4f5','post-transition':'#6ee7a0',metalloid:'#2dd4bf',nonmetal:'#f472b6',halogen:'#c084fc',noble:'#a78bfa',lanthanide:'#22d3ee',actinide:'#fbbf24',unknown:'#94a3b8'};
+const EC_D={alkali:'#d42020',alkaline:'#c95018',transition:'#1742b8','post-transition':'#12703f',metalloid:'#0a8a80',nonmetal:'#b51e90',halogen:'#6d2fd8',noble:'#3a2fb5',lanthanide:'#0782a8',actinide:'#b0680c',unknown:'#4a5c78'};
+
+function drawElectrons(el){
+  if(eRAF)cancelAnimationFrame(eRAF);
+  const cv=document.getElementById('e-cv'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  const isDay=document.documentElement.getAttribute('data-theme')==='day';
+  const sc=(el[12]||'2').split(',').map(Number).slice(0,7);
+  const ec=(isDay?EC_D:EC_N)[el[4]]||'#5ba4f5';
+  const oc=isDay?'rgba(0,0,0,0.12)':'rgba(255,255,255,0.12)';
+
+  // ── Bohr model physics ─────────────────────────────────────────
+  // Orbital radius: r_n = n² × a₀  (a₀ = Bohr radius, scaled to px)
+  // Orbital period: T_n = T₁ × n³  →  ω_n = ω₁ / n³
+  // Speed floor: outer shells must stay visibly spinning —
+  //   purely physical ω_n/n³ makes n=6,7 essentially static at canvas fps.
+  //   We apply a minimum of ω₁/20 so every shell is always visible.
+  const BASE_R=9.5;        // n=1 shell radius in px (scales up with canvas)
+  const W1=0.032;          // n=1 angular speed (rad/frame)
+  const MIN_SPD=W1/20;     // speed floor — outermost shells never slower than this
+
+  const rawR=sc.map((_,i)=>BASE_R*(i+1)*(i+1));
+  const maxFit=Math.min(cx,cy)-5;
+  const scale=rawR.length>0?Math.min(1,maxFit/rawR[rawR.length-1]):1;
+  const radii=rawR.map(r=>r*scale);
+
+  // Angular speed: ω_n = max(ω₁/n³, MIN_SPD)
+  const spds=sc.map((_,i)=>{
+    const n=i+1;
+    return Math.max(W1/(n*n*n), MIN_SPD);
+  });
+
+  // Stagger starting angles so shells don't look aligned
+  const offs=sc.map((_,i)=>i*1.23);
+
+  // Electron dot radius: slightly larger on bigger canvas, shrinks for crowded shells
+  const eDotR=(r,cnt)=>Math.max(1.4, Math.min(2.8, r*Math.PI/(cnt*3.2)));
+
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // Nucleus — size proportional to proton count, capped
+    const nucR=Math.max(3,2+Math.log(sc.reduce((a,b)=>a+b,0)+1)*0.9);
+    ctx.beginPath();ctx.arc(cx,cy,nucR,0,Math.PI*2);
+    ctx.fillStyle=ec;ctx.fill();
+    sc.forEach((cnt,si)=>{
+      const r=radii[si];
+      // Orbit ring
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle=oc;ctx.lineWidth=0.8;ctx.stroke();
+      // Electrons
+      const dotR=eDotR(r,cnt);
+      for(let e=0;e<cnt;e++){
+        const a=offs[si]+(2*Math.PI/cnt)*e+t*spds[si];
+        ctx.beginPath();ctx.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),dotR,0,Math.PI*2);
+        ctx.fillStyle=ec;ctx.fill();
+      }
+    });
+    t++;eRAF=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── AI ──────────────────────────────────────────── */
+document.getElementById('ai-in').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();triggerAsk()}
+});
+function fillQ(q){document.getElementById('ai-in').value=q;document.getElementById('ai-in').focus()}
+
+async function triggerAsk(){
+  const q=document.getElementById('ai-in').value.trim();
+  if(q.length<2)return;
+  const btn=document.getElementById('ask-btn');
+  btn.disabled=true;btn.textContent='Asking…';
+  const wrap=document.getElementById('ai-ans-wrap');
+  const body=document.getElementById('ai-body');
+  document.getElementById('ai-qtxt').textContent=`"${q}"`;
+  body.innerHTML=`<div class="ld-row"><div class="ld-dots"><div class="ld-d"></div><div class="ld-d"></div><div class="ld-d"></div></div><span>Consulting ChemLab AI…</span></div>`;
+  wrap.classList.add('show');
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  const sys=`You are ChemLab AI — an expert chemistry assistant embedded in the ChemLab periodic table website. You ONLY answer questions strictly about the 118 chemical elements.
+
+Allowed topics: melting point, boiling point, density, history/discovery, physical characteristics, chemical characteristics, isotopes, nuclear characteristics, laboratory preparation, industrial production, special cases/anomalies, advantages/applications, disadvantages/hazards.
+
+Formatting rules:
+- Use **bold** for key terms and values.
+- Use bullet points (- item) for lists.
+- Use ### for section headers when covering multiple aspects.
+- Be accurate, concise, and professional.
+- Always include the element symbol and atomic number when first mentioned.
+- If asked about non-element topics, politely decline.`;
+
+  try{
+    const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?system=${encodeURIComponent(sys)}&model=openai&seed=77`);
+    if(!r.ok)throw 0;
+    const txt=await r.text();
+    body.innerHTML=`<div class="ai-resp">${mdHtml(txt)}</div>`;
+  }catch{
+    body.innerHTML=`<div class="ai-resp" style="color:var(--alkali)">Could not reach ChemLab AI. Please check your connection and try again.</div>`;
+  }finally{btn.disabled=false;btn.textContent='Ask AI'}
+}
+
+function closeAns(){
+  document.getElementById('ai-ans-wrap').classList.remove('show');
+  document.getElementById('ai-in').value='';
+}
+
+function mdHtml(t){
+  return t
+    .replace(/^###\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^##\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^#\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^[-•]\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)/g,(m)=>`<ul>${m}</ul>`)
+    .replace(/<\/ul>\s*<ul>/g,'')
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n(?![<])/g,' ');
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   ELEMENT DETAIL PAGE — complete Mendeleev-app-style data
+   Categories: General · Physical · Atomic · Thermodynamic ·
+   Electromagnetic · Nuclear · Reactivity · Abundances ·
+   Isotopes · Compounds · History · Uses & Biology
+═══════════════════════════════════════════════════════════ */
+
+/* ── Per-element extended data ──────────────────────────────
+   Fields (all optional — 'null' = data not available):
+   eneg, aRc(calc), aRe(empirical), covR, vdwR,
+   ie1(kJ/mol), ea(kJ/mol),
+   mp°C, bp°C, hfus(kJ/mol), hvap(kJ/mol), cp(J/g·K),
+   kth(W/m·K thermal cond), res(Ω·m electrical resistivity),
+   mag(magnetic type string),
+   Y(Young GPa), G(shear GPa), B(bulk GPa), nu(Poisson),
+   mohs, vick(MPa), brin(MPa), vs(speed of sound m/s),
+   disc(year/era), by(discoverer), nm(named by), ety(etymology),
+   Uc(universe ppb), Sc(sun ppb), Mc(meteorite ppb),
+   Cc(crust ppb), Oc(ocean ppb), Hc(human body ppb),
+   cryst(crystal structure), col(color), app(appearance),
+   rad(radioactive bool), cas,
+   ox(oxidation states []), ie(all ionisation energies [kJ/mol]),
+   iso(isotopes [{s,Z,N,m,ab,stable,hl,dc,note}]),
+   cpd(compounds [{f,n}]),
+   uses(string), bio(string), hist(string), fun(string)
+──────────────────────────────────────────────────────────── */
+const XD = {
+1:{eneg:2.20,aRc:53,aRe:25,covR:31,vdwR:120,ie1:1312,ea:72.8,
+  mpC:-259.1,bpC:-252.9,hfus:0.117,hvap:0.452,cp:14.304,
+  kth:0.1805,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:1270,
+  disc:'1766',by:'Henry Cavendish',nm:'Antoine Lavoisier (1783)',
+  ety:'Greek: hydro (water) + genes (forming) — "water-former"',
+  Uc:750000000,Sc:909000000,Mc:2000000,Cc:1400000,Oc:108000000,Hc:600000000,
+  cryst:'Hexagonal (solid H₂)',col:'Colorless',app:'Colorless, odorless diatomic gas',
+  rad:false,cas:'1333-74-0',
+  ox:['-1','0','+1'],
+  ie:[1312.0,2372.3],
+  iso:[{s:'¹H',Z:1,N:0,m:'1.007825',ab:'99.985%',stable:true},
+       {s:'²H',Z:1,N:1,m:'2.014102',ab:'0.015%',stable:true,note:'Deuterium'},
+       {s:'³H',Z:1,N:2,m:'3.016049',ab:'Trace',stable:false,hl:'12.32 yr',dc:'β⁻',note:'Tritium'}],
+  cpd:[{f:'H₂O',n:'Water — solvent of life'},{f:'H₂SO₄',n:'Sulfuric acid — industrial acid'},{f:'HCl',n:'Hydrochloric acid — stomach acid'},{f:'NH₃',n:'Ammonia — fertiliser precursor'},{f:'CH₄',n:'Methane — natural gas'}],
+  uses:'Fuel cells and hydrogen economy; rocket propellant (liquid H₂); hydrogenation of vegetable oils; semiconductor manufacturing; weather balloons; reducing agent in metallurgy; petroleum refining; Haber-Bosch synthesis of NH₃',
+  bio:'Most abundant element in the human body by number of atoms (~60%). Constituent of all water and organic molecules. Critical for acid–base balance (H⁺ ions) and all biochemical reactions.',
+  hist:'Henry Cavendish produced and characterised hydrogen gas in 1766, calling it "inflammable air." Lavoisier named it hydrogen in 1783 after discovering it formed water on combustion, overturning the phlogiston theory.',
+  fun:'Most abundant element in the universe — about 75% of all normal baryonic matter.'},
+2:{eneg:null,aRc:31,aRe:null,covR:28,vdwR:140,ie1:2372.3,ea:0,
+  mpC:-272.2,bpC:-268.9,hfus:0.0138,hvap:0.0829,cp:5.193,
+  kth:0.1513,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:970,
+  disc:'1868',by:'Janssen & Lockyer',nm:'Lockyer & Frankland (1895)',
+  ety:'Greek: Helios (the Sun) — first detected in solar spectrum',
+  Uc:230000000,Sc:185000000,Mc:600,Cc:8,Oc:0.007,Hc:0,
+  cryst:'HCP (under extreme pressure only)',col:'Colorless',app:'Colorless, odorless, tasteless noble gas',
+  rad:false,cas:'7440-59-7',
+  ox:['0'],
+  ie:[2372.3,5250.5],
+  iso:[{s:'³He',Z:2,N:1,m:'3.016029',ab:'0.000134%',stable:true},
+       {s:'⁴He',Z:2,N:2,m:'4.002602',ab:'99.99986%',stable:true}],
+  cpd:[],
+  uses:'MRI & NMR superconducting magnet cooling; deep-sea diving gas mixtures (heliox); pressurizing rocket propellants; leak detection; inert shielding gas for welding; cryogenic research; laser cooling',
+  bio:'No biological role. Non-toxic and chemically inert. Heliox (He+O₂) breathing mixtures are used to treat respiratory obstruction.',
+  hist:'Detected in the 1868 solar eclipse spectrum by Janssen (France) and Lockyer (UK) independently. Isolated on Earth in 1895 by Ramsay from uranium ore (cleveite).',
+  fun:'The only element that cannot be solidified at normal pressure — remains liquid down to absolute zero.'},
+3:{eneg:0.98,aRc:167,aRe:145,covR:128,vdwR:182,ie1:520.2,ea:59.6,
+  mpC:180.5,bpC:1342,hfus:3.0,hvap:136,cp:3.582,
+  kth:84.7,res:9.28e-8,mag:'Paramagnetic',
+  Y:4.9,G:4.2,B:11,nu:0.36,mohs:0.6,vick:null,brin:null,vs:6000,
+  disc:'1817',by:'Johan August Arfwedson',nm:'Johan August Arfwedson',
+  ety:'Greek: lithos (stone)',
+  Uc:6000,Sc:null,Mc:7000,Cc:17000,Oc:180,Hc:3000,
+  cryst:'Body-centred cubic',col:'Silver-white',app:'Soft, silvery-white metal — lightest solid metal',
+  rad:false,cas:'7439-93-2',
+  ox:['+1'],
+  ie:[520.2,7298.1,11815.0],
+  iso:[{s:'⁶Li',Z:3,N:3,m:'6.015123',ab:'7.59%',stable:true},
+       {s:'⁷Li',Z:3,N:4,m:'7.016003',ab:'92.41%',stable:true}],
+  cpd:[{f:'Li₂CO₃',n:'Lithium carbonate — psychiatric drug (bipolar)'},{f:'LiOH',n:'Lithium hydroxide — CO₂ scrubber'},{f:'LiCl',n:'Lithium chloride — dehumidifier, flux'},{f:'LiFePO₄',n:'Lithium iron phosphate — battery cathode'}],
+  uses:'Lithium-ion batteries (smartphones, EVs, grid storage); psychiatric medication (Li₂CO₃ for bipolar disorder); Li⁶ breeds tritium in fusion reactors; heat-resistant glass; lubricating greases; aluminium alloys; air purification',
+  bio:'No confirmed essential role. Lithium salts are first-line mood stabilisers for bipolar disorder, acting on inositol phosphate pathways. Narrow therapeutic window — excess is toxic.',
+  hist:'Discovered by Arfwedson in 1817 while analysing petalite ore. Named by Berzelius from Greek lithos (stone). Isolated by Brande and Davy in 1821 via electrolysis.',
+  fun:'Lightest solid element and the lightest metal. Less dense than water.'},
+4:{eneg:1.57,aRc:112,aRe:105,covR:96,vdwR:153,ie1:899.5,ea:0,
+  mpC:1287,bpC:2469,hfus:12.2,hvap:297,cp:1.825,
+  kth:200,res:3.76e-8,mag:'Diamagnetic',
+  Y:287,G:132,B:130,nu:0.032,mohs:5.5,vick:1670,brin:600,vs:12890,
+  disc:'1798',by:'Louis Vauquelin',nm:'Louis Vauquelin',
+  ety:'Greek: beryllos (a precious stone, beryl)',
+  Uc:1000,Sc:null,Mc:70,Cc:1900,Oc:0.006,Hc:36,
+  cryst:'Hexagonal close-packed',col:'Steel grey',app:'Rigid, steel-grey metal',
+  rad:false,cas:'7440-41-7',
+  ox:['+2'],
+  ie:[899.5,1757.1,14848.7,21006.6],
+  iso:[{s:'⁹Be',Z:4,N:5,m:'9.012182',ab:'100%',stable:true}],
+  cpd:[{f:'BeO',n:'Beryllium oxide — refractory, nuclear moderator'},{f:'BeCl₂',n:'Beryllium chloride — Lewis acid catalyst'},{f:'Be₃Al₂Si₆O₁₈',n:'Beryl — gemstone mineral (emerald, aquamarine)'}],
+  uses:'Copper-beryllium alloys (non-sparking tools, springs); X-ray transparent windows; aerospace structural material; nuclear reactor moderator (Be reflects neutrons); acoustic speakers (beryllium tweeter domes)',
+  bio:'No biological role. Beryllium and its compounds are toxic — cause chronic beryllium disease (berylliosis), a serious lung condition. Group 1 IARC carcinogen.',
+  hist:'Discovered in 1798 by Vauquelin in beryl and emerald minerals. Isolated as a metal by Wöhler and Bussy in 1828 by reducing BeCl₂ with potassium.',
+  fun:'The stiffest of all light metals — has the highest specific stiffness (Young\'s modulus/density) of any element.'},
+5:{eneg:2.04,aRc:87,aRe:85,covR:84,vdwR:192,ie1:800.6,ea:26.7,
+  mpC:2075,bpC:4000,hfus:50.2,hvap:480,cp:1.026,
+  kth:27.4,res:1e4,mag:'Diamagnetic',
+  Y:null,G:null,B:17,nu:null,mohs:9.5,vick:49000,brin:null,vs:16200,
+  disc:'1808',by:'Gay-Lussac & Thenard / Davy',nm:'Gay-Lussac & Thenard',
+  ety:'Arabic: buraq; Persian: burah (borax mineral)',
+  Uc:700,Sc:null,Mc:700,Cc:8700,Oc:4440,Hc:700,
+  cryst:'Rhombohedral (β-B)',col:'Black (amorphous) / black-brown (crystalline)',app:'Hard, dark metalloid',
+  rad:false,cas:'7440-42-8',
+  ox:['-5','-1','0','+1','+2','+3'],
+  ie:[800.6,2427.1,3659.7,25025.8,32826.7],
+  iso:[{s:'¹⁰B',Z:5,N:5,m:'10.012937',ab:'19.9%',stable:true},{s:'¹¹B',Z:5,N:6,m:'11.009305',ab:'80.1%',stable:true}],
+  cpd:[{f:'B₂O₃',n:'Boron trioxide — glass ingredient'},{f:'Na₂B₄O₇',n:'Borax — cleaning & metallurgy'},{f:'BF₃',n:'Boron trifluoride — Lewis acid catalyst'},{f:'B₄C',n:'Boron carbide — hardest material after diamond'}],
+  uses:'Borosilicate glass (Pyrex); fiberglass insulation; borax detergent; B₄C in body armour (lightweight, hard); ¹⁰B in nuclear control rods (neutron absorber); semiconductor dopant; alloys',
+  bio:'Essential micronutrient for plants (cell wall synthesis). Possible trace role in humans — bone health and cognitive function debated. No confirmed RDA for humans.',
+  hist:'Isolated in 1808 by Gay-Lussac and Thenard (France) and Davy (UK) independently, by reducing boric acid with potassium. Pure crystalline boron was not produced until 1909.',
+  fun:'The second hardest element, after carbon (diamond). Boron carbide (B₄C) is used in tank armour.'},
+6:{eneg:2.55,aRc:67,aRe:70,covR:77,vdwR:170,ie1:1086.5,ea:153.9,
+  mpC:3550,bpC:4027,hfus:105.0,hvap:355.8,cp:0.709,
+  kth:119,res:7.84e-6,mag:'Diamagnetic',
+  Y:9.0,G:null,B:33,nu:null,mohs:0.5,vick:null,brin:null,vs:18350,
+  disc:'Ancient',by:'Prehistoric',nm:'Lavoisier (1789)',
+  ety:'Latin: carbo (coal, charcoal)',
+  Uc:5000000,Sc:3300000,Mc:35000000,Cc:200000,Oc:28000,Hc:230000000,
+  cryst:'Hexagonal (graphite) / Diamond cubic',col:'Black (graphite) / Colorless (diamond)',app:'Black solid or transparent crystal depending on allotrope',
+  rad:false,cas:'7440-44-0',
+  ox:['-4','-3','-2','-1','0','+1','+2','+3','+4'],
+  ie:[1086.5,2352.6,4620.5,6222.7,37831,47277],
+  iso:[{s:'¹²C',Z:6,N:6,m:'12.000000',ab:'98.93%',stable:true},
+       {s:'¹³C',Z:6,N:7,m:'13.003355',ab:'1.07%',stable:true},
+       {s:'¹⁴C',Z:6,N:8,m:'14.003242',ab:'Trace',stable:false,hl:'5,730 yr',dc:'β⁻',note:'Radiocarbon dating'}],
+  cpd:[{f:'CO₂',n:'Carbon dioxide — greenhouse gas'},{f:'CH₄',n:'Methane — natural gas'},{f:'C₆H₁₂O₆',n:'Glucose — cellular energy'},{f:'CaCO₃',n:'Calcium carbonate — limestone'},{f:'C₂H₅OH',n:'Ethanol'}],
+  uses:'Steel production (as coke/carbon); diamonds for cutting & jewellery; carbon fibre composites in aerospace; graphite electrodes, lubricants and pencils; activated carbon for filtration; coal as fuel; carbon nanotubes; graphene',
+  bio:'Basis of all known life — organic chemistry is the chemistry of carbon. Forms >10 million known compounds. Present in DNA, RNA, proteins, carbohydrates, and lipids. 18% of human body by mass.',
+  hist:'Known since antiquity. Lavoisier showed diamond is carbon (1772). Buckminsterfullerene (C₆₀) discovered 1985 (Nobel 1996). Graphene isolated 2004 (Nobel 2010).',
+  fun:'¹⁴C radiocarbon dating can date organic materials up to ~50,000 years old.'},
+7:{eneg:3.04,aRc:56,aRe:65,covR:71,vdwR:155,ie1:1402.3,ea:7.0,
+  mpC:-210.0,bpC:-195.8,hfus:0.720,hvap:5.57,cp:1.040,
+  kth:0.02583,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:333,
+  disc:'1772',by:'Daniel Rutherford',nm:'Jean-Antoine Chaptal (1790)',
+  ety:'Greek: nitron (saltpetre) + genes (forming)',
+  Uc:1000000,Sc:1000000,Mc:1400,Cc:19000,Oc:14000,Hc:26000000,
+  cryst:'Hexagonal (solid N₂)',col:'Colorless',app:'Colorless, odorless diatomic gas',
+  rad:false,cas:'7727-37-9',
+  ox:['-3','-2','-1','0','+1','+2','+3','+4','+5'],
+  ie:[1402.3,2856.0,4578.1,7475.0,9444.9,53266.6,64360],
+  iso:[{s:'¹⁴N',Z:7,N:7,m:'14.003074',ab:'99.632%',stable:true},
+       {s:'¹⁵N',Z:7,N:8,m:'15.000109',ab:'0.368%',stable:true}],
+  cpd:[{f:'NH₃',n:'Ammonia — fertiliser precursor'},{f:'HNO₃',n:'Nitric acid — explosives & fertilisers'},{f:'N₂O',n:'Nitrous oxide — anaesthetic & propellant'},{f:'NO',n:'Nitric oxide — biological signalling'},{f:'N₂H₄',n:'Hydrazine — rocket fuel'}],
+  uses:'Fertilisers (Haber-Bosch process for NH₃); liquid nitrogen for cryogenics and food preservation; inert atmosphere in chemical manufacturing; explosive production; airbag inflation; incandescent bulb fill gas',
+  bio:'Essential for all amino acids, nucleotide bases (A, G, C, T/U), and ATP. ~3.3% of human body by mass. Nitrogen-fixing bacteria (Rhizobium) are critical to the global nitrogen cycle.',
+  hist:'Identified by Rutherford in 1772 as "noxious air." Named azote (no life) by Lavoisier. Chaptal coined "nitrogen" in 1790. Haber-Bosch process (1909) for NH₃ synthesis transformed global food production.',
+  fun:'78% of Earth\'s atmosphere is N₂, yet plants cannot use it directly.'},
+8:{eneg:3.44,aRc:48,aRe:60,covR:66,vdwR:152,ie1:1313.9,ea:141.0,
+  mpC:-218.8,bpC:-183.0,hfus:0.444,hvap:6.82,cp:0.918,
+  kth:0.02658,res:null,mag:'Paramagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:317.5,
+  disc:'1771–74',by:'Scheele (1771) / Priestley (1774)',nm:'Antoine Lavoisier (1777)',
+  ety:'Greek: oxys (sharp/acid) + genes (forming)',
+  Uc:10000000,Sc:9000000,Mc:460000000,Cc:461000000,Oc:857000000,Hc:650000000,
+  cryst:'Cubic (solid O₂)',col:'Colorless (pale blue liquid)',app:'Colorless gas; pale blue liquid',
+  rad:false,cas:'7782-44-7',
+  ox:['-2','-1','0','+1','+2'],
+  ie:[1313.9,3388.3,5300.5,7469.2,10989.5,13326.5,71330,84078],
+  iso:[{s:'¹⁶O',Z:8,N:8,m:'15.994915',ab:'99.757%',stable:true},
+       {s:'¹⁷O',Z:8,N:9,m:'16.999132',ab:'0.038%',stable:true},
+       {s:'¹⁸O',Z:8,N:10,m:'17.999161',ab:'0.205%',stable:true}],
+  cpd:[{f:'H₂O',n:'Water — solvent of life'},{f:'CO₂',n:'Carbon dioxide — greenhouse gas'},{f:'SiO₂',n:'Quartz, glass, sand'},{f:'Fe₂O₃',n:'Iron oxide — haematite ore, rust'},{f:'Al₂O₃',n:'Corundum — ruby, sapphire'}],
+  uses:'Medical oxygen therapy; steel refining in blast furnaces; rocket oxidiser (liquid O₂); ozone (O₃) for water treatment; oxy-acetylene cutting & welding; chemical manufacturing',
+  bio:'Most abundant element in the human body by mass (~65%). Required for aerobic cellular respiration (ATP). Haemoglobin carries O₂ from lungs to tissues.',
+  hist:'Discovered independently by Scheele (1771, unpublished) and Priestley (1774). Lavoisier named it and used it to disprove the phlogiston theory, establishing modern chemistry.',
+  fun:'Third most abundant element in the universe. Earth\'s crust is 46% oxygen by mass.'},
+9:{eneg:3.98,aRc:42,aRe:50,covR:64,vdwR:147,ie1:1681.0,ea:328.2,
+  mpC:-219.7,bpC:-188.1,hfus:0.510,hvap:6.62,cp:0.824,
+  kth:0.0277,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:null,
+  disc:'1886',by:'Henri Moissan',nm:'André-Marie Ampère (1810)',
+  ety:'Greek: fluoros (to flow) — from fluorspar used as flux',
+  Uc:400000,Sc:500000,Mc:100,Cc:544000,Oc:1300,Hc:37000,
+  cryst:'Monoclinic (solid F₂)',col:'Pale yellow',app:'Pale yellow diatomic gas',
+  rad:false,cas:'7782-41-4',
+  ox:['-1','0'],
+  ie:[1681.0,3374.2,6050.4,8407.7,11022.7,15164.1,17868,92038,106434],
+  iso:[{s:'¹⁹F',Z:9,N:10,m:'18.998403',ab:'100%',stable:true}],
+  cpd:[{f:'HF',n:'Hydrofluoric acid — semiconductor etching'},{f:'CaF₂',n:'Fluorite — optical lenses'},{f:'PTFE',n:'Polytetrafluoroethylene (Teflon) — non-stick'},{f:'NaF',n:'Sodium fluoride — toothpaste'},{f:'UF₆',n:'Uranium hexafluoride — uranium enrichment'}],
+  uses:'Fluoride in toothpaste and water fluoridation; PTFE (Teflon) non-stick coatings; HF for semiconductor etching; uranium enrichment via UF₆; fluorinated pharmaceuticals (~20% of drugs contain F)',
+  bio:'Fluoride (F⁻) strengthens tooth enamel (fluorapatite formation). No confirmed essential metabolic role beyond dental health. Excess causes dental and skeletal fluorosis. Elemental F₂ and HF are extremely toxic.',
+  hist:'Predicted from compounds for decades before isolation. Henri Moissan finally isolated F₂ in 1886 by electrolyzing anhydrous HF — winning the 1906 Nobel Prize. Early attempts killed or blinded several chemists.',
+  fun:'Most electronegative element (3.98 Pauling) — forms the shortest and strongest single bonds.'},
+10:{eneg:null,aRc:38,aRe:null,covR:58,vdwR:154,ie1:2080.7,ea:0,
+  mpC:-248.6,bpC:-246.1,hfus:0.335,hvap:1.71,cp:1.030,
+  kth:0.0491,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:435,
+  disc:'1898',by:'Ramsay & Travers',nm:'Ramsay & Travers',
+  ety:'Greek: neon (new)',
+  Uc:1300000,Sc:1600000,Mc:0,Cc:0.07,Oc:0.00012,Hc:0,
+  cryst:'FCC (solid)',col:'Colorless (orange-red discharge glow)',app:'Colorless noble gas',
+  rad:false,cas:'7440-01-9',
+  ox:['0'],
+  ie:[2080.7,3952.3,6122,9371,12177,15238,19999,23069,115379,131432],
+  iso:[{s:'²⁰Ne',Z:10,N:10,m:'19.992440',ab:'90.48%',stable:true},
+       {s:'²¹Ne',Z:10,N:11,m:'20.993847',ab:'0.27%',stable:true},
+       {s:'²²Ne',Z:10,N:12,m:'21.991386',ab:'9.25%',stable:true}],
+  cpd:[],
+  uses:'Neon signs (orange-red glow); high-voltage indicators; wave meter tubes; cryogenics (liquid Ne at 27 K); He-Ne lasers; particle detector fill gas',
+  bio:'No biological role. Non-toxic. Cannot form compounds under ordinary conditions.',
+  hist:'Discovered in 1898 by Ramsay and Travers by fractionally distilling liquefied air. Named from Greek neon (new). Neon signs were commercialised by Georges Claude from 1910.',
+  fun:'Gives the distinctive bright orange-red glow seen in neon signs.'},
+11:{eneg:0.93,aRc:190,aRe:180,covR:166,vdwR:227,ie1:495.8,ea:52.8,
+  mpC:97.7,bpC:882.9,hfus:2.60,hvap:97.7,cp:1.228,
+  kth:142,res:4.77e-8,mag:'Paramagnetic',
+  Y:10,G:3.3,B:6.3,nu:0.2,mohs:0.5,vick:null,brin:null,vs:3200,
+  disc:'1807',by:'Humphry Davy',nm:'Humphry Davy',
+  ety:'Symbol Na: Latin natrium (from natron); English "sodium" from medieval Latin soda',
+  Uc:20000,Sc:30000,Mc:6000000,Cc:23600000,Oc:10800000,Hc:1400000,
+  cryst:'Body-centred cubic',col:'Silver-white',app:'Soft, lustrous, silver-white metal',
+  rad:false,cas:'7440-23-5',
+  ox:['+1'],
+  ie:[495.8,4562.4,6910.3,9543,13354,16613,20117,25496,28932,141362,159075],
+  iso:[{s:'²³Na',Z:11,N:12,m:'22.989769',ab:'100%',stable:true},
+       {s:'²²Na',Z:11,N:11,m:'21.994437',ab:'Synthetic',stable:false,hl:'2.6019 yr',dc:'β⁺, EC'},
+       {s:'²⁴Na',Z:11,N:13,m:'23.990963',ab:'Synthetic',stable:false,hl:'14.957 h',dc:'β⁻'}],
+  cpd:[{f:'NaCl',n:'Table salt — food seasoning & preservation'},{f:'NaOH',n:'Caustic soda — soap & paper'},{f:'Na₂CO₃',n:'Washing soda — glass manufacturing'},{f:'NaHCO₃',n:'Baking soda — cooking & antacid'},{f:'Na₂SO₄',n:'Sodium sulfate — detergents'}],
+  uses:'Table salt (NaCl); street lighting (yellow sodium vapour lamps); soap and detergent production; paper manufacturing; nuclear reactor coolant (liquid Na); food preservation',
+  bio:'Primary extracellular cation in mammals. Essential for nerve impulse transmission, muscle contraction, and osmotic regulation. Adult body contains ~100 g Na. Na⁺/K⁺-ATPase pump is fundamental to cell function.',
+  hist:'First isolated by Humphry Davy in 1807 by electrolysis of molten NaOH — one of the first elements isolated by electrolysis. Romans used natron (Na₂CO₃·10H₂O) since antiquity.',
+  fun:'Sodium reacts vigorously with water, producing hydrogen gas and a strong alkaline solution.'},
+12:{eneg:1.31,aRc:145,aRe:150,covR:141,vdwR:173,ie1:737.7,ea:0,
+  mpC:650.0,bpC:1090,hfus:8.48,hvap:128,cp:1.023,
+  kth:156,res:4.39e-8,mag:'Paramagnetic',
+  Y:45,G:17,B:35.4,nu:0.29,mohs:2.5,vick:null,brin:260,vs:4940,
+  disc:'1808',by:'Humphry Davy',nm:'Humphry Davy',
+  ety:'Magnesia district, Thessaly, Greece (magnesite mineral source)',
+  Uc:600000,Sc:700000,Mc:156000000,Cc:23300000,Oc:1290000,Hc:19000000,
+  cryst:'Hexagonal close-packed',col:'Silver-white',app:'Shiny, light grey metal',
+  rad:false,cas:'7439-95-4',
+  ox:['+2'],
+  ie:[737.7,1450.7,7732.7,10542.5,13630,18020,21711,25661,31653,35458,169988,189368],
+  iso:[{s:'²⁴Mg',Z:12,N:12,m:'23.985042',ab:'78.99%',stable:true},
+       {s:'²⁵Mg',Z:12,N:13,m:'24.985837',ab:'10.00%',stable:true},
+       {s:'²⁶Mg',Z:12,N:14,m:'25.982593',ab:'11.01%',stable:true}],
+  cpd:[{f:'MgO',n:'Magnesia — refractory bricks'},{f:'MgSO₄',n:'Epsom salt — medicine'},{f:'MgCl₂',n:'Magnesium chloride — de-icing, food'},{f:'Mg(OH)₂',n:'Milk of magnesia — antacid'},{f:'MgCO₃',n:'Magnesite — refractory, CO₂ source'}],
+  uses:'Lightweight structural alloys (Mg-Al alloys in aircraft, automobiles); die casting; photoengraving plates; Grignard reagents in organic synthesis; MgO in refractory bricks; Epsom salt in medicine; fireworks (brilliant white light)',
+  bio:'Essential cofactor for >300 enzyme systems. Central atom of chlorophyll. Required for ATP synthesis, DNA replication, and bone mineralisation. Adults contain ~25 g Mg. Deficiency causes muscle cramps and arrhythmias.',
+  hist:'Recognised as an element by Black (1755). Isolated by Davy via electrolysis (1808). Named for Magnesia, Greece. First industrial production 1833 (Faraday).',
+  fun:'The central atom in chlorophyll — the molecule that drives photosynthesis.'},
+13:{eneg:1.61,aRc:118,aRe:125,covR:121,vdwR:184,ie1:577.5,ea:41.8,
+  mpC:660.3,bpC:2470,hfus:10.71,hvap:284,cp:0.897,
+  kth:237,res:2.65e-8,mag:'Paramagnetic',
+  Y:70,G:26,B:76,nu:0.35,mohs:2.75,vick:167,brin:245,vs:5100,
+  disc:'1825',by:'Hans Christian Ørsted',nm:'Humphry Davy',
+  ety:'Latin: alumen (alum salt used since antiquity)',
+  Uc:50000,Sc:60000,Mc:11000000,Cc:82300000,Oc:2,Hc:900,
+  cryst:'Face-centred cubic',col:'Silver',app:'Shiny, silvery-white metal',
+  rad:false,cas:'7429-90-5',
+  ox:['+1','+3'],
+  ie:[577.5,1816.7,2744.8,11577,14842,18379,23326,27466,31853,38473,42647,201266,222316],
+  iso:[{s:'²⁷Al',Z:13,N:14,m:'26.981538',ab:'100%',stable:true}],
+  cpd:[{f:'Al₂O₃',n:'Alumina — abrasive, refractory'},{f:'Al(OH)₃',n:'Aluminium hydroxide — antacid, water treatment'},{f:'AlCl₃',n:'Aluminium chloride — Lewis acid catalyst'},{f:'Al₂(SO₄)₃',n:'Aluminium sulfate — water purification'}],
+  uses:'Beverage cans and food packaging (foil); aircraft and spacecraft structures; electrical power lines; kitchen cookware; bicycle frames; corundum (Al₂O₃) as abrasive; thermite (Al + Fe₂O₃ mixture)',
+  bio:'No known essential role. Very low bioavailability. At high exposures possibly linked to neurological effects (Alzheimer\'s link is controversial). Al(OH)₃ used as antacid and vaccine adjuvant.',
+  hist:'Recognised in alum salts in the 18th century. Ørsted produced impure sample (1825). Wöhler isolated pure Al (1827). Hall-Héroult electrolytic process (1886) made Al cheap and abundant.',
+  fun:'Most abundant metal in Earth\'s crust — makes up 8.1% by mass.'},
+14:{eneg:1.90,aRc:111,aRe:110,covR:111,vdwR:210,ie1:786.5,ea:134.1,
+  mpC:1414,bpC:3265,hfus:50.21,hvap:383,cp:0.710,
+  kth:149,res:1e-3,mag:'Diamagnetic',
+  Y:130,G:51,B:97,nu:0.28,mohs:6.5,vick:null,brin:null,vs:8433,
+  disc:'1824',by:'Jöns Jacob Berzelius',nm:'Jöns Jacob Berzelius',
+  ety:'Latin: silex/silicis (flint, hard stone)',
+  Uc:700000,Sc:900000,Mc:107000000,Cc:282000000,Oc:2800,Hc:260,
+  cryst:'Diamond cubic',col:'Dark grey with metallic lustre',app:'Dark grey, brittle metalloid',
+  rad:false,cas:'7440-21-3',
+  ox:['-4','-1','0','+1','+2','+4'],
+  ie:[786.5,1577.1,3231.6,4355.5,16091,19805,23780,29287,33878,38726,45962,50502,235196,257923],
+  iso:[{s:'²⁸Si',Z:14,N:14,m:'27.976927',ab:'92.23%',stable:true},
+       {s:'²⁹Si',Z:14,N:15,m:'28.976495',ab:'4.67%',stable:true},
+       {s:'³⁰Si',Z:14,N:16,m:'29.973770',ab:'3.10%',stable:true}],
+  cpd:[{f:'SiO₂',n:'Silicon dioxide — glass, quartz'},{f:'SiC',n:'Silicon carbide — abrasive, semiconductor'},{f:'Si₃N₄',n:'Silicon nitride — engineering ceramic'},{f:'(CH₃)₂SiO',n:'Silicone — sealant, lubricant, implant'}],
+  uses:'Microelectronics and integrated circuits (silicon wafers); photovoltaic solar cells; glass and ceramics; silicone polymers; optical fibre (fused silica); semiconductor transistors and diodes',
+  bio:'Trace requirement possible — involved in connective tissue and bone health (collagen synthesis, not firmly established). Silica dust (SiO₂) causes silicosis if inhaled chronically.',
+  hist:'Lavoisier identified Si in silica (1787). Berzelius isolated amorphous silicon (1824) by reducing K₂SiF₆ with potassium. Crystalline Si prepared by Deville (1854). First commercial Si transistors: Texas Instruments, 1954.',
+  fun:'Silicon Valley is named after silicon — the material underpinning the entire semiconductor industry.'},
+15:{eneg:2.19,aRc:98,aRe:100,covR:107,vdwR:180,ie1:1011.8,ea:72.0,
+  mpC:44.2,bpC:280.5,hfus:0.657,hvap:51.9,cp:0.769,
+  kth:0.236,res:1e11,mag:'Diamagnetic',
+  Y:null,G:null,B:11,nu:null,mohs:null,vick:null,brin:null,vs:null,
+  disc:'1669',by:'Hennig Brand',nm:'Hennig Brand',
+  ety:'Greek: phosphoros (light-bearer) — white P glows in air',
+  Uc:7000,Sc:null,Mc:1220,Cc:1050000,Oc:88000,Hc:11000000,
+  cryst:'Orthorhombic (white P) / Complex (red P)',col:'White (waxy) or red (powder)',app:'White waxy solid or red amorphous powder',
+  rad:false,cas:'7723-14-0',
+  ox:['-3','-2','-1','0','+1','+2','+3','+4','+5'],
+  ie:[1011.8,1907,2914.1,4963.6,6273.9,21267,25431],
+  iso:[{s:'³¹P',Z:15,N:16,m:'30.973762',ab:'100%',stable:true}],
+  cpd:[{f:'H₃PO₄',n:'Phosphoric acid — fertilisers, soft drinks'},{f:'Ca₃(PO₄)₂',n:'Calcium phosphate — bones, teeth'},{f:'P₄O₁₀',n:'Phosphorus pentoxide — desiccant'},{f:'PCl₃',n:'Phosphorus trichloride — chemical synthesis'},{f:'ATP',n:'Adenosine triphosphate — cellular energy currency'}],
+  uses:'Fertilisers (as phosphate compounds — critical for agriculture); detergents; matches and pyrotechnics; nerve agent antidotes (organophosphate chemistry); pesticides; steel production additive',
+  bio:'Essential for all life — backbone of DNA and RNA (phosphodiester bonds), ATP energy currency, and cell membranes (phospholipids). Bones and teeth are ~70% calcium phosphate. About 750 g P in adult human body.',
+  hist:'First element with a recorded discoverer. Hennig Brand discovered it in 1669 by boiling urine. White phosphorus glows in air (chemiluminescence). Named phosphoros (light-bearer) in Greek.',
+  fun:'Discovered by boiling urine — Brand was searching for the Philosopher\'s Stone.'},
+16:{eneg:2.58,aRc:88,aRe:100,covR:105,vdwR:180,ie1:999.6,ea:200.4,
+  mpC:112.8,bpC:444.6,hfus:1.717,hvap:45,cp:0.710,
+  kth:0.205,res:1e15,mag:'Diamagnetic',
+  Y:null,G:null,B:7.7,nu:null,mohs:2.0,vick:null,brin:null,vs:null,
+  disc:'Ancient',by:'Prehistoric',nm:'Lavoisier (1789)',
+  ety:'Latin: sulphur (brimstone)',
+  Uc:500000,Sc:450000,Mc:5400000,Cc:350000,Oc:905000,Hc:2000000,
+  cryst:'Orthorhombic (α-S)',col:'Yellow',app:'Bright yellow crystalline solid',
+  rad:false,cas:'7704-34-9',
+  ox:['-2','-1','0','+1','+2','+3','+4','+6'],
+  ie:[999.6,2252,3357,4556,7004.3,8495.8,27107,31719],
+  iso:[{s:'³²S',Z:16,N:16,m:'31.972071',ab:'94.99%',stable:true},
+       {s:'³³S',Z:16,N:17,m:'32.971459',ab:'0.75%',stable:true},
+       {s:'³⁴S',Z:16,N:18,m:'33.967867',ab:'4.25%',stable:true},
+       {s:'³⁶S',Z:16,N:20,m:'35.967081',ab:'0.01%',stable:true}],
+  cpd:[{f:'H₂SO₄',n:'Sulfuric acid — most produced industrial chemical'},{f:'SO₂',n:'Sulfur dioxide — preservative, bleaching'},{f:'H₂S',n:'Hydrogen sulfide — toxic gas, rotten egg smell'},{f:'Na₂SO₄',n:'Sodium sulfate — detergents'},{f:'CaSO₄',n:'Gypsum — plaster, drywall'}],
+  uses:'Sulfuric acid production (H₂SO₄ — primary industrial acid); vulcanisation of rubber; gunpowder; fungicides and insecticides; paper bleaching; food preservative (sulfites); pharmaceuticals',
+  bio:'Essential for life — component of two amino acids (cysteine, methionine), coenzyme A, and biotin. Disulfide bonds (S-S) stabilise protein structure. ~140 g S in adult human body.',
+  hist:'Known since antiquity — the brimstone of the Bible. Used in fumigation, medicine, and incendiary devices in ancient times. Identified as an element by Lavoisier (1789). Sulfuric acid (oil of vitriol) has been known since the 8th century.',
+  fun:'The Frasch process (1894) extracts elemental sulfur from underground deposits by melting it with superheated water.'},
+17:{eneg:3.16,aRc:79,aRe:100,covR:102,vdwR:175,ie1:1251.2,ea:348.6,
+  mpC:-101.5,bpC:-34.0,hfus:6.406,hvap:20.41,cp:0.479,
+  kth:0.0089,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:null,
+  disc:'1774',by:'Carl Wilhelm Scheele',nm:'Humphry Davy (1810)',
+  ety:'Greek: chloros (pale green)',
+  Uc:1000,Sc:8000,Mc:700,Cc:170000,Oc:19900000,Hc:1200000,
+  cryst:'Orthorhombic (solid Cl₂)',col:'Yellow-green',app:'Yellow-green diatomic gas',
+  rad:false,cas:'7782-50-5',
+  ox:['-1','0','+1','+3','+5','+7'],
+  ie:[1251.2,2298,3822,5158.6,6542,9362,11018,33604,38600,43961],
+  iso:[{s:'³⁵Cl',Z:17,N:18,m:'34.968853',ab:'75.77%',stable:true},
+       {s:'³⁷Cl',Z:17,N:20,m:'36.965903',ab:'24.23%',stable:true}],
+  cpd:[{f:'HCl',n:'Hydrochloric acid — stomach acid, industrial'},{f:'NaCl',n:'Table salt'},{f:'NaOCl',n:'Sodium hypochlorite — bleach'},{f:'PVC',n:'Polyvinyl chloride — plastic'},{f:'CHCl₃',n:'Chloroform — formerly anaesthetic'}],
+  uses:'Water disinfection (chlorination); PVC plastic manufacturing; bleach (NaOCl); solvents (CHCl₃, CCl₄); pharmaceuticals synthesis; agrochemicals (herbicides, pesticides); pulp and paper bleaching',
+  bio:'Essential as chloride ion (Cl⁻) — main extracellular anion in animals. Maintains osmotic balance and stomach acid (HCl). Adult body contains ~95 g Cl. NaCl (table salt) is a dietary requirement.',
+  hist:'Scheele produced Cl₂ in 1774 by reacting MnO₂ with HCl. Davy proved it was an element in 1810. Used as a chemical weapon in WWI (first large-scale chemical weapon, 1915).',
+  fun:'Chlorine gas was used as the first chemical warfare agent in WWI at the Second Battle of Ypres, 1915.'},
+18:{eneg:null,aRc:71,aRe:null,covR:106,vdwR:188,ie1:1520.6,ea:0,
+  mpC:-189.3,bpC:-185.8,hfus:1.18,hvap:6.53,cp:0.520,
+  kth:0.01772,res:null,mag:'Diamagnetic',
+  Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:319,
+  disc:'1894',by:'Lord Rayleigh & William Ramsay',nm:'Lord Rayleigh & William Ramsay',
+  ety:'Greek: argos (inactive, idle)',
+  Uc:3600000,Sc:4200000,Mc:560,Cc:3500,Oc:0.45,Hc:0,
+  cryst:'FCC (solid)',col:'Colorless',app:'Colorless, odorless noble gas',
+  rad:false,cas:'7440-37-1',
+  ox:['0'],
+  ie:[1520.6,2665.8,3931,5771,7238,8781,11995,13842,40760,46186],
+  iso:[{s:'³⁶Ar',Z:18,N:18,m:'35.967545',ab:'0.337%',stable:true},
+       {s:'³⁸Ar',Z:18,N:20,m:'37.962732',ab:'0.063%',stable:true},
+       {s:'⁴⁰Ar',Z:18,N:22,m:'39.962383',ab:'99.600%',stable:true}],
+  cpd:[],
+  uses:'Inert shielding gas for TIG/MIG welding; inert fill gas in incandescent and fluorescent light bulbs; inert atmosphere in semiconductor manufacturing; wine preservation; fire suppression systems (Ar does not react with electrical equipment)',
+  bio:'No biological role. Non-toxic. Can cause asphyxiation at high concentrations by displacing oxygen.',
+  hist:'Discovered by Rayleigh and Ramsay in 1894 when they noticed atmospheric nitrogen was slightly denser than nitrogen from chemical reactions. Named argos (idle) for its inertness.',
+  fun:'Makes up about 0.93% of Earth\'s atmosphere — the third most abundant gas, more than CO₂.'},
+19:{eneg:0.82,aRc:243,aRe:220,covR:203,vdwR:275,ie1:418.8,ea:48.4,
+  mpC:63.4,bpC:759,hfus:2.335,hvap:79.87,cp:0.757,
+  kth:102.5,res:7.2e-8,mag:'Paramagnetic',
+  Y:3.53,G:1.3,B:3.1,nu:0.36,mohs:0.4,vick:null,brin:null,vs:2000,
+  disc:'1807',by:'Humphry Davy',nm:'Humphry Davy',
+  ety:'English: potash (from pot ash); Symbol K: Latin kalium',
+  Uc:3000,Sc:null,Mc:2090000,Cc:20900000,Oc:392000,Hc:2000000,
+  cryst:'Body-centred cubic',col:'Silver-white',app:'Soft, waxy, silver-white metal',
+  rad:false,cas:'7440-09-7',
+  ox:['+1'],
+  ie:[418.8,3051.8,4420,5877,7975,9590,11343,14944,16963.7,48610,54490],
+  iso:[{s:'³⁹K',Z:19,N:20,m:'38.963707',ab:'93.258%',stable:true},
+       {s:'⁴⁰K',Z:19,N:21,m:'39.963998',ab:'0.012%',stable:false,hl:'1.248 Gyr',dc:'β⁻, EC, β⁺',note:'Natural radioactive isotope'},
+       {s:'⁴¹K',Z:19,N:22,m:'40.961826',ab:'6.730%',stable:true}],
+  cpd:[{f:'KCl',n:'Potassium chloride — fertiliser, salt substitute'},{f:'KOH',n:'Potassium hydroxide — caustic potash'},{f:'KNO₃',n:'Potassium nitrate — gunpowder, fertiliser'},{f:'K₂CO₃',n:'Potassium carbonate — glass, soap'},{f:'KMnO₄',n:'Potassium permanganate — oxidiser, antiseptic'}],
+  uses:'Fertilisers (largest use — potassium is a macronutrient for plants); soap and glass manufacturing; KNO₃ in gunpowder; KCl as salt substitute; NaK alloy as nuclear coolant; ⁴⁰K in potassium-argon geological dating',
+  bio:'Primary intracellular cation — essential for nerve impulse transmission, muscle contraction, and cardiac rhythm. Na⁺/K⁺-ATPase pumps K⁺ into cells. About 140 g K in adult body. Deficiency causes hypokalaemia (cardiac arrhythmias).',
+  hist:'Isolated by Davy in 1807 by electrolysis of molten KOH. First metal isolated by electrolysis. Symbol K from Latin kalium. Name from English potash (pot ash from wood ashes).',
+  fun:'Natural ⁴⁰K makes every human being slightly radioactive — we contain about 4,400 decays per second from it.'},
+20:{eneg:1.00,aRc:194,aRe:180,covR:176,vdwR:231,ie1:589.8,ea:2.37,
+  mpC:842,bpC:1484,hfus:8.54,hvap:155,cp:0.647,
+  kth:201,res:3.36e-8,mag:'Diamagnetic',
+  Y:20,G:7.4,B:17,nu:0.31,mohs:1.75,vick:null,brin:167,vs:3810,
+  disc:'1808',by:'Humphry Davy',nm:'Humphry Davy',
+  ety:'Latin: calx (lime, limestone); Greek: kalyx',
+  Uc:70000,Sc:200000,Mc:93000000,Cc:41500000,Oc:412000,Hc:22000000,
+  cryst:'Face-centred cubic (low T) / BCC (high T)',col:'Silver-white',app:'Soft, silvery-white metal',
+  rad:false,cas:'7440-70-2',
+  ox:['+2'],
+  ie:[589.8,1145.4,4912.4,6491,8153,10496,12270,14206,18191,20385,57110,63410],
+  iso:[{s:'⁴⁰Ca',Z:20,N:20,m:'39.962591',ab:'96.941%',stable:true},
+       {s:'⁴²Ca',Z:20,N:22,m:'41.958618',ab:'0.647%',stable:true},
+       {s:'⁴⁴Ca',Z:20,N:24,m:'43.955481',ab:'2.086%',stable:true},
+       {s:'⁴⁸Ca',Z:20,N:28,m:'47.952534',ab:'0.187%',stable:true}],
+  cpd:[{f:'CaCO₃',n:'Calcium carbonate — limestone, chalk, marble'},{f:'CaSO₄',n:'Calcium sulfate — gypsum, plaster of Paris'},{f:'Ca(OH)₂',n:'Calcium hydroxide — slaked lime, cement'},{f:'CaF₂',n:'Fluorite — optical lenses'},{f:'Ca₃(PO₄)₂',n:'Calcium phosphate — bones, teeth'}],
+  uses:'Cement and concrete (calcium silicates); steel production (deoxidiser); lime (CaO) in agriculture for pH control; calcium carbide for acetylene; PVC stabiliser; calcium supplements for bone health',
+  bio:'Most abundant mineral in the human body — 99% in bones and teeth (as hydroxyapatite). Vital for muscle contraction, nerve transmission, blood clotting, and cell signalling. Adult contains ~1 kg Ca. Deficiency causes rickets and osteoporosis.',
+  hist:'Davy isolated calcium in 1808 by electrolysis of calcium mercury amalgam. Lime (CaO) and limestone have been used since antiquity in construction, from Roman concrete to the Pyramids.',
+  fun:'Calcium is the fifth most abundant element in Earth\'s crust and the most abundant mineral in the human body.'},
+26:{eneg:1.83,aRc:156,aRe:140,covR:125,vdwR:null,ie1:762.5,ea:15.7,
+  mpC:1538,bpC:2861,hfus:13.81,hvap:340,cp:0.449,
+  kth:80.4,res:9.71e-8,mag:'Ferromagnetic',
+  Y:211,G:82,B:170,nu:0.29,mohs:4.0,vick:608,brin:490,vs:4910,
+  disc:'Ancient (before 5000 BCE)',by:'Prehistoric',nm:'Anglo-Saxon',
+  ety:'Symbol Fe: Latin ferrum (firm/strong); English "iron" from Anglo-Saxon iren',
+  Uc:1100000,Sc:1000000,Mc:220000000,Cc:56300000,Oc:2,Hc:60000,
+  cryst:'BCC (α-Fe, δ-Fe) / FCC (γ-Fe at 912–1394°C)',col:'Silvery-grey',app:'Lustrous metallic with a grayish tinge',
+  rad:false,cas:'7439-89-6',
+  ox:['-2','-1','0','+1','+2','+3','+4','+5','+6'],
+  ie:[762.5,1561.9,2957,5290,7240,9560,12060,14580,22540,25290],
+  iso:[{s:'⁵⁴Fe',Z:26,N:28,m:'53.939611',ab:'5.845%',stable:true},
+       {s:'⁵⁶Fe',Z:26,N:30,m:'55.934938',ab:'91.754%',stable:true,note:'Highest nuclear binding energy/nucleon'},
+       {s:'⁵⁷Fe',Z:26,N:31,m:'56.935394',ab:'2.119%',stable:true},
+       {s:'⁵⁸Fe',Z:26,N:32,m:'57.933280',ab:'0.282%',stable:true},
+       {s:'⁶⁰Fe',Z:26,N:34,m:'59.934071',ab:'Trace',stable:false,hl:'2.6 Myr',dc:'β⁻'}],
+  cpd:[{f:'Fe₂O₃',n:'Iron(III) oxide — haematite ore, rust pigment'},{f:'Fe₃O₄',n:'Magnetite — magnetic ore'},{f:'FeCl₃',n:'Iron(III) chloride — water treatment'},{f:'FeSO₄',n:'Iron(II) sulfate — dietary iron supplement'},{f:'Fe(CO)₅',n:'Iron pentacarbonyl — chemical vapour deposition'}],
+  uses:'Steel production (>1.8 billion tonnes/yr — largest use of any metal); cast iron for engine blocks and cookware; electromagnets and transformer cores; iron oxide pigments; Haber process catalyst; dietary iron supplements',
+  bio:'Essential trace element. Core atom of haemoglobin (O₂ transport) and myoglobin (O₂ storage in muscle). Cofactor for cytochromes in electron transport chain. Iron deficiency anaemia is the world\'s most prevalent nutritional disorder (~2 billion people).',
+  hist:'Used since ~4000 BCE (meteoric iron beads in Egypt). Iron Age began ~1200 BCE. Bessemer converter (1856) enabled mass steel production. Fe-56 has the highest nuclear binding energy per nucleon — it is the end-product of stellar nucleosynthesis in massive stars.',
+  fun:'⁵⁶Fe has the highest nuclear binding energy per nucleon — it is the most stable nucleus in the universe.'},
+29:{eneg:1.90,aRc:145,aRe:135,covR:138,vdwR:140,ie1:745.5,ea:118.4,
+  mpC:1085,bpC:2562,hfus:13.05,hvap:300.4,cp:0.385,
+  kth:401,res:1.678e-8,mag:'Diamagnetic',
+  Y:130,G:48,B:140,nu:0.34,mohs:3.0,vick:369,brin:874,vs:3570,
+  disc:'Ancient',by:'Prehistoric',nm:'Anglo-Saxon; Symbol Cu: Latin cuprum',
+  ety:'Symbol Cu: Latin cuprum, from Greek Kypros (Cyprus island — main ancient source)',
+  Uc:700,Sc:500,Mc:120000,Cc:68000,Oc:250,Hc:1000,
+  cryst:'Face-centred cubic',col:'Copper/reddish-orange',app:'Lustrous, reddish-orange metal',
+  rad:false,cas:'7440-50-8',
+  ox:['+1','+2','+3','+4'],
+  ie:[745.5,1957.9,3555,5536,7700,9900,13400,16000,19600,23000],
+  iso:[{s:'⁶³Cu',Z:29,N:34,m:'62.929598',ab:'69.15%',stable:true},
+       {s:'⁶⁵Cu',Z:29,N:36,m:'64.927790',ab:'30.85%',stable:true},
+       {s:'⁶⁴Cu',Z:29,N:35,m:'63.929764',ab:'Synthetic',stable:false,hl:'12.7 h',dc:'β⁺, β⁻'}],
+  cpd:[{f:'CuSO₄',n:'Copper sulfate — pesticide, electroplating'},{f:'CuO',n:'Copper(II) oxide — pigment, catalyst'},{f:'Cu₂O',n:'Copper(I) oxide — antifouling paint'},{f:'CuCl₂',n:'Copper chloride — catalyst'},{f:'Cu(OH)₂',n:'Copper hydroxide — fungicide, pigment'}],
+  uses:'Electrical wiring and motors (highest conductivity of common metals); plumbing pipe and fittings; coinage (Cu alloys); printed circuit boards; brass (Cu-Zn) and bronze (Cu-Sn) alloys; antimicrobial hospital surfaces; heat exchangers',
+  bio:'Essential trace element. Cofactor for ~30 enzymes including cytochrome c oxidase and superoxide dismutase. Required for iron absorption and haemoglobin formation. About 70 mg in adult body. Excess causes Wilson\'s disease.',
+  hist:'One of the oldest metals — tools from ~9000 BCE. Cyprus (Kypros) was the main ancient source (hence cuprum). Adding tin to copper created bronze (~3000 BCE), launching the Bronze Age. Copper wire became critical to electrical technology in the 19th century.',
+  fun:'Copper is one of only two metals with a colour other than silver or grey (gold being the other).'},
+47:{eneg:1.93,aRc:165,aRe:160,covR:153,vdwR:172,ie1:731.0,ea:125.6,
+  mpC:961.8,bpC:2162,hfus:11.28,hvap:255,cp:0.235,
+  kth:429,res:1.587e-8,mag:'Diamagnetic',
+  Y:83,G:30,B:100,nu:0.37,mohs:2.5,vick:251,brin:206,vs:2600,
+  disc:'Ancient',by:'Prehistoric',nm:'Anglo-Saxon',
+  ety:'Symbol Ag: Latin argentum (shining); English "silver" from Anglo-Saxon seolfor',
+  Uc:60,Sc:100,Mc:140,Cc:75,Oc:28,Hc:20,
+  cryst:'Face-centred cubic',col:'Silver-white',app:'Lustrous, white metallic shine',
+  rad:false,cas:'7440-22-4',
+  ox:['+1','+2','+3'],
+  ie:[731.0,2073,3361],
+  iso:[{s:'¹⁰⁷Ag',Z:47,N:60,m:'106.905097',ab:'51.839%',stable:true},
+       {s:'¹⁰⁹Ag',Z:47,N:62,m:'108.904752',ab:'48.161%',stable:true},
+       {s:'¹¹⁰Ag',Z:47,N:63,m:'109.906107',ab:'Synthetic',stable:false,hl:'249.83 d',dc:'β⁻'}],
+  cpd:[{f:'AgNO₃',n:'Silver nitrate — antiseptic, photography'},{f:'AgCl',n:'Silver chloride — photography, antiseptic'},{f:'AgBr',n:'Silver bromide — photographic film'},{f:'Ag₂O',n:'Silver oxide — battery electrode'},{f:'AgF',n:'Silver fluoride — fluorinating agent'}],
+  uses:'Jewellery and silverware; highest electrical conductivity of any element — used in contacts and conductors; photography (AgBr emulsions); mirrors (silver coating); solar panels; antibacterial wound dressings; rapid diagnostic tests (gold and silver nanoparticle lateral flow assays)',
+  bio:'No known essential biological role. Ionic Ag⁺ is antimicrobial — used in wound dressings and medical devices. Excess silver causes argyria (permanent bluish-grey skin discoloration).',
+  hist:'Used since ~4000 BCE. First silver mines at Laurion, Greece (~600 BCE). Photography relied on silver halides from 1839 until the digital revolution in the 1990s.',
+  fun:'Silver has the highest thermal conductivity, highest electrical conductivity, and highest optical reflectivity of any element.'},
+79:{eneg:2.54,aRc:174,aRe:135,covR:136,vdwR:166,ie1:890.1,ea:222.8,
+  mpC:1064.2,bpC:2856,hfus:12.55,hvap:330,cp:0.129,
+  kth:317,res:2.214e-8,mag:'Diamagnetic',
+  Y:78,G:27,B:180,nu:0.44,mohs:2.5,vick:216,brin:25,vs:3240,
+  disc:'Ancient',by:'Prehistoric',nm:'Old English',
+  ety:'Symbol Au: Latin aurum (shining dawn/gold); English "gold" from Proto-Germanic gulþą',
+  Uc:6,Sc:1,Mc:140,Cc:4,Oc:0.013,Hc:0.1,
+  cryst:'Face-centred cubic',col:'Gold/yellow',app:'Shiny, dense yellow metal (unique colour among metals)',
+  rad:false,cas:'7440-57-5',
+  ox:['-1','0','+1','+2','+3','+5'],
+  ie:[890.1,1980,2900],
+  iso:[{s:'¹⁹⁷Au',Z:79,N:118,m:'196.966569',ab:'100%',stable:true},
+       {s:'¹⁹⁶Au',Z:79,N:117,m:'195.966570',ab:'Synthetic',stable:false,hl:'6.1669 d',dc:'β⁺, EC'},
+       {s:'¹⁹⁸Au',Z:79,N:119,m:'197.968242',ab:'Synthetic',stable:false,hl:'2.6947 d',dc:'β⁻'}],
+  cpd:[{f:'HAuCl₄',n:'Gold(III) chloride — gold plating'},{f:'Au₂S',n:'Gold sulfide'},{f:'AuCN',n:'Gold cyanide — electroplating'},{f:'Auranofin',n:'Gold complex — anti-rheumatic drug'},{f:'Au nanoparticles',n:'Used in diagnostics and drug delivery'}],
+  uses:'Jewellery and coinage (7,000+ years); electronic contacts and connectors (corrosion-proof); space telescope mirror coatings (James Webb); ¹⁹⁸Au cancer radiation therapy; rapid diagnostic tests; dental alloys; gold leaf in art and architecture',
+  bio:'No known essential biological role. Biocompatible — used in dental restorations and medical implants. Auranofin (Au complex) treats rheumatoid arthritis. Gold nanoparticles used in COVID-19 and other lateral flow diagnostic tests.',
+  hist:'Used since ~4000 BCE. First gold coins struck in Lydia (~600 BCE). Gold\'s yellow colour arises from relativistic effects on 6s electrons. Gold standard monetary system persisted until 1971 (Nixon shock). Gold rushes (California 1848, Witwatersrand 1886) drove mass exploitation.',
+  fun:'Gold\'s yellow colour is caused by relativistic effects — without relativity, gold would be silvery-white like most metals.'},
+92:{eneg:1.38,aRc:196,aRe:156,covR:170,vdwR:186,ie1:597.6,ea:50.9,
+  mpC:1132,bpC:4131,hfus:9.14,hvap:420,cp:0.116,
+  kth:27.5,res:2.8e-7,mag:'Paramagnetic',
+  Y:208,G:111,B:100,nu:0.23,mohs:6.0,vick:1960,brin:2400,vs:3155,
+  disc:'1789 (oxide); 1841 (metal)',by:'Klaproth (oxide); Péligot (metal)',nm:'Martin Klaproth',
+  ety:'Named after the planet Uranus, discovered by Herschel in 1781',
+  Uc:0.02,Sc:null,Mc:8,Cc:1800,Oc:3.2,Hc:0,
+  cryst:'Orthorhombic (α-U)',col:'Silver-grey',app:'Silvery-grey, lustrous metal',
+  rad:true,cas:'7440-61-1',
+  ox:['+3','+4','+5','+6'],
+  ie:[597.6,1420,1900],
+  iso:[{s:'²³⁴U',Z:92,N:142,m:'234.040952',ab:'0.0054%',stable:false,hl:'245,500 yr',dc:'α'},
+       {s:'²³⁵U',Z:92,N:143,m:'235.043930',ab:'0.7204%',stable:false,hl:'703.8 Myr',dc:'α',note:'Fissile — used in reactors & weapons'},
+       {s:'²³⁸U',Z:92,N:146,m:'238.050788',ab:'99.2742%',stable:false,hl:'4.468 Gyr',dc:'α',note:'Most abundant; fertile'}],
+  cpd:[{f:'UO₂',n:'Uranium dioxide — nuclear fuel pellets'},{f:'UF₆',n:'Uranium hexafluoride — isotope separation'},{f:'U₃O₈',n:'Yellowcake — primary ore product'},{f:'UO₂(NO₃)₂',n:'Uranyl nitrate — reprocessing intermediate'}],
+  uses:'Nuclear power reactor fuel (U-235 fission); depleted uranium (DU) armour-piercing ammunition and shielding; U-Pb radiometric dating of geological samples; uranium glass (fluorescent greenish colour); historical use as yellow ceramic glaze',
+  bio:'No essential biological role. Nephrotoxic at elevated exposures (damages kidney tubules). Weakly radioactive with combined chemical and radiological toxicity. Radon-222 (a decay product chain) is the second-leading cause of lung cancer.',
+  hist:'Uranium oxide discovered by Klaproth in pitchblende (1789), named for planet Uranus. Metal isolated by Péligot (1841). Becquerel discovered radioactivity from uranium in 1896. Marie Curie studied it. Hahn and Strassmann discovered nuclear fission (1938). First controlled nuclear chain reaction: Chicago Pile-1, December 1942.',
+  fun:'⁲³⁸U has a half-life of 4.468 billion years — about the age of the Earth — allowing uranium-lead dating of ancient rocks.'},
+};
+
+/* ── Default fallback for elements without full data ─ */
+function getXD(n,el){
+  const d=XD[n];
+  if(d)return d;
+  // Build minimal defaults from ELS array
+  const[,,,mass,cat,group,period,state,config,mp,bp,density]=el;
+  return{
+    eneg:null,aRc:null,aRe:null,covR:null,vdwR:null,ie1:null,ea:null,
+    mpC:mp?mp-273.15:null,bpC:bp?bp-273.15:null,
+    hfus:null,hvap:null,cp:null,kth:null,res:null,mag:'—',
+    Y:null,G:null,B:null,nu:null,mohs:null,vick:null,brin:null,vs:null,
+    disc:'—',by:'—',nm:'—',ety:'—',
+    Uc:null,Sc:null,Mc:null,Cc:null,Oc:null,Hc:null,
+    cryst:'—',col:'—',app:state+' at STP',
+    rad:n>83||n===43||n===61,cas:'—',
+    ox:['?'],ie:[],iso:[],cpd:[],
+    uses:'See Wikipedia for detailed uses of this element.',
+    bio:'Biological role data not available locally.',
+    hist:'Historical data not available locally.',
+    fun:null
+  };
+}
+
+/* ── Tab definitions (matches Mendeleev app) ── */
+const DP_TABS=[
+  {id:'general',   label:'General'},
+  {id:'physical',  label:'Physical'},
+  {id:'atomic',    label:'Atomic'},
+  {id:'thermo',    label:'Thermodynamic'},
+  {id:'em',        label:'Electromagnetic'},
+  {id:'nuclear',   label:'Nuclear'},
+  {id:'reactivity',label:'Reactivity'},
+  {id:'abundance', label:'Abundances'},
+  {id:'isotopes',  label:'Isotopes'},
+  {id:'compounds', label:'Compounds'},
+  {id:'history',   label:'History'},
+  {id:'uses',      label:'Uses & Biology'},
+];
+
+let dpRAF=null, dpEl=null;
+
+/* ── Open the detail page ── */
+function openDp(num){
+  const el=byN[num]; if(!el)return;
+  dpEl=el;
+  const[n,sym,name,mass,cat,group,period,state,config,mp,bp,density,shells]=el;
+  const cv=CATS[cat]?.cv||'var(--unknown)';
+  const d=getXD(n,el);
+
+  // Accent colour
+  const pg=document.getElementById('dp');
+  pg.style.setProperty('--dpacc',cv);
+
+  // Header
+  const ds=document.getElementById('dp-sym');
+  ds.textContent=sym; ds.style.color=cv;
+  document.getElementById('dp-name').textContent=name;
+  document.getElementById('dp-sub').textContent=`Z = ${n}  ·  ${mass} u  ·  Group ${group||'—'}  ·  Period ${period||'—'}`;
+  const db=document.getElementById('dp-badge');
+  db.textContent=CATS[cat]?.label||'Unknown';
+  db.style.cssText=`background:${cv}18;color:${cv};border:1px solid ${cv}42`;
+
+  // Build tabs
+  document.getElementById('dp-nav').innerHTML=DP_TABS.map((t,i)=>
+    `<button class="dp-tab${i===0?' act':''}" data-tab="${t.id}"
+      onclick="switchDpTab('${t.id}')">${t.label}</button>`
+  ).join('');
+
+  // Render first tab
+  renderDpTab('general');
+
+  // Show page
+  pg.classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('dp-body').scrollTop=0;
+
+  // Start canvas
+  setTimeout(()=>startDpCanvas(el,cv),60);
+}
+
+function closeDp(){
+  document.getElementById('dp').classList.remove('open');
+  document.body.style.overflow='';
+  if(dpRAF){cancelAnimationFrame(dpRAF);dpRAF=null;}
+}
+
+function switchDpTab(id){
+  document.querySelectorAll('.dp-tab').forEach(t=>t.classList.toggle('act',t.dataset.tab===id));
+  renderDpTab(id);
+  document.getElementById('dp-body').scrollTop=0;
+}
+
+/* ── Electron canvas for detail page ── */
+function startDpCanvas(el,cv){
+  if(dpRAF){cancelAnimationFrame(dpRAF);dpRAF=null;}
+  const canvas=document.getElementById('dp-cv');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  const isDay=document.documentElement.getAttribute('data-theme')==='day';
+  const sc=(el[12]||'2').split(',').map(Number).slice(0,7);
+  const ec=(isDay?EC_D:EC_N)[el[4]]||'#5ba4f5';
+  const oc=isDay?'rgba(0,0,0,0.12)':'rgba(255,255,255,0.12)';
+  const BASE_R=13, W1=0.028, MIN_SPD=W1/20;
+  const rawR=sc.map((_,i)=>BASE_R*(i+1)*(i+1));
+  const maxFit=Math.min(cx,cy)-6;
+  const scale=rawR.length>0?Math.min(1,maxFit/rawR[rawR.length-1]):1;
+  const radii=rawR.map(r=>r*scale);
+  const spds=sc.map((_,i)=>Math.max(W1/Math.pow(i+1,3),MIN_SPD));
+  const offs=sc.map((_,i)=>i*1.23);
+  const eDotR=(r,cnt)=>Math.max(2,Math.min(4,r*Math.PI/(cnt*3)));
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const nucR=Math.max(4,2.5+Math.log(sc.reduce((a,b)=>a+b,0)+1)*1.1);
+    ctx.beginPath();ctx.arc(cx,cy,nucR,0,Math.PI*2);ctx.fillStyle=ec;ctx.fill();
+    sc.forEach((cnt,si)=>{
+      const r=radii[si];
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=oc;ctx.lineWidth=0.9;ctx.stroke();
+      const dot=eDotR(r,cnt);
+      for(let e=0;e<cnt;e++){
+        const a=offs[si]+(2*Math.PI/cnt)*e+t*spds[si];
+        ctx.beginPath();ctx.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),dot,0,Math.PI*2);
+        ctx.fillStyle=ec;ctx.fill();
+      }
+    });
+    t++;dpRAF=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── Helpers ── */
+const fv=(v,dp=3,unit='')=>v!=null&&v!='—'?`${typeof v==='number'?parseFloat(v.toFixed(dp)).toLocaleString():v}${unit?(' '+unit):''}` : '—';
+const fC=(c)=>{
+  if(c==null||c==='—')return'—';
+  const k=(parseFloat(c)+273.15).toFixed(2);
+  const f=(parseFloat(c)*9/5+32).toFixed(1);
+  return`${parseFloat(c).toLocaleString()} °C  /  ${k} K  /  ${f} °F`;
+};
+const fSci=(v)=>{
+  if(v==null)return'—';
+  if(v===0)return'0';
+  const e=Math.floor(Math.log10(Math.abs(v)));
+  const m=(v/Math.pow(10,e)).toFixed(2);
+  const sup=String(e).split('').map(c=>({'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'}[c]||c)).join('');
+  return`${m}×10${sup}`;
+};
+const fPpb=(v)=>{
+  if(v==null)return'—';
+  if(v===0)return'0 ppb';
+  if(v>=1e9)return(v/1e9).toPrecision(3)+' ×10⁹ ppb';
+  if(v>=1e6)return(v/1e6).toPrecision(3)+' ppm';
+  if(v>=1e3)return(v/1e3).toPrecision(3)+' ppb×10³';
+  return v.toPrecision(3)+' ppb';
+};
+
+function dpCell(l,v,u=''){
+  return`<div class="dp-cell"><div class="dp-cl">${l}</div><div class="dp-cv">${v!=null&&v!='—'?v:'—'}<span class="dp-cu">${u}</span></div></div>`;
+}
+function dpGrid(cells,cols3=false){
+  return`<div class="dp-grid${cols3?' dp-grid-3':''}">${cells}</div>`;
+}
+function dpHero(v,l){
+  return`<div class="dp-hero"><div class="dp-hv">${v||'—'}</div><div class="dp-hl">${l}</div></div>`;
+}
+function dpSec(title,content){
+  return`<div style="margin-bottom:1.3rem"><div class="dp-sh">${title}</div>${content}</div>`;
+}
+function dpRow(l,v){
+  return`<div class="dp-row"><span class="dp-rl">${l}</span><span class="dp-rv">${v||'—'}</span></div>`;
+}
+function dpAbRow(lbl,ppb,maxPpb){
+  if(ppb==null)return'';
+  const pct=ppb>0?Math.min(100,(Math.log10(ppb+1)/Math.log10(maxPpb+2))*100).toFixed(1):0;
+  return`<div class="dp-ab-row">
+    <span class="dp-ab-lbl">${lbl}</span>
+    <div class="dp-ab-bar"><div class="dp-ab-fill" style="width:${pct}%"></div></div>
+    <span class="dp-ab-val">${fPpb(ppb)}</span>
+  </div>`;
+}
+
+/* ── Main tab renderer ── */
+function renderDpTab(id){
+  if(!dpEl)return;
+  const[n,sym,name,mass,cat,group,period,state,config,mp,bp,density,shells]=dpEl;
+  const d=getXD(n,dpEl);
+  const cv=CATS[cat]?.cv||'var(--unknown)';
+  const shArr=(shells||'').split(',').map(Number).filter(v=>!isNaN(v)&&v>0);
+  const blk=config.includes('f')?'f':config.includes('d')?'d':config.includes('p')?'p':'s';
+  let h='';
+
+  /* ── GENERAL ── */
+  if(id==='general'){
+    h+=`<div class="dp-heroes">
+      ${dpHero(n,'Atomic Number')}
+      ${dpHero(mass,'Atomic Weight (u)')}
+      ${dpHero(group||'—','Group')}
+      ${dpHero(period||'—','Period')}
+      ${dpHero(blk+'-block','Block')}
+      ${dpHero(state,'State at STP')}
+    </div>`;
+    h+=dpSec('Identity',dpGrid(
+      dpCell('Name',name)+
+      dpCell('Symbol',sym)+
+      dpCell('Atomic Number',n)+
+      dpCell('Atomic Weight',mass,'u')+
+      dpCell('CAS Number',d.cas)+
+      dpCell('Category',CATS[cat]?.label||'Unknown')+
+      dpCell('Group',group||'—')+
+      dpCell('Period',period||'—')+
+      dpCell('Block',blk+'-block')+
+      dpCell('State at STP',state)+
+      dpCell('Color',d.col||'—')+
+      dpCell('Appearance',d.app||'—')+
+      dpCell('Crystal Structure',d.cryst||'—')+
+      dpCell('Radioactive',d.rad?'⚠ Yes':'No')
+    ));
+    h+=dpSec('Electron Configuration',dpGrid(
+      dpCell('Configuration',config)+
+      dpCell('Electrons per Shell',shells||'—')+
+      dpCell('Valence Electrons',shArr[shArr.length-1]||'—')+
+      dpCell('Number of Shells',shArr.length)
+    ));
+    h+=dpSec('Name Etymology',`<div class="dp-card"><strong>Origin</strong>${d.ety||'—'}</div>`);
+    if(d.fun){h+=`<div class="dp-card"><strong>⚡ Notable Fact</strong>${d.fun}</div>`;}
+  }
+
+  /* ── PHYSICAL PROPERTIES ── */
+  else if(id==='physical'){
+    h+=dpSec('Basic Physical Properties',dpGrid(
+      dpCell('Phase at STP',state)+
+      dpCell('Density',density)+
+      dpCell('Color',d.col||'—')+
+      dpCell('Appearance',d.app||'—')+
+      dpCell('Crystal Structure',d.cryst||'—')+
+      dpCell('Sound Speed',fv(d.vs),'m/s')
+    ));
+    h+=dpSec('Mechanical / Elastic Properties',dpGrid(
+      dpCell("Young's Modulus",fv(d.Y),'GPa')+
+      dpCell('Shear Modulus',fv(d.G),'GPa')+
+      dpCell('Bulk Modulus',fv(d.B),'GPa')+
+      dpCell("Poisson's Ratio",fv(d.nu,3))
+    ));
+    h+=dpSec('Hardness',dpGrid(
+      dpCell('Mohs Scale',fv(d.mohs,1))+
+      dpCell('Vickers Hardness',fv(d.vick),'MPa')+
+      dpCell('Brinell Hardness',fv(d.brin),'MPa')
+    ));
+    h+=dpSec('Density & Volume',dpGrid(
+      dpCell('Density',density)+
+      dpCell('Molar Volume',d.aRe?(4/3*Math.PI*Math.pow(d.aRe/100,3)*6.022e23/1e24).toFixed(2):'—','cm³/mol')
+    ));
+  }
+
+  /* ── ATOMIC PROPERTIES ── */
+  else if(id==='atomic'){
+    h+=`<div class="dp-bohr">
+      <div id="dp-cv-wrap"><canvas id="dp-cv" width="180" height="180"></canvas></div>
+      <div class="dp-shells">
+        <div class="dp-sh" style="margin-bottom:.45rem">Electron Shells</div>
+        ${shArr.map((cnt,i)=>{
+          const maxShow=Math.min(cnt,20);
+          const dots=Array.from({length:maxShow}).map(()=>`<div class="dp-sdot"></div>`).join('');
+          const extra=cnt>20?`<span style="font-size:.58rem;color:var(--txt3)"> +${cnt-20}</span>`:'';
+          return`<div class="dp-shell-row">
+            <span class="dp-sn">n=${i+1}</span>
+            <div class="dp-sdots">${dots}${extra}</div>
+            <span class="dp-sc">${cnt}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+    setTimeout(()=>startDpCanvas(dpEl,cv),50);
+
+    h+=dpSec('Electron Configuration',dpGrid(
+      dpCell('Configuration',config)+
+      dpCell('Electrons per Shell',shells||'—')+
+      dpCell('Valence Electrons',shArr[shArr.length-1]||'—')+
+      dpCell('Electron Affinity',d.ea!=null?d.ea+' kJ/mol':'—')+
+      dpCell('Atomic Term Symbol','—')
+    ));
+    h+=dpSec('Atomic Radii',dpGrid(
+      dpCell('Calculated Radius',fv(d.aRc),'pm')+
+      dpCell('Empirical Radius',fv(d.aRe),'pm')+
+      dpCell('Covalent Radius',fv(d.covR),'pm')+
+      dpCell('Van der Waals Radius',fv(d.vdwR),'pm')
+    ));
+
+    // Bohr shell physics table
+    if(shArr.length>0){
+      const rows=shArr.map((cnt,i)=>{
+        const sn=i+1;
+        return`<tr>
+          <td>n=${sn}</td><td>${cnt}</td>
+          <td>${(52.9*sn*sn).toFixed(0)} pm</td>
+          <td>${(2190/sn).toFixed(0)} km/s</td>
+          <td>${(0.152*Math.pow(sn,3)).toFixed(3)}×10⁻¹⁵ s</td>
+        </tr>`;
+      }).join('');
+      h+=dpSec('Bohr Model — Shell Parameters',
+        `<table class="dp-tbl">
+          <thead><tr><th>Shell</th><th>Electrons</th><th>Radius (n²·a₀)</th><th>Speed (v₁/n)</th><th>Period (T₁·n³)</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`);
     }
   }
 
-  // Separator
-  const sep = document.createElement('div');
-  sep.className = 'sep-row';
-  grid.appendChild(sep);
-
-  // Lanthanide row
-  for (let c = 0; c < 18; c++) {
-    if (c < 3) { const s=document.createElement('div'); s.className='spacer'; grid.appendChild(s); continue; }
-    const el = lants[c-3];
-    grid.appendChild(el ? makeCell(el) : (() => { const s=document.createElement('div'); s.className='spacer'; return s; })());
-  }
-  // Actinide row
-  for (let c = 0; c < 18; c++) {
-    if (c < 3) { const s=document.createElement('div'); s.className='spacer'; grid.appendChild(s); continue; }
-    const el = acts[c-3];
-    grid.appendChild(el ? makeCell(el) : (() => { const s=document.createElement('div'); s.className='spacer'; return s; })());
-  }
-}
-
-function makeCell(el) {
-  const [num,sym,name,mass,cat] = el;
-  const color = CATS[cat]?.color || '#888';
-  const div = document.createElement('div');
-  div.className = 'el';
-  div.dataset.num = num;
-  div.style.setProperty('--c', color);
-  div.innerHTML = `<div class="el-num">${num}</div><div class="el-symbol">${sym}</div><div class="el-name">${name}</div><div class="el-mass">${mass}</div>`;
-  div.addEventListener('click', () => showEl(num));
-  return div;
-}
-
-/* Panel */
-let activeNum = null;
-
-function showEl(num) {
-  const el = byNum[num];
-  if (!el) return;
-  const [n,sym,name,mass,cat,group,period,state,config,shells] = el;
-  const color = CATS[cat]?.color || '#888';
-
-  if (activeNum) document.querySelector(`.el[data-num="${activeNum}"]`)?.classList.remove('active');
-  activeNum = num;
-  document.querySelector(`.el[data-num="${num}"]`)?.classList.add('active');
-
-  const panel = document.getElementById('info-panel');
-  panel.style.borderColor = color;
-  panel.style.boxShadow = `0 0 30px -5px ${color}, 0 0 60px -15px ${color}`;
-
-  const symEl = document.getElementById('panel-symbol');
-  symEl.textContent = sym;
-  symEl.style.color = color;
-  symEl.style.textShadow = `0 0 20px ${color}, 0 0 40px ${color}88`;
-
-  buildShellDiagram(shells, color);
-  document.getElementById('panel-shells-str').style.color = color;
-  document.getElementById('panel-shells-str').textContent = shells.join(' - ');
-
-  const nameEl = document.getElementById('panel-name');
-  nameEl.textContent = name;
-  nameEl.style.color = color;
-  nameEl.style.textShadow = `0 0 10px ${color}66`;
-
-  document.getElementById('panel-num').textContent = `Atomic Number ${n}`;
-  document.getElementById('panel-div').style.background = color;
-
-  const rows = [
-    ['Atomic Mass', mass + ' u'],
-    ['State (STP)', state],
-    group  ? ['Group',  group]  : null,
-    period ? ['Period', period] : null,
-  ].filter(Boolean);
-
-  document.getElementById('panel-rows').innerHTML = rows.map(([l,v]) =>
-    `<div class="panel-row"><span class="panel-lbl">${l}</span><span class="panel-val" style="color:${color};text-shadow:0 0 8px ${color}66">${v}</span></div>`
-  ).join('');
-
-  const cfgEl = document.getElementById('panel-config');
-  cfgEl.style.color = color;
-  cfgEl.textContent = config;
-
-  document.getElementById('panel-badge-wrap').innerHTML =
-    `<span class="panel-badge" style="color:${color};border-color:${color};background:${color}18">${CATS[cat]?.label||'Unknown'}</span>`;
-
-  document.getElementById('info-overlay').classList.add('open');
-}
-
-function buildShellDiagram(shells, color) {
-  const wrap = document.getElementById('shell-wrap');
-  wrap.innerHTML = '';
-  wrap.style.color = color;
-
-  const nuc = document.createElement('div');
-  nuc.className = 'shell-nucleus';
-  wrap.appendChild(nuc);
-
-  const maxShells = Math.min(shells.length, 4);
-  if (maxShells < 2) {
-    const maxR = 50, minR = 18;
-    const r = minR;
-    addOrbit(wrap, r, shells[0] || 0, color, 2.2);
-    return;
-  }
-  const maxR = 58, minR = 16;
-  for (let i = 0; i < maxShells; i++) {
-    const r = minR + (maxR - minR) * (i / (maxShells - 1));
-    addOrbit(wrap, r, shells[i], color, 2 + i * 1.4);
-  }
-}
-
-function addOrbit(wrap, r, count, color, duration) {
-  const orbit = document.createElement('div');
-  orbit.className = 'shell-orbit';
-  orbit.style.width = orbit.style.height = (r*2)+'px';
-  orbit.style.borderColor = color;
-
-  const shown = Math.min(count, 8);
-  for (let e = 0; e < shown; e++) {
-    const angle = (2*Math.PI*e/shown) - Math.PI/2;
-    const dot = document.createElement('div');
-    dot.className = 'shell-electron';
-    dot.style.left = `calc(50% + ${Math.cos(angle)*r - 2.5}px)`;
-    dot.style.top  = `calc(50% + ${Math.sin(angle)*r - 2.5}px)`;
-    dot.style.background = color;
-    dot.style.boxShadow = `0 0 5px 2px ${color}`;
-    orbit.appendChild(dot);
+  /* ── THERMODYNAMIC PROPERTIES ── */
+  else if(id==='thermo'){
+    h+=`<div class="dp-heroes">
+      ${dpHero(d.mpC!=null?(d.mpC+273.15).toFixed(0):'—','Melt Point (K)')}
+      ${dpHero(d.bpC!=null?(d.bpC+273.15).toFixed(0):'—','Boil Point (K)')}
+      ${dpHero(d.kth!=null?d.kth:'—','Thermal Cond. W/m·K')}
+    </div>`;
+    h+=dpSec('Phase Transition Temperatures',dpGrid(
+      dpCell('Melting Point',fC(d.mpC))+
+      dpCell('Boiling Point',fC(d.bpC))
+    ));
+    h+=dpSec('Enthalpies',dpGrid(
+      dpCell('Heat of Fusion',fv(d.hfus),'kJ/mol')+
+      dpCell('Heat of Vaporization',fv(d.hvap),'kJ/mol')+
+      dpCell('Specific Heat Capacity',fv(d.cp,3),'J/g·K')+
+      dpCell('Thermal Conductivity',fv(d.kth),'W/m·K')+
+      dpCell('Thermal Expansion','—','/K')+
+      dpCell('Adiabatic Index','—')
+    ));
+    // Phase context
+    const note=state==='Gas'?`${name} is a gas at STP (0 °C, 1 atm).`
+      :state==='Liquid'?`${name} is one of only two elements liquid at room temperature.`
+      :d.mpC!=null&&d.mpC<30?`${name} melts near room temperature — handle with care.`
+      :d.mpC!=null&&d.mpC>3000?`${name} is a refractory material with an extremely high melting point.`
+      :`${name} is a solid at room temperature.`;
+    h+=`<div class="dp-card"><strong>Phase Context</strong>${note}</div>`;
   }
 
-  // Count label
-  const lbl = document.createElement('div');
-  lbl.style.cssText = `position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-size:0.55rem;color:${color};opacity:0.6`;
-  lbl.textContent = count;
-  orbit.appendChild(lbl);
-
-  wrap.appendChild(orbit);
-}
-
-function closePanel() {
-  document.getElementById('info-overlay').classList.remove('open');
-  if (activeNum) {
-    document.querySelector(`.el[data-num="${activeNum}"]`)?.classList.remove('active');
-    activeNum = null;
+  /* ── ELECTROMAGNETIC PROPERTIES ── */
+  else if(id==='em'){
+    h+=dpSec('Electrical Properties',dpGrid(
+      dpCell('Electrical Type',d.res!=null?'Conductor':state==='Gas'?'Non-conductor (gas)':blk==='p'||blk==='s'&&cat!=='alkali'&&cat!=='alkaline'?'—':'Conductor')+
+      dpCell('Electrical Resistivity',d.res!=null?fSci(d.res):'—','Ω·m')+
+      dpCell('Electrical Conductivity',d.res!=null?fSci(1/d.res):'—','S/m')+
+      dpCell('Superconducting Point','—')
+    ));
+    h+=dpSec('Magnetic Properties',dpGrid(
+      dpCell('Magnetic Type',d.mag||'—')+
+      dpCell('Curie Point',n===26?'1043 K (770 °C)':n===27?'1388 K':n===28?'631 K':'—')+
+      dpCell('Vol. Magnetic Susceptibility',d.mag!=null?fSci(d.mag_susc_vol||null):'—')+
+      dpCell('Magnetic Ordering',d.mag||'—')
+    ));
+    h+=dpSec('Optical & Acoustic Properties',dpGrid(
+      dpCell('Refractive Index',state==='Gas'?'~1.000':d.res!=null?'N/A (opaque metal)':'—')+
+      dpCell('Speed of Sound',fv(d.vs),'m/s')+
+      dpCell('Thermal Conductivity',fv(d.kth),'W/m·K')
+    ));
+    h+=`<div class="dp-card"><strong>Electromagnetic Context</strong>
+      ${d.mag==='Ferromagnetic'?`${name} is ferromagnetic — it can be permanently magnetised. Critical for electromagnets, motors and data storage.`
+       :d.mag==='Paramagnetic'?`${name} is paramagnetic — weakly attracted by magnetic fields but cannot be permanently magnetised.`
+       :d.mag==='Diamagnetic'?`${name} is diamagnetic — weakly repelled by magnetic fields.`
+       :`${name} magnetic properties: ${d.mag||'—'}.`}
+    </div>`;
   }
+
+  /* ── NUCLEAR PROPERTIES ── */
+  else if(id==='nuclear'){
+    const isRad=d.rad||n>83||n===43||n===61;
+    h+=dpSec('Nuclear Identity',dpGrid(
+      dpCell('Proton Number (Z)',n)+
+      dpCell('Neutrons in ⁻ isotope',mass?Math.round(parseFloat(mass)-n):'—')+
+      dpCell('Mass Number (A)',mass?Math.round(parseFloat(mass)):'—')+
+      dpCell('Radioactive',isRad?'⚠ Yes — all isotopes radioactive':'No — has stable isotopes')+
+      dpCell('Atomic Weight',mass,'u')+
+      dpCell('CAS Number',d.cas||'—')
+    ));
+    const stableCount=(d.iso||[]).filter(x=>x.stable).length;
+    const unstableCount=(d.iso||[]).filter(x=>!x.stable).length;
+    h+=dpSec('Isotope Summary',dpGrid(
+      dpCell('Stable Isotopes',stableCount||'—')+
+      dpCell('Listed Radioactive',unstableCount||'—')+
+      dpCell('Most Abundant',d.iso&&d.iso.length>0?d.iso.reduce((a,b)=>{
+        const pa=parseFloat((a.ab||'0').replace('%','').replace('Trace','0'))||0;
+        const pb=parseFloat((b.ab||'0').replace('%','').replace('Trace','0'))||0;
+        return pb>pa?b:a;
+      }).s:'—')+
+      dpCell('Longest Half-Life',isRad&&d.iso&&d.iso.length>0?
+        (d.iso.filter(x=>!x.stable).sort((a,b)=>{
+          const parse=s=>{if(!s)return 0;const m=s.match(/[\d.]+/);const v=m?parseFloat(m[0]):0;if(s.includes('Gyr'))return v*1e9;if(s.includes('Myr'))return v*1e6;if(s.includes('yr'))return v;if(s.includes('d'))return v/365;return 0;};
+          return parse(b.hl)-parse(a.hl);
+        })[0]?.hl||'—'):'N/A (stable)'
+      )
+    ));
+    h+=`<div class="dp-card" style="border-left-color:${isRad?'#f87171':'#2dd4bf'}">
+      <strong>Nuclear Stability</strong>
+      ${n<=82&&n!==43&&n!==61?
+        `${name} (Z=${n}) has ${stableCount} stable isotope${stableCount!==1?'s':''}. Elements with "magic numbers" of nucleons (2, 8, 20, 28, 50, 82, 126) are especially stable.`
+        :n===43?`Technetium (Z=43) is the lightest element with no stable isotopes. It is produced artificially in nuclear reactors.`
+        :n===61?`Promethium (Z=61) has no stable isotopes. All 38 known isotopes are radioactive.`
+        :`${name} (Z=${n}) is a radioactive element — all known isotopes are unstable.`}
+    </div>`;
+    if(n===92||n===94||n===95){
+      h+=dpSec('Fission Data',dpGrid(
+        dpCell('Fissile Isotope',n===92?'²³⁵U':n===94?'²³⁹Pu':'²⁴²ᵐAm')+
+        dpCell('Energy per Fission',n===92?'~200 MeV':n===94?'~207 MeV':'~200 MeV')+
+        dpCell('Bare Critical Mass',n===92?'~52 kg':n===94?'~10 kg':'~9 kg')+
+        dpCell('Application',n===92?'Power reactors & weapons':n===94?'Weapons & MOX fuel':'Research')
+      ));
+    }
+    h+=`<a class="dp-wiki" href="https://en.wikipedia.org/wiki/Isotopes_of_${encodeURIComponent(name.toLowerCase())}" target="_blank" rel="noopener">🔗 Full isotope list — Wikipedia</a>`;
+  }
+
+  /* ── REACTIVITY ── */
+  else if(id==='reactivity'){
+    const oxBadges=(d.ox||[]).map(s=>{
+      const v=parseFloat(s);
+      const col=v>0?`color:var(--dpacc,var(--acc));border-color:rgba(79,142,247,.35)`:v<0?`color:#f87171;border-color:rgba(248,113,113,.35)`:`color:var(--txt3);border-color:var(--brd2)`;
+      return`<span class="dp-oxb" style="${col}">${s}</span>`;
+    }).join('');
+
+    h+=dpSec('Chemical Properties',dpGrid(
+      dpCell('Electronegativity',d.eneg!=null?d.eneg+' (Pauling)':'N/A')+
+      dpCell('Electron Affinity',d.ea!=null?fv(d.ea)+' kJ/mol':'—')+
+      dpCell('1st Ionisation Energy',d.ie1!=null?fv(d.ie1)+' kJ/mol':'—')+
+      dpCell('Valence Electrons',shArr[shArr.length-1]||'—')
+    ));
+
+    // EN visual scale
+    if(d.eneg!=null){
+      const pct=(d.eneg/4.0*100).toFixed(1);
+      h+=`<div style="margin-bottom:1.2rem">
+        <div class="dp-sh">Electronegativity Scale — Pauling (0 to 4.0)</div>
+        <div class="dp-en-bar">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--txt3);width:14px">0</span>
+          <div class="dp-en-track"><div class="dp-en-fill" style="width:${pct}%"></div></div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.85rem;font-weight:700;color:var(--dpacc,var(--acc));width:30px;text-align:right">${d.eneg}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--txt3)">/ 4.0</span>
+        </div>
+      </div>`;
+    }
+
+    h+=`<div style="margin-bottom:1.2rem">
+      <div class="dp-sh">Oxidation States</div>
+      <div class="dp-oxwrap">${oxBadges||'<span style="color:var(--txt3)">—</span>'}</div>
+    </div>`;
+
+    // All ionisation energies
+    if(d.ie&&d.ie.length>0){
+      const ords=['st','nd','rd'];
+      const rows=d.ie.map((v,i)=>{
+        const ord=i<3?ords[i]:'th';
+        return`<tr><td>${i+1}${ord} IE</td><td>${v.toLocaleString()} kJ/mol</td><td>${(v/96.485).toFixed(3)} eV</td></tr>`;
+      }).join('');
+      h+=dpSec('All Ionisation Energies',
+        `<table class="dp-tbl">
+          <thead><tr><th>Ionisation</th><th>kJ / mol</th><th>eV</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`);
+    }
+
+    h+=`<div class="dp-card"><strong>Reactivity Note</strong>
+      ${cat==='noble'?`${name} is a noble gas — essentially chemically inert, electronegativity is undefined on the Pauling scale.`
+       :cat==='alkali'?`Highly reactive alkali metal — reacts vigorously with water, producing H₂ gas and a strong base. Must be stored under mineral oil.`
+       :cat==='halogen'?`Highly electronegative halogen — strong oxidising agent, reacts with most metals and many nonmetals.`
+       :`${name} shows ${d.ox?.length>1?'variable oxidation states':'a fixed oxidation state'}.${d.eneg?` Electronegativity: ${d.eneg} (Pauling).`:''}`}
+    </div>`;
+  }
+
+  /* ── ABUNDANCES ── */
+  else if(id==='abundance'){
+    const maxU=750000000, maxC=461000000, maxH=650000000;
+    h+=`<div class="dp-heroes">
+      ${dpHero(d.Uc!=null?(d.Uc/1e6).toPrecision(3):'—','Universe (ppm)')}
+      ${dpHero(d.Cc!=null?(d.Cc/1e3).toPrecision(3):'—','Crust (ppm)')}
+      ${dpHero(d.Hc!=null?(d.Hc/1e4).toPrecision(3):'—','Human Body (ppm)')}
+    </div>`;
+    h+=`<div style="margin-bottom:1.2rem">
+      <div class="dp-sh">Abundance — Logarithmic Scale</div>
+      ${dpAbRow('🌌 Universe',d.Uc,750000000)}
+      ${dpAbRow('☀️ Sun',d.Sc,909000000)}
+      ${dpAbRow('☄️ Meteorites',d.Mc,460000000)}
+      ${dpAbRow('🌍 Earth\'s Crust',d.Cc,461000000)}
+      ${dpAbRow('🌊 Oceans',d.Oc,857000000)}
+      ${dpAbRow('🧬 Human Body',d.Hc,650000000)}
+    </div>`;
+    h+=dpSec('Abundance Values',dpGrid(
+      dpCell('Universe',fPpb(d.Uc))+
+      dpCell('Sun',fPpb(d.Sc))+
+      dpCell('Meteorites',fPpb(d.Mc))+
+      dpCell("Earth's Crust",fPpb(d.Cc))+
+      dpCell('Oceans',fPpb(d.Oc))+
+      dpCell('Human Body',fPpb(d.Hc))
+    ));
+    const origin=n<=2?'Big Bang nucleosynthesis (~3 min after the Big Bang).'
+      :n<=26?'Stellar nucleosynthesis — forged in nuclear fusion in stellar cores.'
+      :n<=83?'Slow neutron capture (s-process) in AGB stars / supernova.'
+      :'Rapid neutron capture (r-process) in neutron star mergers.';
+    h+=`<div class="dp-card"><strong>🌌 Cosmic Origin</strong>${origin}</div>`;
+    h+=`<div class="dp-card"><strong>🌍 Crustal Occurrence</strong>
+      ${d.Cc!=null?`${name} makes up ${(d.Cc/1e4).toPrecision(3)} ppm of Earth\'s crust by mass — ${d.Cc>50000000?'one of the most abundant':'a trace to moderately abundant'} element.`
+        :`Crustal abundance data not available locally.`}
+    </div>`;
+  }
+
+  /* ── ISOTOPES ── */
+  else if(id==='isotopes'){
+    if(d.iso&&d.iso.length>0){
+      const rows=d.iso.map(x=>`<tr>
+        <td style="font-weight:700;font-size:.75rem">${x.s}</td>
+        <td>${x.Z}</td><td>${x.N}</td>
+        <td>${x.m}</td>
+        <td>${x.ab}</td>
+        <td class="${x.stable?'iso-s':'iso-u'}">${x.stable?'Stable':'Unstable'}</td>
+        <td>${x.hl||'—'}</td>
+        <td>${x.dc||'—'}</td>
+        <td style="font-size:.58rem;color:var(--txt3)">${x.note||''}</td>
+      </tr>`).join('');
+      h+=dpSec('Isotopes of '+name,
+        `<div style="overflow-x:auto"><table class="dp-tbl">
+          <thead><tr><th>Isotope</th><th>Z</th><th>N</th><th>Mass (u)</th><th>Abundance</th><th>Stability</th><th>Half-life</th><th>Decay</th><th>Notes</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>`);
+    } else {
+      h+=`<div class="dp-card"><strong>Isotope Data</strong>Full isotope data for ${name} available via Wikipedia link below.</div>`;
+    }
+    h+=`<a class="dp-wiki" href="https://en.wikipedia.org/wiki/Isotopes_of_${encodeURIComponent(name.toLowerCase())}" target="_blank" rel="noopener">🔗 Complete isotope list — Wikipedia</a>`;
+  }
+
+  /* ── COMPOUNDS ── */
+  else if(id==='compounds'){
+    if(d.cpd&&d.cpd.length>0){
+      const rows=d.cpd.map(c=>`<tr>
+        <td style="font-weight:700;font-size:.78rem;letter-spacing:.04em">${c.f}</td>
+        <td style="color:var(--txt2)">${c.n}</td>
+      </tr>`).join('');
+      h+=dpSec('Common Compounds',
+        `<table class="dp-tbl">
+          <thead><tr><th>Formula</th><th>Name & Notes</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`);
+    } else {
+      h+=`<div class="dp-card"><strong>Compounds</strong>${cat==='noble'?`${name} is a noble gas — does not form stable compounds under ordinary conditions.`:`Compound data not available locally.`}</div>`;
+    }
+    h+=dpSec('Bonding Character',dpGrid(
+      dpCell('Electronegativity',d.eneg!=null?d.eneg+' (Pauling)':'N/A')+
+      dpCell('Oxidation States',(d.ox||[]).join(', ')||'—')+
+      dpCell('Electron Affinity',d.ea!=null?fv(d.ea)+' kJ/mol':'—')+
+      dpCell('Bonding Type',cat==='noble'?'None (inert)':cat==='alkali'||cat==='alkaline'?'Ionic (typical)':cat==='nonmetal'||cat==='halogen'?'Covalent (typical)':'Metallic / Mixed')
+    ));
+    h+=`<a class="dp-wiki" href="https://en.wikipedia.org/wiki/${encodeURIComponent(name+'_compounds')}" target="_blank" rel="noopener">🔗 ${name} compounds — Wikipedia</a>`;
+  }
+
+  /* ── HISTORY ── */
+  else if(id==='history'){
+    h+=dpSec('Discovery',dpGrid(
+      dpCell('Year / Era',d.disc||'—')+
+      dpCell('Discoverer',d.by||'—')+
+      dpCell('Named by',d.nm||'—')
+    ));
+    h+=dpSec('Name & Symbol Etymology',`<div class="dp-card"><strong>Etymology</strong>${d.ety||'—'}</div>`);
+    h+=dpSec('Historical Account',`<div class="dp-prose">${d.hist||'Historical information not available locally.'}</div>`);
+    h+=`<a class="dp-wiki" href="https://en.wikipedia.org/wiki/${encodeURIComponent(name)}" target="_blank" rel="noopener">🔗 ${name} — Wikipedia</a>
+    <a class="dp-wiki" href="https://en.wikipedia.org/wiki/${encodeURIComponent(name+'#History')}" target="_blank" rel="noopener">🔗 History section</a>`;
+  }
+
+  /* ── USES & BIOLOGY ── */
+  else if(id==='uses'){
+    const useItems=(d.uses||'').split(';').map(u=>u.trim()).filter(Boolean);
+    if(useItems.length>0){
+      h+=dpSec('Industrial & Everyday Uses',useItems.map(u=>`<div class="dp-use-row">${u}</div>`).join(''));
+    }
+    h+=dpSec('Biological Role',`<div class="dp-prose">${d.bio||'No known biological role.'}</div>`);
+
+    // Safety
+    const safe=n===80?'Mercury is highly neurotoxic. All forms — elemental, inorganic, and organic — are hazardous.'
+      :n===82?'Lead is a neurotoxin with no safe exposure level. Particularly harmful to developing children.'
+      :n===33?'Inorganic arsenic is a Group 1 IARC carcinogen. Chronic exposure causes skin, lung and bladder cancer.'
+      :n===9?'Fluorine gas and hydrofluoric acid are extremely corrosive and toxic. Require specialist facilities.'
+      :n===35?'Bromine is a corrosive liquid with toxic vapour, causing severe burns to skin and mucous membranes.'
+      :d.rad?`${name} is radioactive — all isotopes emit ionising radiation. Requires appropriate shielding and procedures.`
+      :cat==='noble'?`${name} is chemically inert and non-toxic, though can cause asphyxiation by displacing oxygen in confined spaces.`
+      :cat==='alkali'?`Reacts violently with water, producing corrosive hydroxide solution and flammable hydrogen gas. Store under mineral oil.`
+      :`Refer to the Safety Data Sheet (SDS) for safe handling of ${name} and its compounds.`;
+    h+=`<div class="dp-card"><strong>⚠️ Safety & Hazards</strong>${safe}</div>`;
+    h+=`<a class="dp-wiki" href="https://en.wikipedia.org/wiki/${encodeURIComponent(name)}" target="_blank" rel="noopener">🔗 ${name} — Wikipedia</a>`;
+  }
+
+  document.getElementById('dp-body').innerHTML=h;
 }
 
-buildGrid();
 
-// Stagger-in animation
-document.querySelectorAll('.el:not(.spacer):not(.gap-cell)').forEach((el, i) => {
-  el.style.opacity = '0';
-  el.style.transform = 'scale(0.65)';
-  el.style.transition = `opacity 0.35s ease ${i*4.5}ms, transform 0.35s ease ${i*4.5}ms`;
-  setTimeout(() => {
-    el.style.opacity = '1';
-    el.style.transform = '';
-  }, 20 + i * 4.5);
-});
+
+
 </script>
+
+<!-- ═══════════════════════════════════════════════
+     ELEMENT DETAIL PAGE
+═══════════════════════════════════════════════ -->
+<div id="dp">
+  <div class="dp-bar" id="dp-bar">
+    <button class="dp-back" onclick="closeDp()">← Back</button>
+    <div class="dp-bar-sym" id="dp-sym"></div>
+    <div class="dp-bar-info">
+      <div class="dp-bar-name" id="dp-name"></div>
+      <div class="dp-bar-sub"  id="dp-sub"></div>
+      <div class="dp-bar-badge" id="dp-badge"></div>
+    </div>
+  </div>
+  <div class="dp-nav-wrap">
+    <div class="dp-nav" id="dp-nav"></div>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+</div>
+
 </body>
 </html>
-
