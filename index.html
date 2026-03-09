@@ -1,730 +1,991 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="night">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Periodic Table of Elements</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>ChemLab – Periodic Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@200;300;400;600;700&family=Exo+2:wght@200;300;400;600;700&family=Cormorant+Garamond:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Raleway:wght@300;400;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --border: rgba(255,255,255,0.07);
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --accent: #00d4ff;
+:root{
+  --font-body:'Outfit',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --el-sym-font:'Outfit',sans-serif;
+  --el-num-font:'IBM Plex Mono',monospace;
+  --el-mass-font:'IBM Plex Mono',monospace;
+  --el-sym-size:1.28rem;
+  --el-sym-weight:700;
+  --el-sym-spacing:0em;
+  --el-num-size:.65rem;
+  --el-num-color:var(--txt3);
+  --el-num-weight:600;
+  --el-name-size:.42rem;
+  --el-name-color:var(--txt);
+  --el-name-weight:500;
+  --el-mass-size:.55rem;
+  --el-mass-color:rgba(255,255,255,0.45);
+  --bg:#060811;--bg2:#0a0e1c;--bg3:#10172a;
+  --surf:#111827;--surf2:#192238;--surf3:#1f2d45;
+  --brd:rgba(79,142,247,.1);--brd2:rgba(79,142,247,.2);--brd3:rgba(79,142,247,.38);
+  --txt:#dce4ff;--txt2:#7e92c0;--txt3:#3d4f72;
+  --acc:#4f8ef7;--acc2:#6ea6ff;--acc-rgb:79,142,247;
+  --shadow:rgba(0,0,0,.55);
+  --alkali:#ff6b6b;--alkaline:#ff9f4a;--transition:#5ba4f5;
+  --post-transition:#6ee7a0;--metalloid:#2dd4bf;--nonmetal:#f472b6;
+  --halogen:#c084fc;--noble:#a78bfa;--lanthanide:#22d3ee;
+  --actinide:#fbbf24;--unknown:#94a3b8;
+}
+[data-theme="day"]{
+  --bg:#edf0f9;--bg2:#e3e8f5;--bg3:#d6dcee;
+  --surf:#ffffff;--surf2:#f2f5fc;--surf3:#e8ecf7;
+  --brd:rgba(20,60,160,.12);--brd2:rgba(20,60,160,.22);--brd3:rgba(20,60,160,.38);
+  --txt:#0a1228;--txt2:#2e3f6e;--txt3:#6272a0;
+  --acc:#1d53d4;--acc2:#2d6aff;--acc-rgb:29,83,212;
+  --shadow:rgba(0,0,0,.14);
+  --alkali:#c81a1a;--alkaline:#c04a12;--transition:#1438b0;
+  --post-transition:#0f6836;--metalloid:#087a72;--nonmetal:#a81880;
+  --halogen:#6020cc;--noble:#3520aa;--lanthanide:#0572a0;
+  --actinide:#a05a08;--unknown:#3e5070;
+  --el-num-color:var(--txt3);
+  --el-name-color:var(--txt);
+  --el-mass-color:rgba(0,0,0,0.4);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;transition:background .45s,color .45s}
+::selection{background:var(--acc);color:#fff}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--brd3);border-radius:99px}
 
-    --alkali: #ff6b6b;
-    --alkaline: #ffa94d;
-    --transition: #74c0fc;
-    --post-transition: #a9e34b;
-    --metalloid: #63e6be;
-    --nonmetal: #f783ac;
-    --halogen: #da77f2;
-    --noble: #9775fa;
-    --lanthanide: #66d9e8;
-    --actinide: #ffd43b;
-    --unknown: #868e96;
-  }
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 65% 45% at 12% 8%,rgba(var(--acc-rgb),.055) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 55% at 88% 88%,rgba(168,130,250,.04) 0%,transparent 60%);
+  transition:background .45s;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── SPLASH ─────────────────────────────────────── */
+#splash{
+  position:fixed;inset:0;background:#060811;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+  z-index:9999;transition:opacity .7s ease,transform .7s ease;
+}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+.sp-logo{font-family:'Outfit',sans-serif;font-size:clamp(3.5rem,12vw,9rem);font-weight:900;letter-spacing:.06em;opacity:0;transform:translateY(26px);animation:spIn .9s cubic-bezier(.22,1,.36,1) .2s forwards}
+.sp-logo .c{color:#fff}.sp-logo .l{color:#4f8ef7}
+.sp-tag{font-family:'Outfit',sans-serif;font-size:clamp(.8rem,2.8vw,1.45rem);font-weight:200;letter-spacing:.32em;text-transform:uppercase;color:#3a4d72;opacity:0;animation:spIn .7s ease .7s forwards}
+.sp-tag span{color:#4f8ef7}
+.sp-track{width:200px;height:2px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:2.2rem;overflow:hidden;opacity:0;animation:spIn .4s ease 1.1s forwards}
+.sp-fill{height:100%;width:0;background:linear-gradient(90deg,#4f8ef7,#a78bfa);border-radius:99px;animation:spBar 1.6s cubic-bezier(.4,0,.2,1) 1.2s forwards}
+.sp-hint{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:#232d46;margin-top:.7rem;opacity:0;animation:spIn .5s ease 1.5s forwards}
+@keyframes spIn{to{opacity:1;transform:none}}
+@keyframes spBar{to{width:100%}}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: auto;
-  }
+/* ── APP ─────────────────────────────────────────── */
+#app{opacity:0;transition:opacity .7s ease}
+#app.show{opacity:1}
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 80% 40% at 20% 20%, rgba(0,212,255,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 60% at 80% 80%, rgba(151,117,250,0.04) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ── TOPBAR ──────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:600;
+  background:rgba(6,8,17,.85);backdrop-filter:blur(22px) saturate(160%);
+  border-bottom:1px solid var(--brd);padding:.65rem 2rem;
+  transition:background .45s,border-color .45s;
+}
+[data-theme="day"] .topbar{background:rgba(236,239,248,.9)}
+.topbar-in{max-width:1700px;margin:0 auto;display:flex;align-items:center;gap:1.2rem}
+.logo{font-family:'Outfit',sans-serif!important;font-size:1.6rem;font-weight:900;letter-spacing:.04em;flex-shrink:0;text-decoration:none;cursor:default}
+[data-theme="night"] .logo .c{color:#fff}
+[data-theme="night"] .logo .l{color:#4f8ef7}
+[data-theme="day"]   .logo .c{color:#0c1530}
+[data-theme="day"]   .logo .l{color:#1d53d4}
+.tb-right{display:flex;align-items:center;gap:.5rem;margin-left:auto}
+.tb-btn{background:var(--surf2);border:1px solid var(--brd2);border-radius:8px;color:var(--txt2);font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:600;letter-spacing:.06em;padding:.46rem .9rem;cursor:pointer;white-space:nowrap;transition:all .2s;position:relative;overflow:hidden}
+.tb-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--acc-rgb),.14),transparent);opacity:0;transition:opacity .2s}
+.tb-btn:hover{border-color:var(--brd3);color:var(--txt);transform:translateY(-1px)}.tb-btn:hover::before{opacity:1}
 
-  header {
-    padding: 2.5rem 2rem 1rem;
-    position: relative;
-    z-index: 1;
-  }
+/* ── DROPDOWN MENUS ──────────────────────────────── */
+.fd-wrap{position:relative}
+.fd-menu{display:none;position:absolute;top:calc(100% + 7px);right:0;background:var(--surf);border:1px solid var(--brd2);border-radius:12px;overflow:hidden;min-width:185px;z-index:700;box-shadow:0 22px 60px var(--shadow);animation:fdIn .18s ease}
+@keyframes fdIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.fd-menu.open{display:block}
+.fd-opt{padding:.62rem 1rem;cursor:pointer;font-size:.8rem;color:var(--txt2);border-bottom:1px solid var(--brd);transition:all .14s;display:flex;align-items:center;gap:.45rem}
+.fd-opt:last-child{border:none}.fd-opt:hover{background:var(--surf2);color:var(--txt)}.fd-opt.sel{color:var(--acc)}
+.fd-opt.sel::before{content:'✓';font-size:.66rem;width:.7rem}.fd-opt:not(.sel)::before{content:'';display:inline-block;width:.7rem}
 
-  .header-inner {
-    max-width: 1600px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
+/* Effect dropdown special styling */
+.fd-opt .fx-icon{font-size:.72rem;opacity:.6}
+.fd-opt.sel .fx-icon{opacity:1}
+.fx-preview{display:inline-flex;gap:2px;align-items:center}
+.fx-preview span{width:5px;height:5px;border-radius:1px;background:var(--acc);display:inline-block}
 
-  h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    letter-spacing: 0.08em;
-    line-height: 0.9;
-    color: #fff;
-  }
+/* ── HERO / AI ───────────────────────────────────── */
+.hero{position:relative;z-index:1;padding:3.5rem 2rem 2rem;max-width:1700px;margin:0 auto}
+.hero-top{text-align:center;margin-bottom:2.8rem;opacity:0;transform:translateY(20px);animation:heroin .8s ease .1s forwards}
+@keyframes heroin{to{opacity:1;transform:none}}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:linear-gradient(135deg,rgba(var(--acc-rgb),.14),rgba(var(--acc-rgb),.04));
+  border:1px solid var(--brd2);border-radius:99px;
+  padding:.3rem .9rem;margin-bottom:1.2rem;
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);
+}
+.hero-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.hero-h1{font-family:'Outfit',sans-serif!important;font-size:clamp(2rem,5.5vw,4rem);font-weight:800;line-height:1.05;letter-spacing:-.01em}
+[data-theme="night"] .hero-h1 .hl{background:linear-gradient(130deg,#4f8ef7 20%,#a78bfa 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+[data-theme="day"]   .hero-h1 .hl{background:linear-gradient(130deg,#1d53d4 20%,#6d2fd8 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{margin-top:.8rem;font-size:clamp(.82rem,1.7vw,.98rem);color:var(--txt3);font-weight:300;letter-spacing:.04em}
 
-  h1 span { color: var(--accent); }
+.ai-wrap{max-width:760px;margin:0 auto;opacity:0;transform:translateY(16px);animation:heroin .75s ease .3s forwards}
+.ai-box{
+  position:relative;background:var(--surf);border:1.5px solid var(--brd2);
+  border-radius:20px;padding:1.3rem 1.4rem;
+  transition:border-color .3s,box-shadow .3s;overflow:hidden;
+}
+.ai-box::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(var(--acc-rgb),.06),transparent 55%);pointer-events:none}
+.ai-box:focus-within{border-color:var(--brd3);box-shadow:0 0 0 4px rgba(var(--acc-rgb),.07),0 24px 70px var(--shadow)}
+.ask-lbl{font-family:'IBM Plex Mono',monospace;font-size:.63rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2);margin-bottom:.75rem;display:flex;align-items:center;gap:.35rem}
+.ask-lbl::before{content:'⬡';font-size:.7rem}
+.ai-row{display:flex;align-items:center;gap:.75rem}
+.ai-in{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-family:'Outfit',sans-serif;font-size:.98rem;font-weight:400;caret-color:var(--acc)}
+.ai-in::placeholder{color:var(--txt3)}
+.ask-btn{
+  flex-shrink:0;background:linear-gradient(135deg,var(--acc),#7b6cf6);border:none;
+  border-radius:12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;
+  letter-spacing:.06em;padding:.7rem 1.4rem;cursor:pointer;white-space:nowrap;
+  transition:transform .2s,box-shadow .2s,opacity .2s;position:relative;overflow:hidden;
+}
+.ask-btn::after{content:'';position:absolute;inset:0;border-radius:12px;background:rgba(255,255,255,.14);opacity:0;transition:opacity .2s}
+.ask-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(var(--acc-rgb),.4)}.ask-btn:hover::after{opacity:1}
+.ask-btn:active{transform:translateY(0)}.ask-btn:disabled{opacity:.5;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--brd)}
+.chip{background:var(--surf2);border:1px solid var(--brd);border-radius:99px;color:var(--txt3);font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:500;letter-spacing:.03em;padding:.24rem .68rem;cursor:pointer;transition:all .16s}
+.chip:hover{background:var(--surf3);color:var(--txt2);border-color:var(--brd2)}
 
-  .subtitle {
-    font-size: 0.85rem;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-    font-family: 'Space Mono', monospace;
-  }
+.ai-ans-wrap{max-width:760px;margin:.85rem auto 0;display:none;animation:ansin .32s ease}
+@keyframes ansin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.ai-ans-wrap.show{display:block}
+.ai-card{background:var(--surf);border:1.5px solid var(--brd2);border-radius:16px;overflow:hidden;position:relative}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),#a78bfa,var(--acc));background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:16px 16px 0 0}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ai-head{padding:.85rem 1.15rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.ai-head-l{display:flex;align-items:center;gap:.55rem}
+.ai-badge{background:linear-gradient(135deg,var(--acc),#7b6cf6);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:.58rem;font-weight:600;letter-spacing:.12em;padding:.18rem .5rem;border-radius:5px}
+.ai-qtxt{font-size:.78rem;color:var(--txt2);font-style:italic;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-close{background:var(--surf2);border:1px solid var(--brd);border-radius:7px;color:var(--txt3);width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.74rem;transition:all .16s}
+.ai-close:hover{color:var(--txt);border-color:var(--brd2)}
+.ai-body{padding:1.15rem;min-height:56px}
+.ld-row{display:flex;align-items:center;gap:.7rem;color:var(--txt2);font-family:'Outfit',sans-serif;font-size:.83rem}
+.ld-dots{display:flex;gap:4px}.ld-d{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:ldb 1.4s ease-in-out infinite}
+.ld-d:nth-child(2){animation-delay:.2s}.ld-d:nth-child(3){animation-delay:.4s}
+@keyframes ldb{0%,80%,100%{transform:scale(.5);opacity:.35}40%{transform:scale(1);opacity:1}}
+.ai-resp{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:400;line-height:1.82;color:var(--txt)}
+.ai-resp strong{font-weight:700;color:var(--acc2)}.ai-resp em{font-style:italic;color:var(--txt2)}
+.ai-resp h3{font-size:.84rem;font-weight:700;color:var(--txt);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;margin:.9rem 0 .3rem;text-transform:uppercase}
+.ai-resp ul{padding-left:1.35rem;margin:.4rem 0}.ai-resp li{margin:.25rem 0;color:var(--txt2)}.ai-resp li::marker{color:var(--acc)}
 
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    align-items: center;
-  }
+/* ── PT HEADER ───────────────────────────────────── */
+.pt-hdr{
+  position:relative;z-index:1;max-width:1700px;margin:0 auto;
+  padding:.6rem 2rem 0;display:flex;align-items:flex-end;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;opacity:0;transform:translateY(12px);animation:heroin .7s ease .5s forwards;
+}
+.pt-title{font-family:'Outfit',sans-serif!important;font-size:clamp(1.35rem,3vw,2.1rem);font-weight:700;letter-spacing:.01em;line-height:1}
+[data-theme="day"]   .pt-title .t2{color:#1d53d4}
+[data-theme="night"] .pt-title .t2{color:#4f8ef7}
+.pt-sub{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--txt3);letter-spacing:.14em;text-transform:uppercase;margin-top:.3rem}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem .7rem}
+.leg-it{display:flex;align-items:center;gap:.32rem;font-size:.67rem;color:var(--txt2);cursor:pointer;padding:.2rem .5rem;border-radius:6px;border:1px solid transparent;transition:all .17s}
+.leg-it:hover{color:var(--txt);background:var(--surf2);border-color:var(--brd)}.leg-it.act{background:var(--surf2);border-color:var(--brd2);color:var(--txt)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
+/* ── GRID ────────────────────────────────────────── */
+.pt-wrap{position:relative;z-index:1;padding:.7rem 2rem 2rem;overflow-x:auto}
+.pt-inner{max-width:1700px;margin:0 auto}
+.pt-grid{display:grid;grid-template-columns:repeat(18,minmax(53px,1fr));grid-template-rows:repeat(10,minmax(57px,auto));gap:3px;min-width:1000px}
 
-  .legend-item:hover { color: var(--text); }
+.el{
+  background:var(--surf);border:1px solid var(--brd);border-radius:7px;
+  padding:5px 6px 4px;cursor:pointer;position:relative;
+  display:flex;flex-direction:column;justify-content:space-between;min-height:57px;overflow:hidden;
+  transition:transform .18s cubic-bezier(.34,1.4,.64,1),border-color .18s,box-shadow .18s,opacity .22s,filter .22s;
+}
+.el::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cat-color);border-radius:7px 0 0 7px}
+.el:hover{transform:scale(1.12) translateY(-2px);border-color:var(--cat-color);box-shadow:0 0 20px -4px var(--cat-color),0 8px 24px rgba(0,0,0,.4);z-index:80}
+.el.acel{border-color:var(--cat-color);box-shadow:0 0 0 2px var(--cat-color)}
+.el-num{font-family:var(--el-num-font);font-size:var(--el-num-size);color:var(--el-num-color);line-height:1;font-weight:var(--el-num-weight)}
+.el-sym{font-family:var(--el-sym-font)!important;font-size:var(--el-sym-size);color:var(--cat-color);font-weight:var(--el-sym-weight);line-height:1;letter-spacing:var(--el-sym-spacing)}
+.el-name{font-size:var(--el-name-size);color:var(--el-name-color);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em;font-weight:var(--el-name-weight);line-height:1.2}
+.el-mass{font-family:var(--el-mass-font);font-size:var(--el-mass-size);color:var(--el-mass-color)}
+.sp{background:transparent;border:none;pointer-events:none}
+.gc{background:var(--surf);border:1px dashed var(--brd);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:default}
+.gc span{font-family:'IBM Plex Mono',monospace;font-size:.52rem;color:var(--txt3);text-align:center;line-height:1.5}
+.gc-series{background:var(--surf);border:1px solid var(--brd);border-radius:7px;padding:5px 6px 4px;display:flex;flex-direction:column;justify-content:center;gap:.18rem;cursor:default;overflow:hidden}
+.gc-series::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cat-color);border-radius:7px 0 0 7px}
 
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
+/* ════════════════════════════════════════════════════
+   EFFECT STYLES
+═══════════════════════════════════════════════════ */
 
-  .table-wrapper {
-    position: relative;
-    z-index: 1;
-    padding: 1rem 2rem 2rem;
-    overflow-x: auto;
-  }
+/* ── EFFECT 1: Fade (Original) ───────────────────── */
+.fx1 .el.hi{opacity:1!important;filter:none!important;border-color:var(--cat-color)}
+.fx1 .el.dm{opacity:.11;filter:grayscale(.5)}
 
-  .table-inner {
-    max-width: 1600px;
-    margin: 0 auto;
-  }
+/* ── EFFECT 2: Domino Glow ───────────────────────── */
+@keyframes dominoGrow{
+  from{transform:scale(1);opacity:.6}
+  to{transform:scale(1.12);opacity:1}
+}
+@keyframes dominoShrink{
+  from{transform:scale(1.12);opacity:1}
+  to{transform:scale(1);opacity:.6}
+}
+.fx2 .el.dm{
+  opacity:.13;filter:grayscale(.7) brightness(.6);
+  transition:opacity .3s ease,filter .3s ease;
+}
+.fx2 .el.hi{
+  border-color:var(--cat-color);
+  box-shadow:0 0 14px var(--cat-color),0 0 24px var(--cat-color),inset 0 0 8px rgba(255,255,255,.07);
+  z-index:50;
+  animation:dominoGrow .4s ease-out forwards;
+  filter:brightness(1.18) saturate(1.25);
+}
+.fx2 .el.shrink{
+  animation:dominoShrink .4s ease-out forwards;
+}
 
-  .pt-grid {
-    display: grid;
-    grid-template-columns: repeat(18, minmax(54px, 1fr));
-    grid-template-rows: repeat(10, minmax(54px, auto));
-    gap: 3px;
-    min-width: 1000px;
-  }
+/* ── EFFECT 3: Ring Glow (Thick outline + domino) ── */
+@keyframes ringGrow{
+  from{transform:scale(1);opacity:.6}
+  to  {transform:scale(1.15);opacity:1}
+}
+@keyframes ringShrink{
+  from{transform:scale(1.15);opacity:1}
+  to  {transform:scale(1);opacity:.6}
+}
+.fx3 .el.dm{
+  opacity:.15;filter:grayscale(.7) brightness(.6);
+  transition:opacity .3s ease,filter .3s ease;
+}
+.fx3 .el.hi{
+  border-color:var(--cat-color);
+  box-shadow:0 0 0 5px var(--cat-color),0 0 20px var(--cat-color),0 0 30px rgba(var(--cat-color),.4);
+  z-index:50;
+  animation:ringGrow .4s ease-out forwards;
+}
+.fx3 .el.shrink{
+  animation:ringShrink .4s ease-out forwards;
+}
+/* instant-clear variant used when clicking a non-matching element */
+.fx3 .el.instant-clear{
+  animation:none !important;
+  transform:scale(1) !important;
+  opacity:1 !important;
+}
 
-  .el {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 4px 5px;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 54px;
-    overflow: hidden;
-  }
+/* ── INFO PANEL ──────────────────────────────────── */
+#info-panel{
+  position:fixed;right:1.5rem;bottom:1.5rem;width:310px;max-height:90vh;
+  background:var(--surf);border:1.5px solid var(--brd2);border-radius:18px;z-index:800;
+  transform:translateY(calc(100% + 2.5rem));
+  transition:transform .42s cubic-bezier(.34,1.3,.64,1),background .45s,border-color .45s;
+  box-shadow:0 30px 80px var(--shadow);display:flex;flex-direction:column;overflow:hidden;
+}
+#info-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pc,var(--acc)),transparent 65%);border-radius:18px 18px 0 0}
+#info-panel.show{transform:translateY(0)}
+.pan-hdr{padding:1.1rem 1.1rem .4rem;flex-shrink:0;position:relative}
+.pan-close{position:absolute;top:.82rem;right:.82rem;background:var(--surf2);border:1px solid var(--brd);border-radius:7px;color:var(--txt3);width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.76rem;cursor:pointer;transition:all .16s}
+.pan-close:hover{color:var(--txt);border-color:var(--brd2)}
+.pan-el-row{display:flex;align-items:flex-start;gap:.9rem;margin-bottom:.9rem}
+.e-stage{flex-shrink:0;width:82px;height:82px;border:1.5px solid var(--brd2);border-radius:12px;background:var(--bg2);overflow:hidden}
+.e-cv{width:100%;height:100%;display:block}
+.pan-info{flex:1}
+.p-sym{font-family:'Outfit',sans-serif!important;font-size:2.75rem;font-weight:800;line-height:1;letter-spacing:.01em}
+.p-name{font-family:'Outfit',sans-serif!important;font-size:.93rem;font-weight:600;margin-top:.1rem}
+.p-num{font-family:'IBM Plex Mono',monospace;font-size:.63rem;color:var(--txt3);margin-top:.1rem}
+.p-badge{display:inline-block;padding:.17rem .52rem;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:.59rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.45rem}
+.p-div{height:1px;background:var(--brd);margin:.7rem 0}
+.pan-body{overflow-y:auto;padding:0 1.1rem 1.1rem;flex:1;scrollbar-width:thin;scrollbar-color:var(--brd2) transparent}
+.ps-ttl{font-family:'IBM Plex Mono',monospace;font-size:.57rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);margin-bottom:.32rem}
+.ps-sec{margin-bottom:.8rem}
+.p-row{display:flex;justify-content:space-between;align-items:baseline;padding:.28rem 0;border-bottom:1px solid var(--brd)}
+.p-row:last-child{border:none}
+.p-lbl{font-family:'Outfit',sans-serif!important;font-size:.7rem;font-weight:400;color:var(--txt2)}
+.p-val{font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--txt);text-align:right;max-width:57%}
 
-  .el::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--cat-color);
-    opacity: 0.8;
-  }
+/* ── FOOTER ──────────────────────────────────────── */
+footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35rem 2rem;margin-top:.5rem;transition:border-color .45s}
+.ft-in{max-width:1700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.ft-logo{font-family:'Outfit',sans-serif!important;font-size:1.1rem;font-weight:900;letter-spacing:.04em}
+[data-theme="night"] .ft-logo .c{color:#fff}
+[data-theme="night"] .ft-logo .l{color:#4f8ef7}
+[data-theme="day"]   .ft-logo .c{color:#0c1530}
+[data-theme="day"]   .ft-logo .l{color:#1d53d4}
+.ft-copy{font-family:'Outfit',sans-serif!important;font-size:.72rem;font-weight:400;letter-spacing:.05em}
+[data-theme="night"] .ft-copy{color:#ffffff}
+[data-theme="day"]   .ft-copy{color:#0c1530}
 
-  .el:hover {
-    transform: scale(1.12) translateY(-2px);
-    border-color: var(--cat-color);
-    box-shadow: 0 0 20px -4px var(--cat-color), 0 8px 24px rgba(0,0,0,0.4);
-    z-index: 100;
-  }
-  
-  .el.category-dimmed:hover {
-    transform: scale(1.08);
-    filter: grayscale(0.5) brightness(0.8);
-  }
-
-  .el.active {
-    border-color: var(--cat-color);
-    box-shadow: 0 0 0 5px var(--cat-color), 0 0 20px var(--cat-color), 0 0 30px rgba(var(--cat-color), 0.4);
-  }
-
-  .el.category-highlighted {
-    border-color: var(--cat-color);
-    box-shadow: 0 0 0 5px var(--cat-color), 0 0 20px var(--cat-color), 0 0 30px rgba(var(--cat-color), 0.4);
-    z-index: 50;
-    animation: categoryGrow 0.4s ease-out forwards;
-  }
-
-  @keyframes categoryGrow {
-    from {
-      transform: scale(1);
-      opacity: 0.6;
-    }
-    to {
-      transform: scale(1.15);
-      opacity: 1;
-    }
-  }
-
-  .el.category-shrinking {
-    animation: categoryShrink 0.4s ease-out forwards;
-  }
-
-  @keyframes categoryShrink {
-    from {
-      transform: scale(1.15);
-      opacity: 1;
-    }
-    to {
-      transform: scale(1);
-      opacity: 0.6;
-    }
-  }
-
-  .el.category-dimmed {
-    opacity: 0.15;
-    filter: grayscale(0.7) brightness(0.6);
-    transition: opacity 0.3s ease, filter 0.3s ease;
-  }
-  
-  .el.category-dimmed .el-symbol,
-  .el.category-dimmed .el-name {
-    color: rgba(255,255,255,0.2) !important;
-  }
-  
-  .el.category-dimmed::before {
-    opacity: 0.2;
-  }
-
-  .legend-item.active-filter {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .el-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--muted);
-    line-height: 1;
-    font-weight: 600;
-  }
-
-  .el-symbol {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1.35rem;
-    color: var(--cat-color);
-    line-height: 1;
-    letter-spacing: 0.02em;
-  }
-
-  .el-name {
-    font-size: 0.42rem;
-    color: var(--text);
-    line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 500;
-  }
-
-  .el-mass {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.55rem;
-    color: rgba(255,255,255,0.5);
-  }
-
-  .spacer { background: transparent; border: none; pointer-events: none; }
-
-  .gap-cell {
-    background: var(--surface);
-    border: 1px dashed rgba(255,255,255,0.1);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.55rem;
-    color: rgba(255,255,255,0.2);
-    font-family: 'Space Mono', monospace;
-  }
-
-  #info-panel {
-    position: fixed;
-    right: 2rem;
-    bottom: 2rem;
-    width: 280px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.5rem;
-    z-index: 999;
-    transform: translateY(120%);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-
-  #info-panel.visible { transform: translateY(0); }
-
-  #info-panel .panel-symbol {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 4rem;
-    line-height: 1;
-    letter-spacing: 0.05em;
-  }
-
-  #info-panel .panel-name {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-top: 0.25rem;
-  }
-
-  #info-panel .panel-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-  }
-
-  .panel-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 1rem 0;
-  }
-
-  .panel-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
-  }
-
-  .panel-label {
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .panel-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--text);
-  }
-
-  .panel-category {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 3px;
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 0.75rem; right: 0.75rem;
-    background: none; border: none;
-    color: var(--muted); font-size: 1rem;
-    cursor: pointer; line-height: 1;
-    padding: 0.25rem;
-    transition: color 0.2s;
-  }
-  .close-btn:hover { color: var(--text); }
-
-  @media (max-width: 700px) {
-    header { padding: 1.5rem 1rem 0.5rem; }
-    .table-wrapper { padding: 0.5rem 0.5rem 1rem; }
-    #info-panel { right: 0.5rem; bottom: 0.5rem; width: calc(100vw - 1rem); }
-  }
+/* ── RESPONSIVE ──────────────────────────────────── */
+@media(max-width:768px){
+  .topbar{padding:.6rem 1rem}.topbar-in{gap:.5rem}
+  .hero{padding:2rem 1rem 1.5rem}
+  .pt-hdr{padding:.5rem 1rem 0}
+  .pt-wrap{padding:.65rem 1rem 1.5rem}
+  #info-panel{right:.55rem;bottom:.55rem;width:calc(100vw - 1.1rem);max-width:390px}
+  footer{padding:1rem}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo"><span class="c">Chem</span><span class="l">Lab</span></div>
+  <div class="sp-tag">Designed <span> By </span> ChemLab Team! </div>
+  <div class="sp-track"><div class="sp-fill"></div></div>
+  <div class="sp-hint">LOADING</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <div class="topbar-in">
+      <div class="logo"><span class="c">Chem</span><span class="l">Lab</span></div>
+      <div class="tb-right">
+
+        <!-- EFFECT PICKER -->
+        <div class="fd-wrap" id="fx-wrap">
+          <button class="tb-btn" onclick="toggleFxMenu()" id="fx-btn">✦ Effect: Fade</button>
+          <div class="fd-menu" id="fx-menu">
+            <div class="fd-opt sel" data-fx="1" onclick="setEffect(1,this)">
+              <span class="fx-icon">◐</span> Fade
+            </div>
+            <div class="fd-opt" data-fx="2" onclick="setEffect(2,this)">
+              <span class="fx-icon">◈</span> Domino Glow
+            </div>
+            <div class="fd-opt" data-fx="3" onclick="setEffect(3,this)">
+              <span class="fx-icon">◉</span> Ring Glow
+            </div>
+          </div>
+        </div>
+
+        <!-- FONT PICKER -->
+        <div class="fd-wrap" id="fd-wrap">
+          <button class="tb-btn" onclick="toggleFd()">Font</button>
+          <div class="fd-menu" id="fd-menu">
+            <div class="fd-opt sel" data-f="'Outfit',sans-serif" onclick="setFont(this)" style="font-family:'Outfit',sans-serif">Outfit</div>
+            <div class="fd-opt" data-f="'DM Sans',sans-serif" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif">DM Sans</div>
+            <div class="fd-opt" data-f="'Raleway',sans-serif" onclick="setFont(this)" style="font-family:'Raleway',sans-serif">Raleway</div>
+            <div class="fd-opt" data-f="'Josefin Sans',sans-serif" onclick="setFont(this)" style="font-family:'Josefin Sans',sans-serif">Josefin Sans</div>
+            <div class="fd-opt" data-f="'Exo 2',sans-serif" onclick="setFont(this)" style="font-family:'Exo 2',sans-serif">Exo 2</div>
+            <div class="fd-opt" data-f="'Playfair Display',serif" onclick="setFont(this)" style="font-family:'Playfair Display',serif">Playfair Display</div>
+            <div class="fd-opt" data-f="'Cormorant Garamond',serif" onclick="setFont(this)" style="font-family:'Cormorant Garamond',serif">Cormorant Garamond</div>
+            <div class="fd-opt" data-f="'Source Serif 4',serif" onclick="setFont(this)" style="font-family:'Source Serif 4',serif">Source Serif 4</div>
+            <div class="fd-opt" data-f="'Bebas Neue',sans-serif" onclick="setFont(this)" style="font-family:'Bebas Neue',sans-serif">Bebas Neue</div>
+            <div class="fd-opt" data-f="'Space Mono',monospace" onclick="setFont(this)" style="font-family:'Space Mono',monospace">Space Mono</div>
+            <div class="fd-opt" data-f="'IBM Plex Mono',monospace" onclick="setFont(this)" style="font-family:'IBM Plex Mono',monospace">IBM Plex Mono</div>
+            <div class="fd-opt" data-f="__pro__" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif;border-top:1px solid var(--brd2);margin-top:.2rem;padding-top:.7rem;color:var(--acc)">✦ Pro Style</div>
+          </div>
+        </div>
+
+        <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">Day</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO + AI SEARCH -->
+  <section class="hero">
+    <div class="hero-top">
+      <div class="hero-pill">UNDER MAINTENANCE</div>
+      <h1 class="hero-h1">Ask <span class="hl">Anything!</span></h1>
+    </div>
+
+    <div class="ai-wrap">
+      <div class="ai-box" id="ai-box">
+        <div class="ask-lbl">Ask ChemLab AI</div>
+        <div class="ai-row">
+          <input class="ai-in" id="ai-in" type="text"
+            placeholder="e.g. Boiling point of tungsten? History of plutonium?"
+            autocomplete="off" />
+          <button class="ask-btn" id="ask-btn" onclick="triggerAsk()">Ask AI</button>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="fillQ('Melting point of iron')">Melting point of iron</span>
+          <span class="chip" onclick="fillQ('History of uranium')">History of uranium</span>
+          <span class="chip" onclick="fillQ('Isotopes of carbon')">Isotopes of carbon</span>
+          <span class="chip" onclick="fillQ('Industrial production of aluminium')">Industrial aluminium</span>
+          <span class="chip" onclick="fillQ('Chemical properties of gold')">Chemical properties of gold</span>
+          <span class="chip" onclick="fillQ('Nuclear characteristics of plutonium')">Nuclear characteristics of Pu</span>
+        </div>
+      </div>
+
+      <div class="ai-ans-wrap" id="ai-ans-wrap">
+        <div class="ai-card">
+          <div class="ai-head">
+            <div class="ai-head-l">
+              <span class="ai-badge">ChemLab AI</span>
+              <span class="ai-qtxt" id="ai-qtxt"></span>
+            </div>
+            <button class="ai-close" onclick="closeAns()">✕</button>
+          </div>
+          <div class="ai-body" id="ai-body"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PT HEADER + LEGEND -->
+  <div class="pt-hdr">
     <div>
-      <h1>Periodic<br><span>Table</span></h1>
-      <p class="subtitle">118 Elements · Interactive</p>
+      <div class="pt-title"><span>Periodic </span><span class="t2">Table</span></div>
+      <div class="pt-sub"></div>
     </div>
     <div class="legend" id="legend"></div>
   </div>
-</header>
 
-<div class="table-wrapper">
-  <div class="table-inner">
-    <div class="pt-grid" id="pt-grid"></div>
+  <!-- GRID -->
+  <div class="pt-wrap">
+    <div class="pt-inner">
+      <div class="pt-grid fx1" id="pt-grid"></div>
+    </div>
   </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="ft-in">
+      <div class="ft-logo"><span class="c">Chem</span><span class="l">Lab</span></div>
+      <div class="ft-copy">© 2026 All Rights Reserved · Kabya Saha</div>
+    </div>
+  </footer>
+
 </div>
 
+<!-- INFO PANEL -->
 <div id="info-panel">
-  <button class="close-btn" onclick="closePanel()">✕</button>
-  <div id="panel-content"></div>
+  <div class="pan-hdr">
+    <button class="pan-close" onclick="closePanel()">✕</button>
+    <div class="pan-el-row">
+      <div class="e-stage"><canvas class="e-cv" id="e-cv" width="82" height="82"></canvas></div>
+      <div class="pan-info">
+        <div class="p-sym" id="p-sym"></div>
+        <div class="p-name" id="p-name"></div>
+        <div class="p-num" id="p-num"></div>
+        <div class="p-badge" id="p-badge"></div>
+      </div>
+    </div>
+    <div class="p-div"></div>
+  </div>
+  <div class="pan-body" id="pan-body"></div>
 </div>
 
 <script>
-const CATEGORIES = {
-  alkali:           { label: 'Alkali Metal',        color: 'var(--alkali)' },
-  alkaline:         { label: 'Alkaline Earth',      color: 'var(--alkaline)' },
-  transition:       { label: 'Transition Metal',    color: 'var(--transition)' },
-  'post-transition':{ label: 'Post-Transition',     color: 'var(--post-transition)' },
-  metalloid:        { label: 'Metalloid',           color: 'var(--metalloid)' },
-  nonmetal:         { label: 'Reactive Nonmetal',   color: 'var(--nonmetal)' },
-  halogen:          { label: 'Halogen',             color: 'var(--halogen)' },
-  noble:            { label: 'Noble Gas',           color: 'var(--noble)' },
-  lanthanide:       { label: 'Lanthanide',          color: 'var(--lanthanide)' },
-  actinide:         { label: 'Actinide',            color: 'var(--actinide)' },
-  unknown:          { label: 'Unknown',             color: 'var(--unknown)' },
+/* ── DATA ────────────────────────────────────────── */
+const CATS={
+  alkali:          {label:'Alkali Metal',      cv:'var(--alkali)'},
+  alkaline:        {label:'Alkaline Earth',    cv:'var(--alkaline)'},
+  transition:      {label:'Transition Metal',  cv:'var(--transition)'},
+  'post-transition':{label:'Post-Transition',  cv:'var(--post-transition)'},
+  metalloid:       {label:'Metalloid',         cv:'var(--metalloid)'},
+  nonmetal:        {label:'Reactive Nonmetal', cv:'var(--nonmetal)'},
+  halogen:         {label:'Halogen',           cv:'var(--halogen)'},
+  noble:           {label:'Noble Gas',         cv:'var(--noble)'},
+  lanthanide:      {label:'Lanthanide',        cv:'var(--lanthanide)'},
+  actinide:        {label:'Actinide',          cv:'var(--actinide)'},
+  unknown:         {label:'Unknown',           cv:'var(--unknown)'},
 };
 
-const ELEMENTS = [
-  [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹'],
-  [2,'He','Helium','4.003','noble',18,1,'Gas','1s²'],
-  [3,'L','Lithium','6.941','alkali',1,2,'Solid','[He] 2s¹'],
-  [4,'Be','Beryllium','9.012','alkaline',2,2,'Solid','[He] 2s²'],
-  [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹'],
-  [6,'C','Carbon','12.01','nonmetal',14,2,'Solid','[He] 2s²2p²'],
-  [7,'N','Nitrogen','14.01','nonmetal',15,2,'Gas','[He] 2s²2p³'],
-  [8,'O','Oxygen','15.99','nonmetal',16,2,'Gas','[He] 2s²2p⁴'],
-  [9,'F','Fluorine','18.99','halogen',17,2,'Gas','[He] 2s²2p⁵'],
-  [10,'Ne','Neon','20.18','noble',18,2,'Gas','[He] 2s²2p⁶'],
-  [11,'Na','Sodium','22.99','alkali',1,3,'Solid','[Ne] 3s¹'],
-  [12,'Mg','Magnesium','24.31','alkaline',2,3,'Solid','[Ne] 3s²'],
-  [13,'Al','Aluminium','26.98','post-transition',13,3,'Solid','[Ne] 3s²3p¹'],
-  [14,'Si','Silicon','28.09','metalloid',14,3,'Solid','[Ne] 3s²3p²'],
-  [15,'P','Phosphorus','30.97','nonmetal',15,3,'Solid','[Ne] 3s²3p³'],
-  [16,'S','Sulfur','32.06','nonmetal',16,3,'Solid','[Ne] 3s²3p⁴'],
-  [17,'Cl','Chlorine','35.45','halogen',17,3,'Gas','[Ne] 3s²3p⁵'],
-  [18,'Ar','Argon','39.95','noble',18,3,'Gas','[Ne] 3s²3p⁶'],
-  [19,'K','Potassium','39.10','alkali',1,4,'Solid','[Ar] 4s¹'],
-  [20,'Ca','Calcium','40.08','alkaline',2,4,'Solid','[Ar] 4s²'],
-  [21,'Sc','Scandium','44.96','transition',3,4,'Solid','[Ar] 3d¹4s²'],
-  [22,'Ti','Titanium','47.87','transition',4,4,'Solid','[Ar] 3d²4s²'],
-  [23,'V','Vanadium','50.94','transition',5,4,'Solid','[Ar] 3d³4s²'],
-  [24,'Cr','Chromium','52.00','transition',6,4,'Solid','[Ar] 3d⁵4s¹'],
-  [25,'Mn','Manganese','54.94','transition',7,4,'Solid','[Ar] 3d⁵4s²'],
-  [26,'Fe','Iron','55.85','transition',8,4,'Solid','[Ar] 3d⁶4s²'],
-  [27,'Co','Cobalt','58.93','transition',9,4,'Solid','[Ar] 3d⁷4s²'],
-  [28,'Ni','Nickel','58.69','transition',10,4,'Solid','[Ar] 3d⁸4s²'],
-  [29,'Cu','Copper','63.55','transition',11,4,'Solid','[Ar] 3d¹⁰4s¹'],
-  [30,'Zn','Zinc','65.38','transition',12,4,'Solid','[Ar] 3d¹⁰4s²'],
-  [31,'Ga','Gallium','69.72','post-transition',13,4,'Solid','[Ar] 3d¹⁰4s²4p¹'],
-  [32,'Ge','Germanium','72.63','metalloid',14,4,'Solid','[Ar] 3d¹⁰4s²4p²'],
-  [33,'As','Arsenic','74.92','metalloid',15,4,'Solid','[Ar] 3d¹⁰4s²4p³'],
-  [34,'Se','Selenium','78.97','nonmetal',16,4,'Solid','[Ar] 3d¹⁰4s²4p⁴'],
-  [35,'Br','Bromine','79.90','halogen',17,4,'Liquid','[Ar] 3d¹⁰4s²4p⁵'],
-  [36,'Kr','Krypton','83.80','noble',18,4,'Gas','[Ar] 3d¹⁰4s²4p⁶'],
-  [37,'Rb','Rubidium','85.47','alkali',1,5,'Solid','[Kr] 5s¹'],
-  [38,'Sr','Strontium','87.62','alkaline',2,5,'Solid','[Kr] 5s²'],
-  [39,'Y','Yttrium','88.91','transition',3,5,'Solid','[Kr] 4d¹5s²'],
-  [40,'Zr','Zirconium','91.22','transition',4,5,'Solid','[Kr] 4d²5s²'],
-  [41,'Nb','Niobium','92.91','transition',5,5,'Solid','[Kr] 4d⁴5s¹'],
-  [42,'Mo','Molybdenum','95.96','transition',6,5,'Solid','[Kr] 4d⁵5s¹'],
-  [43,'Tc','Technetium','[98]','transition',7,5,'Solid','[Kr] 4d⁵5s²'],
-  [44,'Ru','Ruthenium','101.1','transition',8,5,'Solid','[Kr] 4d⁷5s¹'],
-  [45,'Rh','Rhodium','102.9','transition',9,5,'Solid','[Kr] 4d⁸5s¹'],
-  [46,'Pd','Palladium','106.4','transition',10,5,'Solid','[Kr] 4d¹⁰'],
-  [47,'Ag','Silver','107.9','transition',11,5,'Solid','[Kr] 4d¹⁰5s¹'],
-  [48,'Cd','Cadmium','112.4','transition',12,5,'Solid','[Kr] 4d¹⁰5s²'],
-  [49,'In','Indium','114.8','post-transition',13,5,'Solid','[Kr] 4d¹⁰5s²5p¹'],
-  [50,'Sn','Tin','118.7','post-transition',14,5,'Solid','[Kr] 4d¹⁰5s²5p²'],
-  [51,'Sb','Antimony','121.8','metalloid',15,5,'Solid','[Kr] 4d¹⁰5s²5p³'],
-  [52,'Te','Tellurium','127.6','metalloid',16,5,'Solid','[Kr] 4d¹⁰5s²5p⁴'],
-  [53,'I','Iodine','126.9','halogen',17,5,'Solid','[Kr] 4d¹⁰5s²5p⁵'],
-  [54,'Xe','Xenon','131.3','noble',18,5,'Gas','[Kr] 4d¹⁰5s²5p⁶'],
-  [55,'Cs','Caesium','132.9','alkali',1,6,'Solid','[Xe] 6s¹'],
-  [56,'Ba','Barium','137.3','alkaline',2,6,'Solid','[Xe] 6s²'],
-  [57,'La','Lanthanum','138.9','lanthanide',3,6,'Solid','[Xe] 5d¹6s²'],
-  [58,'Ce','Cerium','140.1','lanthanide',null,null,'Solid','[Xe] 4f¹5d¹6s²'],
-  [59,'Pr','Praseodymium','140.9','lanthanide',null,null,'Solid','[Xe] 4f³6s²'],
-  [60,'Nd','Neodymium','144.2','lanthanide',null,null,'Solid','[Xe] 4f⁴6s²'],
-  [61,'Pm','Promethium','[145]','lanthanide',null,null,'Solid','[Xe] 4f⁵6s²'],
-  [62,'Sm','Samarium','150.4','lanthanide',null,null,'Solid','[Xe] 4f⁶6s²'],
-  [63,'Eu','Europium','152.0','lanthanide',null,null,'Solid','[Xe] 4f⁷6s²'],
-  [64,'Gd','Gadolinium','157.3','lanthanide',null,null,'Solid','[Xe] 4f⁷5d¹6s²'],
-  [65,'Tb','Terbium','158.9','lanthanide',null,null,'Solid','[Xe] 4f⁹6s²'],
-  [66,'Dy','Dysprosium','162.5','lanthanide',null,null,'Solid','[Xe] 4f¹⁰6s²'],
-  [67,'Ho','Holmium','164.9','lanthanide',null,null,'Solid','[Xe] 4f¹¹6s²'],
-  [68,'Er','Erbium','167.3','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²'],
-  [69,'Tm','Thulium','168.9','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²'],
-  [70,'Yb','Ytterbium','173.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²'],
-  [71,'Lu','Lutetium','175.0','lanthanide',3,6,'Solid','[Xe] 4f¹⁴5d¹6s²'],
-  [72,'Hf','Hafnium','178.5','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²'],
-  [73,'Ta','Tantalum','180.9','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²'],
-  [74,'W','Tungsten','183.8','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²'],
-  [75,'Re','Rhenium','186.2','transition',7,6,'Solid','[Xe] 4f¹⁴5d⁵6s²'],
-  [76,'Os','Osmium','190.2','transition',8,6,'Solid','[Xe] 4f¹⁴5d⁶6s²'],
-  [77,'Ir','Iridium','192.2','transition',9,6,'Solid','[Xe] 4f¹⁴5d⁷6s²'],
-  [78,'Pt','Platinum','195.1','transition',10,6,'Solid','[Xe] 4f¹⁴5d⁹6s¹'],
-  [79,'Au','Gold','197.0','transition',11,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s¹'],
-  [80,'Hg','Mercury','200.6','transition',12,6,'Liquid','[Xe] 4f¹⁴5d¹⁰6s²'],
-  [81,'Tl','Thallium','204.4','post-transition',13,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p¹'],
-  [82,'Pb','Lead','207.2','post-transition',14,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p²'],
-  [83,'Bi','Bismuth','209.0','post-transition',15,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p³'],
-  [84,'Po','Polonium','[209]','post-transition',16,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁴'],
-  [85,'At','Astatine','[210]','halogen',17,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁵'],
-  [86,'Rn','Radon','[222]','noble',18,6,'Gas','[Xe] 4f¹⁴5d¹⁰6s²6p⁶'],
-  [87,'Fr','Francium','[223]','alkali',1,7,'Solid','[Rn] 7s¹'],
-  [88,'Ra','Radium','[226]','alkaline',2,7,'Solid','[Rn] 7s²'],
-  [89,'Ac','Actinium','[227]','actinide',3,7,'Solid','[Rn] 6d¹7s²'],
-  [90,'Th','Thorium','232.0','actinide',null,null,'Solid','[Rn] 6d²7s²'],
-  [91,'Pa','Protactinium','231.0','actinide',null,null,'Solid','[Rn] 5f²6d¹7s²'],
-  [92,'U','Uranium','238.0','actinide',null,null,'Solid','[Rn] 5f³6d¹7s²'],
-  [93,'Np','Neptunium','[237]','actinide',null,null,'Solid','[Rn] 5f⁴6d¹7s²'],
-  [94,'Pu','Plutonium','[244]','actinide',null,null,'Solid','[Rn] 5f⁶7s²'],
-  [95,'Am','Americium','[243]','actinide',null,null,'Solid','[Rn] 5f⁷7s²'],
-  [96,'Cm','Curium','[247]','actinide',null,null,'Solid','[Rn] 5f⁷6d¹7s²'],
-  [97,'Bk','Berkelium','[247]','actinide',null,null,'Solid','[Rn] 5f⁹7s²'],
-  [98,'Cf','Californium','[251]','actinide',null,null,'Solid','[Rn] 5f¹⁰7s²'],
-  [99,'Es','Einsteinium','[252]','actinide',null,null,'Solid','[Rn] 5f¹¹7s²'],
-  [100,'Fm','Fermium','[257]','actinide',null,null,'Solid','[Rn] 5f¹²7s²'],
-  [101,'Md','Mendelevium','[258]','actinide',null,null,'Solid','[Rn] 5f¹³7s²'],
-  [102,'No','Nobelium','[259]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²'],
-  [103,'Lr','Lawrencium','[266]','actinide',3,7,'Solid','[Rn] 5f¹⁴7s²7p¹'],
-  [104,'Rf','Rutherfordium','[267]','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²'],
-  [105,'Db','Dubnium','[268]','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²'],
-  [106,'Sg','Seaborgium','[271]','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²'],
-  [107,'Bh','Bohrium','[272]','transition',7,7,'Solid','[Rn] 5f¹⁴6d⁵7s²'],
-  [108,'Hs','Hassium','[270]','transition',8,7,'Solid','[Rn] 5f¹⁴6d⁶7s²'],
-  [109,'Mt','Meitnerium','[278]','unknown',9,7,'Solid','[Rn] 5f¹⁴6d⁷7s²'],
-  [110,'Ds','Darmstadtium','[281]','unknown',10,7,'Solid','[Rn] 5f¹⁴6d⁸7s²'],
-  [111,'Rg','Roentgenium','[282]','unknown',11,7,'Solid','[Rn] 5f¹⁴6d⁹7s²'],
-  [112,'Cn','Copernicium','[285]','transition',12,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²'],
-  [113,'Nh','Nihonium','[286]','unknown',13,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p¹'],
-  [114,'Fl','Flerovium','[289]','unknown',14,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p²'],
-  [115,'Mc','Moscovium','[290]','unknown',15,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p³'],
-  [116,'Lv','Livermorium','[293]','unknown',16,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁴'],
-  [117,'Ts','Tennessine','[294]','unknown',17,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁵'],
-  [118,'Og','Oganesson','[294]','noble',18,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²7p⁶'],
+const ELS=[
+  [1,'H','Hydrogen','1.008','nonmetal',1,1,'Gas','1s¹',14,20,'0.0000899 g/L','1'],
+  [2,'He','Helium','4.003','noble',18,1,'Gas','1s²',0.95,4.22,'0.0001785 g/L','2'],
+  [3,'Li','Lithium','6.941','alkali',1,2,'Solid','[He] 2s¹',453.7,1615,'0.534 g/cm³','2,1'],
+  [4,'Be','Beryllium','9.012','alkaline',2,2,'Solid','[He] 2s²',1560,2742,'1.85 g/cm³','2,2'],
+  [5,'B','Boron','10.81','metalloid',13,2,'Solid','[He] 2s²2p¹',2349,4200,'2.34 g/cm³','2,3'],
+  [6,'C','Carbon','12.01','nonmetal',14,2,'Solid','[He] 2s²2p²',3823,4098,'2.267 g/cm³','2,4'],
+  [7,'N','Nitrogen','14.01','nonmetal',15,2,'Gas','[He] 2s²2p³',63,77,'0.0012506 g/L','2,5'],
+  [8,'O','Oxygen','15.99','nonmetal',16,2,'Gas','[He] 2s²2p⁴',54,90,'0.001429 g/L','2,6'],
+  [9,'F','Fluorine','18.99','halogen',17,2,'Gas','[He] 2s²2p⁵',53,85,'0.001696 g/L','2,7'],
+  [10,'Ne','Neon','20.18','noble',18,2,'Gas','[He] 2s²2p⁶',24.6,27.1,'0.0009002 g/L','2,8'],
+  [11,'Na','Sodium','22.99','alkali',1,3,'Solid','[Ne] 3s¹',370.9,1156,'0.968 g/cm³','2,8,1'],
+  [12,'Mg','Magnesium','24.31','alkaline',2,3,'Solid','[Ne] 3s²',923,1363,'1.738 g/cm³','2,8,2'],
+  [13,'Al','Aluminium','26.98','post-transition',13,3,'Solid','[Ne] 3s²3p¹',933,2792,'2.70 g/cm³','2,8,3'],
+  [14,'Si','Silicon','28.09','metalloid',14,3,'Solid','[Ne] 3s²3p²',1687,3538,'2.329 g/cm³','2,8,4'],
+  [15,'P','Phosphorus','30.97','nonmetal',15,3,'Solid','[Ne] 3s²3p³',317,554,'1.823 g/cm³','2,8,5'],
+  [16,'S','Sulfur','32.06','nonmetal',16,3,'Solid','[Ne] 3s²3p⁴',388,718,'2.07 g/cm³','2,8,6'],
+  [17,'Cl','Chlorine','35.45','halogen',17,3,'Gas','[Ne] 3s²3p⁵',172,239,'0.003214 g/L','2,8,7'],
+  [18,'Ar','Argon','39.95','noble',18,3,'Gas','[Ne] 3s²3p⁶',83.8,87.3,'0.001784 g/L','2,8,8'],
+  [19,'K','Potassium','39.10','alkali',1,4,'Solid','[Ar] 4s¹',336.5,1032,'0.862 g/cm³','2,8,8,1'],
+  [20,'Ca','Calcium','40.08','alkaline',2,4,'Solid','[Ar] 4s²',1115,1757,'1.55 g/cm³','2,8,8,2'],
+  [21,'Sc','Scandium','44.96','transition',3,4,'Solid','[Ar] 3d¹4s²',1814,3109,'2.985 g/cm³','2,8,9,2'],
+  [22,'Ti','Titanium','47.87','transition',4,4,'Solid','[Ar] 3d²4s²',1941,3560,'4.506 g/cm³','2,8,10,2'],
+  [23,'V','Vanadium','50.94','transition',5,4,'Solid','[Ar] 3d³4s²',2183,3680,'6.0 g/cm³','2,8,11,2'],
+  [24,'Cr','Chromium','52.00','transition',6,4,'Solid','[Ar] 3d⁵4s¹',2180,2944,'7.19 g/cm³','2,8,13,1'],
+  [25,'Mn','Manganese','54.94','transition',7,4,'Solid','[Ar] 3d⁵4s²',1519,2334,'7.21 g/cm³','2,8,13,2'],
+  [26,'Fe','Iron','55.85','transition',8,4,'Solid','[Ar] 3d⁶4s²',1811,3134,'7.874 g/cm³','2,8,14,2'],
+  [27,'Co','Cobalt','58.93','transition',9,4,'Solid','[Ar] 3d⁷4s²',1768,3200,'8.9 g/cm³','2,8,15,2'],
+  [28,'Ni','Nickel','58.69','transition',10,4,'Solid','[Ar] 3d⁸4s²',1728,3186,'8.908 g/cm³','2,8,16,2'],
+  [29,'Cu','Copper','63.55','transition',11,4,'Solid','[Ar] 3d¹⁰4s¹',1358,2835,'8.96 g/cm³','2,8,18,1'],
+  [30,'Zn','Zinc','65.38','transition',12,4,'Solid','[Ar] 3d¹⁰4s²',693,1180,'7.14 g/cm³','2,8,18,2'],
+  [31,'Ga','Gallium','69.72','post-transition',13,4,'Solid','[Ar] 3d¹⁰4s²4p¹',303,2477,'5.91 g/cm³','2,8,18,3'],
+  [32,'Ge','Germanium','72.63','metalloid',14,4,'Solid','[Ar] 3d¹⁰4s²4p²',1211,3106,'5.323 g/cm³','2,8,18,4'],
+  [33,'As','Arsenic','74.92','metalloid',15,4,'Solid','[Ar] 3d¹⁰4s²4p³',1090,887,'5.727 g/cm³','2,8,18,5'],
+  [34,'Se','Selenium','78.97','nonmetal',16,4,'Solid','[Ar] 3d¹⁰4s²4p⁴',494,958,'4.81 g/cm³','2,8,18,6'],
+  [35,'Br','Bromine','79.90','halogen',17,4,'Liquid','[Ar] 3d¹⁰4s²4p⁵',266,332,'3.1028 g/cm³','2,8,18,7'],
+  [36,'Kr','Krypton','83.80','noble',18,4,'Gas','[Ar] 3d¹⁰4s²4p⁶',116,120,'0.003749 g/L','2,8,18,8'],
+  [37,'Rb','Rubidium','85.47','alkali',1,5,'Solid','[Kr] 5s¹',312.5,961,'1.532 g/cm³','2,8,18,8,1'],
+  [38,'Sr','Strontium','87.62','alkaline',2,5,'Solid','[Kr] 5s²',1050,1655,'2.64 g/cm³','2,8,18,8,2'],
+  [39,'Y','Yttrium','88.91','transition',3,5,'Solid','[Kr] 4d¹5s²',1799,3609,'4.472 g/cm³','2,8,18,9,2'],
+  [40,'Zr','Zirconium','91.22','transition',4,5,'Solid','[Kr] 4d²5s²',2128,4682,'6.52 g/cm³','2,8,18,10,2'],
+  [41,'Nb','Niobium','92.91','transition',5,5,'Solid','[Kr] 4d⁴5s¹',2750,5017,'8.57 g/cm³','2,8,18,12,1'],
+  [42,'Mo','Molybdenum','95.96','transition',6,5,'Solid','[Kr] 4d⁵5s¹',2896,4912,'10.22 g/cm³','2,8,18,13,1'],
+  [43,'Tc','Technetium','[98]','transition',7,5,'Solid','[Kr] 4d⁵5s²',2430,4538,'11 g/cm³','2,8,18,13,2'],
+  [44,'Ru','Ruthenium','101.1','transition',8,5,'Solid','[Kr] 4d⁷5s¹',2607,4423,'12.45 g/cm³','2,8,18,15,1'],
+  [45,'Rh','Rhodium','102.9','transition',9,5,'Solid','[Kr] 4d⁸5s¹',2237,3968,'12.41 g/cm³','2,8,18,16,1'],
+  [46,'Pd','Palladium','106.4','transition',10,5,'Solid','[Kr] 4d¹⁰',1828,3236,'12.023 g/cm³','2,8,18,18'],
+  [47,'Ag','Silver','107.9','transition',11,5,'Solid','[Kr] 4d¹⁰5s¹',1235,2435,'10.49 g/cm³','2,8,18,18,1'],
+  [48,'Cd','Cadmium','112.4','transition',12,5,'Solid','[Kr] 4d¹⁰5s²',594,1040,'8.65 g/cm³','2,8,18,18,2'],
+  [49,'In','Indium','114.8','post-transition',13,5,'Solid','[Kr] 4d¹⁰5s²5p¹',430,2345,'7.31 g/cm³','2,8,18,18,3'],
+  [50,'Sn','Tin','118.7','post-transition',14,5,'Solid','[Kr] 4d¹⁰5s²5p²',505,2875,'7.265 g/cm³','2,8,18,18,4'],
+  [51,'Sb','Antimony','121.8','metalloid',15,5,'Solid','[Kr] 4d¹⁰5s²5p³',904,1860,'6.697 g/cm³','2,8,18,18,5'],
+  [52,'Te','Tellurium','127.6','metalloid',16,5,'Solid','[Kr] 4d¹⁰5s²5p⁴',723,1261,'6.24 g/cm³','2,8,18,18,6'],
+  [53,'I','Iodine','126.9','halogen',17,5,'Solid','[Kr] 4d¹⁰5s²5p⁵',387,457,'4.933 g/cm³','2,8,18,18,7'],
+  [54,'Xe','Xenon','131.3','noble',18,5,'Gas','[Kr] 4d¹⁰5s²5p⁶',161,165,'0.005887 g/L','2,8,18,18,8'],
+  [55,'Cs','Caesium','132.9','alkali',1,6,'Solid','[Xe] 6s¹',302,944,'1.873 g/cm³','2,8,18,18,8,1'],
+  [56,'Ba','Barium','137.3','alkaline',2,6,'Solid','[Xe] 6s²',1000,2170,'3.51 g/cm³','2,8,18,18,8,2'],
+  [57,'La','Lanthanum','138.9','lanthanide',3,6,'Solid','[Xe] 5d¹6s²',1193,3737,'6.162 g/cm³','2,8,18,18,9,2'],
+  [58,'Ce','Cerium','140.1','lanthanide',null,null,'Solid','[Xe] 4f¹5d¹6s²',1068,3716,'6.77 g/cm³','2,8,18,19,9,2'],
+  [59,'Pr','Praseodymium','140.9','lanthanide',null,null,'Solid','[Xe] 4f³6s²',1208,3793,'6.77 g/cm³','2,8,18,21,8,2'],
+  [60,'Nd','Neodymium','144.2','lanthanide',null,null,'Solid','[Xe] 4f⁴6s²',1297,3347,'7.01 g/cm³','2,8,18,22,8,2'],
+  [61,'Pm','Promethium','[145]','lanthanide',null,null,'Solid','[Xe] 4f⁵6s²',1315,3273,'7.26 g/cm³','2,8,18,23,8,2'],
+  [62,'Sm','Samarium','150.4','lanthanide',null,null,'Solid','[Xe] 4f⁶6s²',1345,2067,'7.52 g/cm³','2,8,18,24,8,2'],
+  [63,'Eu','Europium','152.0','lanthanide',null,null,'Solid','[Xe] 4f⁷6s²',1099,1802,'5.244 g/cm³','2,8,18,25,8,2'],
+  [64,'Gd','Gadolinium','157.3','lanthanide',null,null,'Solid','[Xe] 4f⁷5d¹6s²',1585,3546,'7.9 g/cm³','2,8,18,25,9,2'],
+  [65,'Tb','Terbium','158.9','lanthanide',null,null,'Solid','[Xe] 4f⁹6s²',1629,3503,'8.23 g/cm³','2,8,18,27,8,2'],
+  [66,'Dy','Dysprosium','162.5','lanthanide',null,null,'Solid','[Xe] 4f¹⁰6s²',1680,2840,'8.551 g/cm³','2,8,18,28,8,2'],
+  [67,'Ho','Holmium','164.9','lanthanide',null,null,'Solid','[Xe] 4f¹¹6s²',1734,2993,'8.795 g/cm³','2,8,18,29,8,2'],
+  [68,'Er','Erbium','167.3','lanthanide',null,null,'Solid','[Xe] 4f¹²6s²',1802,3141,'9.066 g/cm³','2,8,18,30,8,2'],
+  [69,'Tm','Thulium','168.9','lanthanide',null,null,'Solid','[Xe] 4f¹³6s²',1818,2223,'9.321 g/cm³','2,8,18,31,8,2'],
+  [70,'Yb','Ytterbium','173.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴6s²',1097,1469,'6.965 g/cm³','2,8,18,32,8,2'],
+  [71,'Lu','Lutetium','175.0','lanthanide',null,null,'Solid','[Xe] 4f¹⁴5d¹6s²',1925,3675,'9.841 g/cm³','2,8,18,32,9,2'],
+  [72,'Hf','Hafnium','178.5','transition',4,6,'Solid','[Xe] 4f¹⁴5d²6s²',2506,4876,'13.31 g/cm³','2,8,18,32,10,2'],
+  [73,'Ta','Tantalum','180.9','transition',5,6,'Solid','[Xe] 4f¹⁴5d³6s²',3290,5731,'16.69 g/cm³','2,8,18,32,11,2'],
+  [74,'W','Tungsten','183.8','transition',6,6,'Solid','[Xe] 4f¹⁴5d⁴6s²',3695,5828,'19.25 g/cm³','2,8,18,32,12,2'],
+  [75,'Re','Rhenium','186.2','transition',7,6,'Solid','[Xe] 4f¹⁴5d⁵6s²',3459,5869,'21.02 g/cm³','2,8,18,32,13,2'],
+  [76,'Os','Osmium','190.2','transition',8,6,'Solid','[Xe] 4f¹⁴5d⁶6s²',3306,5285,'22.59 g/cm³','2,8,18,32,14,2'],
+  [77,'Ir','Iridium','192.2','transition',9,6,'Solid','[Xe] 4f¹⁴5d⁷6s²',2719,4701,'22.56 g/cm³','2,8,18,32,15,2'],
+  [78,'Pt','Platinum','195.1','transition',10,6,'Solid','[Xe] 4f¹⁴5d⁹6s¹',2041,4098,'21.45 g/cm³','2,8,18,32,17,1'],
+  [79,'Au','Gold','197.0','transition',11,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s¹',1337,3129,'19.30 g/cm³','2,8,18,32,18,1'],
+  [80,'Hg','Mercury','200.6','transition',12,6,'Liquid','[Xe] 4f¹⁴5d¹⁰6s²',234,630,'13.534 g/cm³','2,8,18,32,18,2'],
+  [81,'Tl','Thallium','204.4','post-transition',13,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p¹',577,1746,'11.85 g/cm³','2,8,18,32,18,3'],
+  [82,'Pb','Lead','207.2','post-transition',14,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p²',601,2022,'11.34 g/cm³','2,8,18,32,18,4'],
+  [83,'Bi','Bismuth','209.0','post-transition',15,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p³',544,1837,'9.78 g/cm³','2,8,18,32,18,5'],
+  [84,'Po','Polonium','[209]','post-transition',16,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁴',527,1235,'9.196 g/cm³','2,8,18,32,18,6'],
+  [85,'At','Astatine','[210]','halogen',17,6,'Solid','[Xe] 4f¹⁴5d¹⁰6s²6p⁵',575,610,'~7 g/cm³','2,8,18,32,18,7'],
+  [86,'Rn','Radon','[222]','noble',18,6,'Gas','[Xe] 4f¹⁴5d¹⁰6s²6p⁶',202,211,'0.00973 g/L','2,8,18,32,18,8'],
+  [87,'Fr','Francium','[223]','alkali',1,7,'Solid','[Rn] 7s¹',300,950,'~1.87 g/cm³','2,8,18,32,18,8,1'],
+  [88,'Ra','Radium','[226]','alkaline',2,7,'Solid','[Rn] 7s²',973,2010,'5.5 g/cm³','2,8,18,32,18,8,2'],
+  [89,'Ac','Actinium','[227]','actinide',3,7,'Solid','[Rn] 6d¹7s²',1323,3471,'10.07 g/cm³','2,8,18,32,18,9,2'],
+  [90,'Th','Thorium','232.0','actinide',null,null,'Solid','[Rn] 6d²7s²',2023,5061,'11.72 g/cm³','2,8,18,32,18,10,2'],
+  [91,'Pa','Protactinium','231.0','actinide',null,null,'Solid','[Rn] 5f²6d¹7s²',1841,4300,'15.37 g/cm³','2,8,18,32,20,9,2'],
+  [92,'U','Uranium','238.0','actinide',null,null,'Solid','[Rn] 5f³6d¹7s²',1405,4404,'19.1 g/cm³','2,8,18,32,21,9,2'],
+  [93,'Np','Neptunium','[237]','actinide',null,null,'Solid','[Rn] 5f⁴6d¹7s²',917,4273,'20.45 g/cm³','2,8,18,32,22,9,2'],
+  [94,'Pu','Plutonium','[244]','actinide',null,null,'Solid','[Rn] 5f⁶7s²',913,3501,'19.816 g/cm³','2,8,18,32,24,8,2'],
+  [95,'Am','Americium','[243]','actinide',null,null,'Solid','[Rn] 5f⁷7s²',1449,2284,'12 g/cm³','2,8,18,32,25,8,2'],
+  [96,'Cm','Curium','[247]','actinide',null,null,'Solid','[Rn] 5f⁷6d¹7s²',1613,3383,'13.51 g/cm³','2,8,18,32,25,9,2'],
+  [97,'Bk','Berkelium','[247]','actinide',null,null,'Solid','[Rn] 5f⁹7s²',1259,2900,'14.78 g/cm³','2,8,18,32,27,8,2'],
+  [98,'Cf','Californium','[251]','actinide',null,null,'Solid','[Rn] 5f¹⁰7s²',1173,1743,'15.1 g/cm³','2,8,18,32,28,8,2'],
+  [99,'Es','Einsteinium','[252]','actinide',null,null,'Solid','[Rn] 5f¹¹7s²',1133,1269,'~8.84 g/cm³','2,8,18,32,29,8,2'],
+  [100,'Fm','Fermium','[257]','actinide',null,null,'Solid','[Rn] 5f¹²7s²',1800,'N/A','~9.7 g/cm³','2,8,18,32,30,8,2'],
+  [101,'Md','Mendelevium','[258]','actinide',null,null,'Solid','[Rn] 5f¹³7s²',1100,'N/A','~10.3 g/cm³','2,8,18,32,31,8,2'],
+  [102,'No','Nobelium','[259]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²',1100,'N/A','~9.9 g/cm³','2,8,18,32,32,8,2'],
+  [103,'Lr','Lawrencium','[266]','actinide',null,null,'Solid','[Rn] 5f¹⁴7s²7p¹',1900,'N/A','~15.6 g/cm³','2,8,18,32,32,8,3'],
+  [104,'Rf','Rutherfordium','[267]','transition',4,7,'Solid','[Rn] 5f¹⁴6d²7s²',2400,'N/A','~23.2 g/cm³','2,8,18,32,32,10,2'],
+  [105,'Db','Dubnium','[268]','transition',5,7,'Solid','[Rn] 5f¹⁴6d³7s²','N/A','N/A','~29.3 g/cm³','2,8,18,32,32,11,2'],
+  [106,'Sg','Seaborgium','[271]','transition',6,7,'Solid','[Rn] 5f¹⁴6d⁴7s²','N/A','N/A','~35.0 g/cm³','2,8,18,32,32,12,2'],
+  [107,'Bh','Bohrium','[272]','transition',7,7,'Solid','[Rn] 5f¹⁴6d⁵7s²','N/A','N/A','~37.1 g/cm³','2,8,18,32,32,13,2'],
+  [108,'Hs','Hassium','[270]','transition',8,7,'Solid','[Rn] 5f¹⁴6d⁶7s²','N/A','N/A','~41.0 g/cm³','2,8,18,32,32,14,2'],
+  [109,'Mt','Meitnerium','[278]','unknown',9,7,'Solid','[Rn] 5f¹⁴6d⁷7s²','N/A','N/A','~37.4 g/cm³','2,8,18,32,32,15,2'],
+  [110,'Ds','Darmstadtium','[281]','unknown',10,7,'Solid','[Rn] 5f¹⁴6d⁸7s²','N/A','N/A','~34.8 g/cm³','2,8,18,32,32,16,2'],
+  [111,'Rg','Roentgenium','[282]','unknown',11,7,'Solid','[Rn] 5f¹⁴6d⁹7s²','N/A','N/A','~28.7 g/cm³','2,8,18,32,32,17,2'],
+  [112,'Cn','Copernicium','[285]','transition',12,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²','N/A',357,'~14.0 g/cm³','2,8,18,32,32,18,2'],
+  [113,'Nh','Nihonium','[286]','unknown',13,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p¹','N/A','N/A','~16 g/cm³','2,8,18,32,32,18,3'],
+  [114,'Fl','Flerovium','[289]','unknown',14,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p²','N/A','N/A','~14.0 g/cm³','2,8,18,32,32,18,4'],
+  [115,'Mc','Moscovium','[290]','unknown',15,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p³','N/A','N/A','~13.5 g/cm³','2,8,18,32,32,18,5'],
+  [116,'Lv','Livermorium','[293]','unknown',16,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁴','N/A','N/A','~12.9 g/cm³','2,8,18,32,32,18,6'],
+  [117,'Ts','Tennessine','[294]','unknown',17,7,'Solid','[Rn] 5f¹⁴6d¹⁰7s²7p⁵','N/A','N/A','~7.2 g/cm³','2,8,18,32,32,18,7'],
+  [118,'Og','Oganesson','[294]','noble',18,7,'Gas','[Rn] 5f¹⁴6d¹⁰7s²7p⁶','N/A','N/A','~5.0 g/cm³','2,8,18,32,32,18,8'],
 ];
 
-const byNumber = {};
-ELEMENTS.forEach(e => byNumber[e[0]] = e);
+const byN={};ELS.forEach(e=>byN[e[0]]=e);
 
-function buildGrid() {
+/* ── BOOT ────────────────────────────────────────── */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    document.getElementById('app').classList.add('show');
+    buildLegend();buildGrid();
+    setTimeout(animateIn,200);
+  },3100);
+});
+
+/* ── THEME ───────────────────────────────────────── */
+function toggleTheme(){
+  const h=document.documentElement,isN=h.getAttribute('data-theme')==='night';
+  h.setAttribute('data-theme',isN?'day':'night');
+  document.getElementById('theme-btn').textContent=isN?'Night':'Day';
+  // update mass color for new theme
+  h.style.setProperty('--el-mass-color', isN ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.45)');
+  if(aEl!==null)drawElectrons(byN[aEl]);
+}
+
+/* ── FONT ────────────────────────────────────────── */
+function toggleFd(){
+  document.getElementById('fd-menu').classList.toggle('open');
+  document.getElementById('fx-menu').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('fd-wrap').contains(e.target))document.getElementById('fd-menu').classList.remove('open');
+  if(!document.getElementById('fx-wrap').contains(e.target))document.getElementById('fx-menu').classList.remove('open');
+});
+function setFont(el){
+  document.querySelectorAll('#fd-menu .fd-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  const r = document.documentElement;
+  const isDay = document.documentElement.dataset.theme === 'day';
+  const massDark = 'rgba(255,255,255,0.45)';
+  const massDay  = 'rgba(0,0,0,0.4)';
+  const mono = (f) => ['IBM Plex Mono','Space Mono'].some(m=>f.includes(m));
+
+  if(el.dataset.f === '__pro__'){
+    // Pro Style: DM Sans body + Space Mono for num/mass
+    r.style.setProperty('--font-body',"'DM Sans',sans-serif");
+    r.style.setProperty('--el-sym-font',"'DM Sans',sans-serif");
+    r.style.setProperty('--el-sym-size','1.35rem');
+    r.style.setProperty('--el-sym-weight','400');
+    r.style.setProperty('--el-sym-spacing','0.02em');
+    r.style.setProperty('--el-num-font',"'Space Mono',monospace");
+    r.style.setProperty('--el-mass-font',"'Space Mono',monospace");
+  } else {
+    const f = el.dataset.f;
+    r.style.setProperty('--font-body', f);
+    r.style.setProperty('--el-sym-font', f);
+    // Serif fonts: lighter symbol weight looks better
+    const isSerif = f.includes('Playfair') || f.includes('Cormorant') || f.includes('Source Serif');
+    r.style.setProperty('--el-sym-weight', isSerif ? '400' : '700');
+    r.style.setProperty('--el-sym-size', '1.28rem');
+    r.style.setProperty('--el-sym-spacing', isSerif ? '0.01em' : '0em');
+    // Monospace fonts: use same font for num/mass
+    const isMono = mono(f);
+    r.style.setProperty('--el-num-font', isMono ? f : "'IBM Plex Mono',monospace");
+    r.style.setProperty('--el-mass-font', isMono ? f : "'IBM Plex Mono',monospace");
+  }
+  // Sizes/weights/colors are universal — just fix mass color for day/night
+  r.style.setProperty('--el-mass-color', isDay ? massDay : massDark);
+  document.getElementById('fd-menu').classList.remove('open');
+}
+
+/* ── EFFECT SWITCHER ─────────────────────────────── */
+let currentFx = 1;
+const fxNames = {1:'Fade', 2:'Domino Glow', 3:'Ring Glow'};
+
+function toggleFxMenu(){
+  document.getElementById('fx-menu').classList.toggle('open');
+  document.getElementById('fd-menu').classList.remove('open');
+}
+
+function setEffect(fx, el){
+  // Clear active category first
+  if(aCat !== null) {
+    clearFilter();
+  }
+  currentFx = fx;
+  // Swap grid class
   const grid = document.getElementById('pt-grid');
-  const cells = Array.from({length:10}, () => Array(18).fill(null));
+  grid.classList.remove('fx1','fx2','fx3');
+  grid.classList.add('fx'+fx);
+  // Update button label
+  document.getElementById('fx-btn').textContent = '✦ Effect: ' + fxNames[fx];
+  // Update dropdown selection
+  document.querySelectorAll('#fx-menu .fd-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('fx-menu').classList.remove('open');
+}
 
-  ELEMENTS.forEach(el => {
-    const [num, sym, name, mass, cat, group, period] = el;
-    if (group && period) cells[period - 1][group - 1] = el;
+/* ── LEGEND ──────────────────────────────────────── */
+function buildLegend(){
+  const w=document.getElementById('legend');
+  Object.entries(CATS).forEach(([k,{label,cv}])=>{
+    const d=document.createElement('div');
+    d.className='leg-it';d.dataset.cat=k;
+    d.innerHTML=`<div class="leg-dot" style="background:${cv}"></div>${label}`;
+    d.addEventListener('click',()=>filterCat(k,d,true));
+    w.appendChild(d);
   });
+}
 
-  const lanthanides = ELEMENTS.filter(e => e[4] === 'lanthanide');
-  const actinides   = ELEMENTS.filter(e => e[4] === 'actinide');
-  lanthanides.forEach((el, i) => { cells[8][i+2] = el; });
-  actinides.forEach((el, i)   => { cells[9][i+2] = el; });
+/* ── GRID ────────────────────────────────────────── */
+function buildGrid(){
+  const g=document.getElementById('pt-grid');
+  const cells=Array.from({length:10},()=>Array(18).fill(null));
+  ELS.forEach(([num,,,,cat,gr,pr])=>{if(gr&&pr)cells[pr-1][gr-1]=byN[num]});
+  // Remove Lu (71) and Lr (103) from group 3 — replace with gap cells below
+  cells[5][2]=null; cells[6][2]=null;
+  ELS.filter(e=>e[4]==='lanthanide').forEach((el,i)=>cells[8][i+2]=el);
+  ELS.filter(e=>e[4]==='actinide').forEach((el,i)=>cells[9][i+2]=el);
 
-  for (let r = 0; r < 10; r++) {
-    if (r === 7) {
-      for (let c = 0; c < 18; c++) {
-        const sp = document.createElement('div');
-        sp.className = 'spacer';
-        sp.style.cssText = `grid-column:${c+1};grid-row:${r+1}`;
-        grid.appendChild(sp);
-      }
-      continue;
-    }
-    for (let c = 0; c < 18; c++) {
-      const el = cells[r][c];
-      if (!el) {
-        const sp = document.createElement('div');
-        if ((r === 5 || r === 6) && c === 2) {
-          sp.className = 'gap-cell el';
-          sp.style.cssText = `grid-column:${c+1};grid-row:${r+1};--cat-color:var(--muted)`;
-          sp.innerHTML = `<span style="font-size:0.55rem;color:var(--muted);text-align:center;line-height:1.3">${r===5?'57–71':'89–103'}</span>`;
-        } else {
-          sp.className = 'spacer';
-          sp.style.cssText = `grid-column:${c+1};grid-row:${r+1}`;
-        }
-        grid.appendChild(sp);
+  for(let r=0;r<10;r++){
+    if(r===7){for(let c=0;c<18;c++){const s=mk('div','sp');s.style.cssText=`grid-column:${c+1};grid-row:${r+1}`;g.appendChild(s)}continue}
+    for(let c=0;c<18;c++){
+      const el=cells[r][c];
+      if(!el){
+        if((r===5||r===6)&&c===2){
+          const iLan=r===5;
+          const cv=iLan?'var(--lanthanide)':'var(--actinide)';
+          const s=mk('div','el gc-series');
+          s.style.cssText=`grid-column:${c+1};grid-row:${r+1};--cat-color:${cv};pointer-events:none`;
+          s.dataset.cat=iLan?'lanthanide':'actinide';
+          s.innerHTML=`<div class="el-sym" style="font-size:.8rem">${iLan?'La–Lu':'Ac–Lr'}</div><div class="el-name">${iLan?'57–71':'89–103'}</div>`;
+          g.appendChild(s);}
+        else{const s=mk('div','sp');s.style.cssText=`grid-column:${c+1};grid-row:${r+1}`;g.appendChild(s)}
         continue;
       }
-      const [num, sym, name, mass, cat] = el;
-      const colorVar = CATEGORIES[cat]?.color || 'var(--unknown)';
-      const div = document.createElement('div');
-      div.className = 'el';
-      div.style.cssText = `grid-column:${c+1};grid-row:${r+1};--cat-color:${colorVar}`;
-      div.dataset.num = num;
-      div.dataset.category = cat;
-      
-      // Special handling for series labels in group 3
-      if (num === 71 && c === 2) {
-        div.innerHTML = `
-          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">La-Lu</div>
-          <div class="el-name" style="font-size: 0.5rem; margin-top: 2px;">57–71</div>
-        `;
-        div.style.pointerEvents = 'none';
-      } else if (num === 103 && c === 2) {
-        div.innerHTML = `
-          <div class="el-symbol" style="font-size: 0.8rem; color: var(--text);">Ac-Lr</div>
-          <div class="el-name" style="font-size: 0.5rem; margin-top: 2px;">89–103</div>
-        `;
-        div.style.pointerEvents = 'none';
-      } else {
-        div.innerHTML = `
-          <div class="el-num">${num}</div>
-          <div class="el-symbol">${sym}</div>
-          <div class="el-name">${name}</div>
-          <div class="el-mass">${mass}</div>
-        `;
-        div.addEventListener('click', () => {
-          // In filter mode, clicking non-matching element will deselect the filter
-          if (activeCategory && cat !== activeCategory) {
-            // Deselect the filter
-            const legendItem = document.querySelector(`.legend-item[data-category="${activeCategory}"]`);
-            toggleCategoryFilter(activeCategory, legendItem, false);
-            return;
-          }
-          showElement(num);
-        });
-      }
-      
-      grid.appendChild(div);
+      const[num,sym,name,mass,cat]=el;
+      const cv=CATS[cat]?.cv||'var(--unknown)';
+      const d=mk('div','el');
+      d.dataset.num=num;d.dataset.cat=cat;
+      d.style.cssText=`grid-column:${c+1};grid-row:${r+1};--cat-color:${cv}`;
+      d.innerHTML=`<div class="el-num">${num}</div><div class="el-sym">${sym}</div><div class="el-name">${name}</div><div class="el-mass">${mass}</div>`;
+      d.addEventListener('click',()=>{
+        if(aCat&&d.dataset.cat!==aCat){filterCat(aCat,document.querySelector(`.leg-it[data-cat="${aCat}"]`),false);return}
+        showEl(num);
+      });
+      g.appendChild(d);
     }
   }
 }
+function mk(t,c){const e=document.createElement(t);e.className=c;return e}
 
-let activeEl = null;
+/* ── FILTER ──────────────────────────────────────── */
+let aCat=null;
+let clearTimer=null;
 
-function showElement(num) {
-  const el = byNumber[num];
-  if (!el) return;
-  const [n, sym, name, mass, cat, group, period, state, config] = el;
-  const colorVar = CATEGORIES[cat]?.color || 'var(--unknown)';
+function clearFilter(instant=false){
+  const aL=document.querySelectorAll('.leg-it');
+  const aE=document.querySelectorAll('.el[data-cat]');
+  aL.forEach(l=>l.classList.remove('act'));
 
-  if (activeEl) document.querySelector(`.el[data-num="${activeEl}"]`)?.classList.remove('active');
-  activeEl = num;
-  document.querySelector(`.el[data-num="${num}"]`)?.classList.add('active');
-
-  document.getElementById('panel-content').innerHTML = `
-    <div class="panel-symbol" style="color:${colorVar}">${sym}</div>
-    <div class="panel-name">${name}</div>
-    <div class="panel-num">Atomic Number ${n}</div>
-    <div class="panel-divider"></div>
-    <div class="panel-row"><span class="panel-label">Atomic Mass</span><span class="panel-value">${mass} u</span></div>
-    <div class="panel-row"><span class="panel-label">State (STP)</span><span class="panel-value">${state}</span></div>
-    ${group  ? `<div class="panel-row"><span class="panel-label">Group</span><span class="panel-value">${group}</span></div>` : ''}
-    ${period ? `<div class="panel-row"><span class="panel-label">Period</span><span class="panel-value">${period}</span></div>` : ''}
-    <div class="panel-row"><span class="panel-label">Config</span><span class="panel-value" style="font-size:0.7rem">${config}</span></div>
-    <div><span class="panel-category" style="background:${colorVar}22;color:${colorVar};border:1px solid ${colorVar}44">${CATEGORIES[cat]?.label || 'Unknown'}</span></div>
-  `;
-
-  document.getElementById('info-panel').classList.add('visible');
-}
-
-function closePanel() {
-  document.getElementById('info-panel').classList.remove('visible');
-  if (activeEl) {
-    document.querySelector(`.el[data-num="${activeEl}"]`)?.classList.remove('active');
-    activeEl = null;
-  }
-}
-
-// Build legend
-const legendEl = document.getElementById('legend');
-let activeCategory = null;
-
-Object.entries(CATEGORIES).forEach(([key, {label, color}]) => {
-  const item = document.createElement('div');
-  item.className = 'legend-item';
-  item.dataset.category = key;
-  item.innerHTML = `<div class="legend-dot" style="background:${color}"></div>${label}`;
-  item.addEventListener('click', () => toggleCategoryFilter(key, item, true));
-  legendEl.appendChild(item);
-});
-
-function toggleCategoryFilter(category, legendItem, isHardDeselect = false) {
-  if (activeCategory === category) {
-    // Deselect if clicking the same category
-    activeCategory = null;
-    legendItem.classList.remove('active-filter');
-    
-    if (isHardDeselect) {
-      // Show shrinking animation when deselecting via category click
-      const highlightedElements = document.querySelectorAll('.el.category-highlighted');
-      highlightedElements.forEach((el, index) => {
-        el.classList.add('category-shrinking');
-        el.style.animationDelay = `${(highlightedElements.length - 1 - index) * 0.05}s`;
-      });
-      
-      const maxStaggerDelay = (highlightedElements.length - 1) * 0.05;
-      const totalAnimationTime = (maxStaggerDelay + 0.4) * 1000;
-      setTimeout(() => {
-        document.querySelectorAll('.el').forEach(el => {
-          el.classList.remove('category-highlighted');
-          el.classList.remove('category-dimmed');
-          el.classList.remove('category-shrinking');
-          el.style.animationDelay = '';
-        });
-      }, totalAnimationTime);
-    } else {
-      // No animation when deselecting via non-selected element click
-      document.querySelectorAll('.el').forEach(el => {
-        el.classList.remove('category-highlighted');
-        el.classList.remove('category-dimmed');
-        el.style.animationDelay = '';
-      });
-    }
+  if(currentFx===1||instant){
+    aE.forEach(e=>{e.classList.remove('hi','dm','shrink');e.style.animationDelay=''});
   } else {
-    // Select new category
-    if (activeCategory) {
-      document.querySelector(`.legend-item[data-category="${activeCategory}"]`)?.classList.remove('active-filter');
-    }
-    activeCategory = category;
-    legendItem.classList.add('active-filter');
-    
-    // Dim all elements first
-    document.querySelectorAll('.el').forEach(el => {
-      el.classList.remove('category-highlighted');
-      el.classList.add('category-dimmed');
-      el.style.animationDelay = '';
+    const highlighted=[...document.querySelectorAll('.el.hi')];
+    highlighted.forEach((e,i)=>{
+      e.classList.remove('hi');
+      e.classList.add('shrink');
+      e.style.animationDelay=`${(highlighted.length-1-i)*0.04}s`;
     });
-    
-    // Highlight and undim selected category with staggered animation
-    const selectedElements = document.querySelectorAll(`.el[data-category="${category}"]`);
-    selectedElements.forEach((el, index) => {
-      el.classList.remove('category-dimmed');
-      el.classList.add('category-highlighted');
-      // Stagger animation based on order for domino effect
-      el.style.animationDelay = `${index * 0.05}s`;
+    const maxDelay=(highlighted.length-1)*0.04;
+    if(clearTimer) clearTimeout(clearTimer);
+    clearTimer=setTimeout(()=>{
+      aE.forEach(e=>{
+        e.classList.remove('hi','dm','shrink');
+        e.style.animationDelay='';
+      });
+    },(maxDelay+0.45)*1000);
+  }
+  aCat=null;
+}
+
+function filterCat(cat,item,isLegendClick=true){
+  const aL=document.querySelectorAll('.leg-it');
+  const aE=document.querySelectorAll('.el[data-cat]');
+
+  if(aCat===cat){
+    const useInstant=(currentFx===3&&!isLegendClick);
+    clearFilter(useInstant);
+    return;
+  }
+
+  if(clearTimer){clearTimeout(clearTimer);clearTimer=null;}
+
+  aE.forEach(e=>{e.classList.remove('hi','dm','shrink');e.style.animationDelay='';});
+
+  aCat=cat;
+  aL.forEach(l=>l.classList.remove('act'));
+  item.classList.add('act');
+
+  if(currentFx===1){
+    aE.forEach(e=>{
+      e.dataset.cat===cat
+        ?(e.classList.add('hi'),e.classList.remove('dm'))
+        :(e.classList.add('dm'),e.classList.remove('hi'));
+    });
+  } else {
+    aE.forEach(e=>e.classList.add('dm'));
+    const sel=[...document.querySelectorAll(`.el[data-cat="${cat}"]`)];
+    sel.forEach((e,i)=>{
+      e.classList.remove('dm');
+      e.classList.add('hi');
+      e.style.animationDelay=`${i*0.045}s`;
     });
   }
 }
 
-buildGrid();
+/* ── ANIMATE IN ──────────────────────────────────── */
+function animateIn(){
+  document.querySelectorAll('.el[data-num]').forEach((el,i)=>{
+    el.style.opacity='0';el.style.transform='scale(0.78)';
+    el.style.transition=`opacity .3s ease ${i*2.4}ms,transform .3s cubic-bezier(.34,1.3,.64,1) ${i*2.4}ms,border-color .18s,box-shadow .18s,filter .22s`;
+    setTimeout(()=>{el.style.opacity='';el.style.transform=''},40+i*2.4);
+  });
+}
 
-document.querySelectorAll('.el:not(.spacer):not(.gap-cell)').forEach((el, i) => {
-  el.style.opacity = '0';
-  el.style.transform = 'scale(0.85)';
-  el.style.transition = `opacity 0.3s ease ${i*4}ms, transform 0.3s ease ${i*4}ms`;
-  setTimeout(() => {
-    el.style.opacity = '1';
-    el.style.transform = '';
-  }, 50 + i * 4);
+/* ── ELEMENT PANEL ───────────────────────────────── */
+let aEl=null,eRAF=null;
+function showEl(num){
+  const el=byN[num];if(!el)return;
+  const[n,sym,name,mass,cat,group,period,state,config,mp,bp,density,shells]=el;
+  const cv=CATS[cat]?.cv||'var(--unknown)';
+  if(aEl!==null)document.querySelector(`.el[data-num="${aEl}"]`)?.classList.remove('acel');
+  aEl=num;document.querySelector(`.el[data-num="${num}"]`)?.classList.add('acel');
+
+  document.getElementById('info-panel').style.setProperty('--pc',cv);
+  const ps=document.getElementById('p-sym');ps.style.color=cv;ps.textContent=sym;
+  document.getElementById('p-name').textContent=name;
+  document.getElementById('p-num').textContent=`Atomic Number ${n}`;
+  const pb=document.getElementById('p-badge');pb.textContent=CATS[cat]?.label||'Unknown';
+  pb.style.cssText=`background:${cv}18;color:${cv};border:1px solid ${cv}42`;
+
+  const fmtK=v=>typeof v==='number'?`${v} K (${(v-273.15).toFixed(1)} °C)`:v;
+  const blk=config.includes('f')?'f-block':config.includes('d')?'d-block':config.includes('p')?'p-block':'s-block';
+
+  document.getElementById('pan-body').innerHTML=`
+    <div class="ps-sec"><div class="ps-ttl">Physical Properties</div>
+      <div class="p-row"><span class="p-lbl">Atomic Mass</span><span class="p-val">${mass} u</span></div>
+      <div class="p-row"><span class="p-lbl">State (STP)</span><span class="p-val">${state}</span></div>
+      <div class="p-row"><span class="p-lbl">Melting Point</span><span class="p-val">${fmtK(mp)}</span></div>
+      <div class="p-row"><span class="p-lbl">Boiling Point</span><span class="p-val">${fmtK(bp)}</span></div>
+      <div class="p-row"><span class="p-lbl">Density</span><span class="p-val">${density}</span></div>
+    </div>
+    <div class="p-div"></div>
+    <div class="ps-sec"><div class="ps-ttl">Atomic Structure</div>
+      <div class="p-row"><span class="p-lbl">Configuration</span><span class="p-val" style="font-size:.59rem">${config}</span></div>
+      <div class="p-row"><span class="p-lbl">Electrons/Shell</span><span class="p-val">${shells||'N/A'}</span></div>
+      ${group?`<div class="p-row"><span class="p-lbl">Group</span><span class="p-val">${group}</span></div>`:''}
+      ${period?`<div class="p-row"><span class="p-lbl">Period</span><span class="p-val">${period}</span></div>`:''}
+      <div class="p-row"><span class="p-lbl">Block</span><span class="p-val">${blk}</span></div>
+    </div>
+    <div class="p-div"></div>
+    <div class="ps-sec"><div class="ps-ttl">Classification</div>
+      <div class="p-row"><span class="p-lbl">Category</span><span class="p-val">${CATS[cat]?.label||'Unknown'}</span></div>
+    </div>`;
+
+  document.getElementById('info-panel').classList.add('show');
+  drawElectrons(el);
+}
+function closePanel(){
+  document.getElementById('info-panel').classList.remove('show');
+  if(aEl!==null){document.querySelector(`.el[data-num="${aEl}"]`)?.classList.remove('acel');aEl=null}
+  if(eRAF)cancelAnimationFrame(eRAF);
+}
+
+/* ── ELECTRON CANVAS ─────────────────────────────── */
+const EC_N={alkali:'#ff6b6b',alkaline:'#ff9f4a',transition:'#5ba4f5','post-transition':'#6ee7a0',metalloid:'#2dd4bf',nonmetal:'#f472b6',halogen:'#c084fc',noble:'#a78bfa',lanthanide:'#22d3ee',actinide:'#fbbf24',unknown:'#94a3b8'};
+const EC_D={alkali:'#d42020',alkaline:'#c95018',transition:'#1742b8','post-transition':'#12703f',metalloid:'#0a8a80',nonmetal:'#b51e90',halogen:'#6d2fd8',noble:'#3a2fb5',lanthanide:'#0782a8',actinide:'#b0680c',unknown:'#4a5c78'};
+
+function drawElectrons(el){
+  if(eRAF)cancelAnimationFrame(eRAF);
+  const cv=document.getElementById('e-cv'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  const isDay=document.documentElement.getAttribute('data-theme')==='day';
+  const sc=(el[12]||'2').split(',').map(Number).slice(0,5);
+  const n=sc.length,maxR=Math.min(cx,cy)-4,minR=8;
+  const radii=sc.map((_,i)=>n===1?14:minR+((maxR-minR)/(n-1))*i);
+  const ec=(isDay?EC_D:EC_N)[el[4]]||'#5ba4f5';
+  const oc=isDay?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.1)';
+  const offs=sc.map((_,i)=>i*1.23);
+  const spds=sc.map((_,i)=>0.019+i*.0055);
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.beginPath();ctx.arc(cx,cy,3.5,0,Math.PI*2);ctx.fillStyle=ec;ctx.fill();
+    sc.forEach((cnt,si)=>{
+      const r=radii[si];
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=oc;ctx.lineWidth=0.7;ctx.stroke();
+      for(let e=0;e<cnt;e++){
+        const a=offs[si]+(2*Math.PI/cnt)*e+t*spds[si];
+        ctx.beginPath();ctx.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),2,0,Math.PI*2);
+        ctx.fillStyle=ec;ctx.fill();
+      }
+    });
+    t++;eRAF=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── AI ──────────────────────────────────────────── */
+document.getElementById('ai-in').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();triggerAsk()}
 });
+function fillQ(q){document.getElementById('ai-in').value=q;document.getElementById('ai-in').focus()}
+
+async function triggerAsk(){
+  const q=document.getElementById('ai-in').value.trim();
+  if(q.length<2)return;
+  const btn=document.getElementById('ask-btn');
+  btn.disabled=true;btn.textContent='Asking…';
+  const wrap=document.getElementById('ai-ans-wrap');
+  const body=document.getElementById('ai-body');
+  document.getElementById('ai-qtxt').textContent=`"${q}"`;
+  body.innerHTML=`<div class="ld-row"><div class="ld-dots"><div class="ld-d"></div><div class="ld-d"></div><div class="ld-d"></div></div><span>Consulting ChemLab AI…</span></div>`;
+  wrap.classList.add('show');
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  const sys=`You are ChemLab AI — an expert chemistry assistant embedded in the ChemLab periodic table website. You ONLY answer questions strictly about the 118 chemical elements.
+
+Allowed topics: melting point, boiling point, density, history/discovery, physical characteristics, chemical characteristics, isotopes, nuclear characteristics, laboratory preparation, industrial production, special cases/anomalies, advantages/applications, disadvantages/hazards.
+
+Formatting rules:
+- Use **bold** for key terms and values.
+- Use bullet points (- item) for lists.
+- Use ### for section headers when covering multiple aspects.
+- Be accurate, concise, and professional.
+- Always include the element symbol and atomic number when first mentioned.
+- If asked about non-element topics, politely decline.`;
+
+  try{
+    const r=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?system=${encodeURIComponent(sys)}&model=openai&seed=77`);
+    if(!r.ok)throw 0;
+    const txt=await r.text();
+    body.innerHTML=`<div class="ai-resp">${mdHtml(txt)}</div>`;
+  }catch{
+    body.innerHTML=`<div class="ai-resp" style="color:var(--alkali)">Could not reach ChemLab AI. Please check your connection and try again.</div>`;
+  }finally{btn.disabled=false;btn.textContent='Ask AI'}
+}
+
+function closeAns(){
+  document.getElementById('ai-ans-wrap').classList.remove('show');
+  document.getElementById('ai-in').value='';
+}
+
+function mdHtml(t){
+  return t
+    .replace(/^###\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^##\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^#\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^[-•]\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)/g,(m)=>`<ul>${m}</ul>`)
+    .replace(/<\/ul>\s*<ul>/g,'')
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n(?![<])/g,' ');
+}
 </script>
 </body>
 </html>
