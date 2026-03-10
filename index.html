@@ -354,76 +354,30 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
   #info-panel{right:.5rem;bottom:.5rem;width:calc(100vw - 1rem);max-width:none}
   footer{padding:.9rem}
   .ft-copy{font-size:.65rem}
-}
 
-/* ── HORIZONTAL / ROTATED VIEW ────────────────────── */
-/* Horizontal view button — hidden on desktop */
-.hz-btn{
-  display:none;
-  align-items:center;gap:.35rem;
-  background:var(--surf2);border:1px solid var(--brd2);
-  border-radius:8px;color:var(--txt2);
-  font-family:'IBM Plex Mono',monospace;font-size:.63rem;
-  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  padding:.42rem .82rem;cursor:pointer;white-space:nowrap;
-  transition:all .18s;flex-shrink:0;
+  /* Grid: reduce min cell width so ~10-11 columns show at once
+     (vs ~7-8 previously) without making cells feel cramped       */
+  .pt-grid{
+    grid-template-columns:repeat(18,minmax(38px,1fr));
+    grid-template-rows:repeat(10,minmax(44px,auto));
+    gap:2px;
+    min-width:700px;   /* was 1000px — lets more cols peek into viewport */
+  }
+  .el{
+    min-height:44px;
+    padding:4px 4px 3px;
+    border-radius:5px;
+    --el-sym-size:1.05rem;
+    --el-num-size:.56rem;
+    --el-name-size:.35rem;
+    --el-mass-size:.46rem;
+  }
+  .el::after{width:2px}
+  .gc-series{padding:4px;border-radius:5px}
 }
-.hz-btn:hover{border-color:var(--brd3);color:var(--txt)}
-.hz-btn.on{border-color:var(--acc);color:var(--acc);background:rgba(var(--acc-rgb),.08)}
-@media(max-width:900px){.hz-btn{display:flex}}
 
 /* pt-wrap base */
 .pt-wrap{position:relative;z-index:1;padding:.7rem 2rem 2rem;overflow-x:auto}
-@media(max-width:768px){.pt-wrap{padding:.5rem .9rem 1.5rem}}
-
-/* ── Rotated container (phone landscape simulation) ─ */
-/* Only activate on narrow screens */
-@media(max-width:900px){
-  /* The spacer reserves vertical room so page doesn't collapse */
-  #hz-spacer{display:none;width:100%}
-  body.hz-mode #hz-spacer{display:block}
-
-  body.hz-mode .pt-section{
-    /* Take the section out of flow and rotate it */
-    position:absolute;
-    left:0;
-    /* centered vertically inside the spacer */
-    transform-origin:top left;
-    /* JS sets top/left/transform dynamically via setHzTransform() */
-    z-index:10;
-    background:var(--bg);
-    width:100%;          /* before rotation; overridden by JS */
-    overflow:visible;
-  }
-
-  /* Inside rotated view: hide legend clutter, tighten padding */
-  body.hz-mode .pt-hdr{padding:.3rem .6rem 0;flex-wrap:nowrap;gap:.4rem}
-  body.hz-mode .legend{flex-wrap:nowrap;overflow-x:auto;gap:.2rem .4rem;padding-bottom:.2rem}
-  body.hz-mode .pt-wrap{padding:.3rem .6rem .8rem;overflow-x:auto}
-
-  /* Grid fills the rotated viewport width fully */
-  body.hz-mode .pt-grid{
-    min-width:unset;
-    width:100%;
-    --el-sym-size:clamp(.55rem,.95vw,.9rem);
-    --el-num-size:clamp(.3rem,.55vw,.5rem);
-    --el-name-size:clamp(.22rem,.38vw,.36rem);
-    --el-mass-size:clamp(.26rem,.45vw,.42rem);
-  }
-  body.hz-mode .pt-grid .el{
-    min-height:0;
-    padding:2px 3px 2px;
-    border-radius:4px;
-  }
-  body.hz-mode .pt-grid .el::after{width:2px}
-  body.hz-mode .pt-grid .gc-series{padding:2px}
-
-  /* Info panel: keep it accessible while rotated */
-  body.hz-mode #info-panel{
-    right:.4rem;bottom:.4rem;
-    max-height:55vh;
-  }
-}
 
 /* ═══════════════════════════════════════════════
    ELEMENT DETAIL PAGE  ·  Full-screen overlay
@@ -741,7 +695,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
           </div>
         </div>
 
-        <button class="hz-btn" id="hz-btn" onclick="toggleHz()">⇔ Fit</button>
         <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">Day</button>
       </div>
     </div>
@@ -788,8 +741,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
     </div>
   </section>
 
-  <!-- PT SECTION (rotatable on mobile) -->
-  <div class="pt-section" id="pt-section">
   <!-- PT HEADER + LEGEND -->
   <div class="pt-hdr">
     <div>
@@ -805,10 +756,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
       <div class="pt-grid fx1" id="pt-grid"></div>
     </div>
   </div>
-  </div><!-- /pt-section -->
 
-  <!-- Spacer that holds vertical space when section is rotated out of flow -->
-  <div id="hz-spacer"></div>
 
   <!-- FOOTER -->
   <footer>
@@ -1084,50 +1032,7 @@ function buildLegend(){
 }
 
 /* ── GRID ────────────────────────────────────────── */
-/* ── ROTATED HORIZONTAL VIEW ────────────────────── */
-let hzOn=false;
 
-function setHzTransform(){
-  const sec=document.getElementById('pt-section');
-  const spc=document.getElementById('hz-spacer');
-  if(!sec||!spc)return;
-  if(!hzOn){
-    sec.style.cssText='';spc.style.height='';return;
-  }
-  // Viewport dimensions
-  const vw=window.innerWidth;
-  const vh=window.innerHeight;
-  // We rotate 90° CW: the section's natural width becomes the height,
-  // and the viewport height becomes the section's working width.
-  const newW=vh;          // after rotation the section fills vw of the screen
-  const scale=vw/sec.scrollHeight||1; // fit section height into viewport width
-  // Position: rotated 90° CW around top-left, then shift so it sits at top-left
-  sec.style.width=newW+'px';
-  sec.style.position='absolute';
-  sec.style.left='0';
-  sec.style.top='0';
-  sec.style.transform=`rotate(90deg) translateY(-${vw}px)`;
-  sec.style.transformOrigin='top left';
-  sec.style.zIndex='10';
-  // Spacer height = the on-screen height the rotated section now occupies
-  // After 90° rotation the section's original width becomes the rendered height
-  spc.style.height=newW+'px';
-}
-
-function toggleHz(){
-  hzOn=!hzOn;
-  const btn=document.getElementById('hz-btn');
-  document.body.classList.toggle('hz-mode',hzOn);
-  if(btn){
-    btn.classList.toggle('on',hzOn);
-    btn.textContent=hzOn?'↺ Normal':'⇔ Fit';
-  }
-  // Small delay so layout settles before we measure
-  requestAnimationFrame(()=>requestAnimationFrame(setHzTransform));
-}
-
-// Re-calculate on resize/orientation change
-window.addEventListener('resize',()=>{if(hzOn)requestAnimationFrame(setHzTransform)});
 
 function buildGrid(){
   const g=document.getElementById('pt-grid');
