@@ -1098,11 +1098,49 @@ const ELS=[
 const byN={};ELS.forEach(e=>byN[e[0]]=e);
 
 /* ── BOOT ────────────────────────────────────────── */
+function applyProFont(){
+  const r=document.documentElement;
+  r.style.setProperty('--font-body',"'DM Sans',sans-serif");
+  r.style.setProperty('--el-sym-font',"'DM Sans',sans-serif");
+  r.style.setProperty('--el-sym-size','1.35rem');
+  r.style.setProperty('--el-sym-weight','400');
+  r.style.setProperty('--el-sym-spacing','0.02em');
+  r.style.setProperty('--el-num-font',"'Space Mono',monospace");
+  r.style.setProperty('--el-mass-font',"'Space Mono',monospace");
+  // Mark Pro Style as selected in the options menu
+  document.querySelectorAll('#opt-menu [data-f]').forEach(o=>o.classList.remove('sel'));
+  const proOpt=document.querySelector('#opt-menu [data-f="__pro__"]');
+  if(proOpt)proOpt.classList.add('sel');
+}
+
+function applyDefaultSize(){
+  const isMobile=window.innerWidth<=900||window.matchMedia('(pointer:coarse)').matches;
+  // Desktop: CSS defaults are already large — set szLarge=true to match
+  // Mobile:  CSS @media(max-width:768px) already shrinks — szLarge=false
+  if(!isMobile&&!szLarge){
+    // silently apply large without toggling the btn text
+    szLarge=true;
+    // No inline overrides needed — the CSS base is desktop-sized
+    // Just mark the menu option correctly
+    const smOpt=document.getElementById('sz-opt-sm');
+    const lgOpt=document.getElementById('sz-opt-lg');
+    if(smOpt)smOpt.classList.remove('sel');
+    if(lgOpt)lgOpt.classList.add('sel');
+    const btn=document.getElementById('sz-btn');
+    if(btn){btn.textContent='⊟ Small';btn.classList.add('on');}
+  } else if(isMobile&&!szLarge){
+    // mobile default is already small — menu already shows Small as sel
+    // nothing to do
+  }
+}
+
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('splash').classList.add('out');
     document.getElementById('app').classList.add('show');
     buildLegend();buildGrid();
+    applyProFont();
+    applyDefaultSize();
     setTimeout(animateIn,200);
   },3100);
 });
@@ -1199,7 +1237,7 @@ function setFont(el){
   }
   // Sizes/weights/colors are universal — just fix mass color for day/night
   r.style.setProperty('--el-mass-color', isDay ? massDay : massDark);
-  document.getElementById('fd-menu').classList.remove('open');
+  // keep opt-menu open so user can browse other options
 }
 
 /* ── OPTIONS MENU ────────────────────────────────── */
@@ -1432,22 +1470,12 @@ function closePanel(){
   ip.style.removeProperty('right');ip.style.removeProperty('bottom');
 }
 function expandPanel(){
-  const ip=document.getElementById('info-panel');
-  // Reset any drag offset first
-  ip.style.removeProperty('left');ip.style.removeProperty('top');
-  ip.style.removeProperty('right');ip.style.removeProperty('bottom');
-  ip.classList.add('expanded');
-  document.body.style.overflow='hidden';
-  // Update back bar title with element name
-  const name=document.getElementById('p-name')?.textContent||'Element';
-  const et=document.getElementById('pan-expand-title');
-  if(et)et.textContent=name;
+  // Open the full-detail overlay (#dp) for the current element
+  if(aEl!==null) openDp(aEl);
 }
 function collapsePanel(){
-  const ip=document.getElementById('info-panel');
-  if(!ip.classList.contains('expanded'))return;
-  ip.classList.remove('expanded');
-  document.body.style.overflow='';
+  // collapsePanel is called by closePanel — nothing to do here
+  // since we're using #dp overlay, closeDp() handles it
 }
 
 /* ── PANEL DRAG ──────────────────────────────────── */
