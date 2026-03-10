@@ -111,6 +111,9 @@ body::before{
 /* ── DROPDOWN MENUS ──────────────────────────────── */
 .fd-wrap{position:relative}
 .fd-menu{display:none;position:absolute;top:calc(100% + 7px);right:0;background:var(--surf);border:1px solid var(--brd2);border-radius:12px;overflow:hidden;min-width:185px;z-index:700;box-shadow:0 22px 60px var(--shadow);animation:fdIn .18s ease}
+.opt-menu{min-width:210px;max-height:80vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--brd2) transparent}
+.opt-sec-lbl{padding:.38rem 1rem .2rem;font-family:'IBM Plex Mono',monospace;font-size:.48rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--txt3);border-top:1px solid var(--brd);margin-top:.1rem}
+.opt-sec-lbl:first-child{border-top:none;margin-top:0}
 @keyframes fdIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .fd-menu.open{display:block}
 .fd-opt{padding:.62rem 1rem;cursor:pointer;font-size:.8rem;color:var(--txt2);border-bottom:1px solid var(--brd);transition:all .14s;display:flex;align-items:center;gap:.45rem}
@@ -329,6 +332,36 @@ body::before{
 #info-panel.show{transform:translateY(0)}
 /* While being dragged — disable the slide transition */
 #info-panel.dragging{transition:none!important}
+/* Full-screen expanded state — mobile only */
+#info-panel.expanded{
+  top:0!important;left:0!important;right:0!important;bottom:0!important;
+  width:100%!important;height:100%!important;
+  border-radius:0!important;transform:none!important;
+  z-index:1100;overflow-y:auto;
+  transition:top .32s ease,left .32s ease,width .32s ease,height .32s ease,border-radius .32s ease!important;
+}
+/* In expanded mode show a back bar at top */
+.pan-expand-bar{
+  display:none;align-items:center;gap:.6rem;
+  padding:.55rem .85rem;border-bottom:1px solid var(--brd);
+  flex-shrink:0;
+}
+#info-panel.expanded .pan-expand-bar{display:flex}
+#info-panel.expanded .pan-drag{display:none}
+.pan-expand-back{
+  background:var(--surf2);border:1px solid var(--brd);border-radius:7px;
+  color:var(--txt2);padding:.3rem .7rem;font-family:'IBM Plex Mono',monospace;
+  font-size:.65rem;font-weight:700;cursor:pointer;transition:all .16s;
+}
+.pan-expand-back:hover{color:var(--txt);border-color:var(--brd2)}
+.pan-expand-title{
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);
+}
+/* Hide normal close btn when expanded (back bar replaces it) */
+#info-panel.expanded .pan-close{display:none}
+/* Make view-btn say "Collapse" when expanded */
+#info-panel.expanded .pan-view-btn{display:none}
 
 /* Drag handle strip at very top */
 .pan-drag{
@@ -791,26 +824,24 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
       <div class="logo"><span class="c">Chem</span><span class="l">Lab</span></div>
       <div class="tb-right">
 
-        <!-- EFFECT PICKER -->
-        <div class="fd-wrap" id="fx-wrap">
-          <button class="tb-btn" onclick="toggleFxMenu()" id="fx-btn">✦ Effect: Fade</button>
-          <div class="fd-menu" id="fx-menu">
-            <div class="fd-opt sel" data-fx="1" onclick="setEffect(1,this)">
-              <span class="fx-icon">◐</span> Fade
-            </div>
-            <div class="fd-opt" data-fx="2" onclick="setEffect(2,this)">
-              <span class="fx-icon">◈</span> Domino Glow
-            </div>
-            <div class="fd-opt" data-fx="3" onclick="setEffect(3,this)">
-              <span class="fx-icon">◉</span> Ring Glow
-            </div>
-          </div>
-        </div>
+        <!-- MERGED OPTIONS MENU -->
+        <div class="fd-wrap" id="opt-wrap">
+          <button class="tb-btn" onclick="toggleOptMenu()" id="opt-btn">⊹ Options</button>
+          <div class="fd-menu opt-menu" id="opt-menu">
 
-        <!-- FONT PICKER -->
-        <div class="fd-wrap" id="fd-wrap">
-          <button class="tb-btn" onclick="toggleFd()">Font</button>
-          <div class="fd-menu" id="fd-menu">
+            <!-- Section: Effect -->
+            <div class="opt-sec-lbl">Effect</div>
+            <div class="fd-opt sel" data-fx="1" onclick="setEffect(1,this)"><span class="fx-icon">◐</span> Fade</div>
+            <div class="fd-opt" data-fx="2" onclick="setEffect(2,this)"><span class="fx-icon">◈</span> Domino Glow</div>
+            <div class="fd-opt" data-fx="3" onclick="setEffect(3,this)"><span class="fx-icon">◉</span> Ring Glow</div>
+
+            <!-- Section: Cell Size -->
+            <div class="opt-sec-lbl" style="margin-top:.4rem">Cell Size</div>
+            <div class="fd-opt sel" id="sz-opt-sm" onclick="setSizeOpt('small',this)">⊟ Small (mobile-fit)</div>
+            <div class="fd-opt" id="sz-opt-lg" onclick="setSizeOpt('large',this)">⊡ Large (desktop)</div>
+
+            <!-- Section: Font -->
+            <div class="opt-sec-lbl" style="margin-top:.4rem">Font</div>
             <div class="fd-opt sel" data-f="'Outfit',sans-serif" onclick="setFont(this)" style="font-family:'Outfit',sans-serif">Outfit</div>
             <div class="fd-opt" data-f="'DM Sans',sans-serif" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif">DM Sans</div>
             <div class="fd-opt" data-f="'Raleway',sans-serif" onclick="setFont(this)" style="font-family:'Raleway',sans-serif">Raleway</div>
@@ -822,11 +853,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
             <div class="fd-opt" data-f="'Bebas Neue',sans-serif" onclick="setFont(this)" style="font-family:'Bebas Neue',sans-serif">Bebas Neue</div>
             <div class="fd-opt" data-f="'Space Mono',monospace" onclick="setFont(this)" style="font-family:'Space Mono',monospace">Space Mono</div>
             <div class="fd-opt" data-f="'IBM Plex Mono',monospace" onclick="setFont(this)" style="font-family:'IBM Plex Mono',monospace">IBM Plex Mono</div>
-            <div class="fd-opt" data-f="__pro__" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif;border-top:1px solid var(--brd2);margin-top:.2rem;padding-top:.7rem;color:var(--acc)">✦ Pro Style</div>
+            <div class="fd-opt" data-f="__pro__" onclick="setFont(this)" style="font-family:'DM Sans',sans-serif;color:var(--acc)">✦ Pro Style</div>
           </div>
         </div>
 
-        <button class="sz-btn" id="sz-btn" onclick="toggleSize()">⊡ Large</button>
         <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">Day</button>
       </div>
     </div>
@@ -902,6 +932,11 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
 
 <!-- INFO PANEL -->
 <div id="info-panel">
+  <!-- expand-mode back bar (hidden in normal mode) -->
+  <div class="pan-expand-bar">
+    <button class="pan-expand-back" onclick="collapsePanel()">← Back</button>
+    <span class="pan-expand-title" id="pan-expand-title">Element Details</span>
+  </div>
   <!-- drag handle -->
   <div class="pan-drag" id="pan-drag"><div class="pan-drag-pip"></div></div>
 
@@ -921,7 +956,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
 
   <div class="pan-body" id="pan-body"></div>
 
-  <button class="pan-view-btn" onclick="openDp(aEl)">⊞ Full Details →</button>
+  <button class="pan-view-btn" id="pan-view-btn" onclick="expandPanel()">⊞ Full Details →</button>
 
 <script>
 /* ── DATA ────────────────────────────────────────── */
@@ -1084,50 +1119,54 @@ function toggleTheme(){
 
 /* ── SIZE TOGGLE ────────────────────────────────── */
 let szLarge=false;
+// Props we add/remove — we NEVER touch grid-column/grid-row/--cat-color
+const SZ_GRID_PROPS=['grid-template-columns','grid-template-rows','gap','min-width',
+  '--el-sym-size','--el-num-size','--el-name-size','--el-mass-size'];
+const SZ_EL_PROPS=['min-height','padding','border-radius'];
 function toggleSize(){
   szLarge=!szLarge;
   const grid=document.getElementById('pt-grid');
   const btn=document.getElementById('sz-btn');
   if(szLarge){
-    // Override to large (desktop) size on mobile
-    grid.style.cssText=[
-      'grid-template-columns:repeat(18,minmax(53px,1fr))',
-      'grid-template-rows:repeat(10,minmax(57px,auto))',
-      'gap:3px',
-      'min-width:1000px',
-      '--el-sym-size:1.28rem',
-      '--el-num-size:.65rem',
-      '--el-name-size:.42rem',
-      '--el-mass-size:.55rem',
-    ].join(';');
-    // Also restore element sizing
+    grid.style.setProperty('grid-template-columns','repeat(18,minmax(53px,1fr))');
+    grid.style.setProperty('grid-template-rows','repeat(10,minmax(57px,auto))');
+    grid.style.setProperty('gap','3px');
+    grid.style.setProperty('min-width','1000px');
+    grid.style.setProperty('--el-sym-size','1.28rem');
+    grid.style.setProperty('--el-num-size','.65rem');
+    grid.style.setProperty('--el-name-size','.42rem');
+    grid.style.setProperty('--el-mass-size','.55rem');
     document.querySelectorAll('.el').forEach(e=>{
-      e.style.minHeight='57px';
-      e.style.padding='5px 6px 4px';
-      e.style.borderRadius='7px';
+      e.style.setProperty('min-height','57px');
+      e.style.setProperty('padding','5px 6px 4px');
+      e.style.setProperty('border-radius','7px');
     });
-    btn.textContent='⊟ Small';
-    btn.classList.add('on');
+    btn.textContent='⊟ Small';btn.classList.add('on');
   } else {
-    // Restore CSS-driven size (mobile @media takes over)
-    grid.style.cssText='';
-    document.querySelectorAll('.el').forEach(e=>e.style.cssText='');
-    btn.textContent='⊡ Large';
-    btn.classList.remove('on');
+    SZ_GRID_PROPS.forEach(p=>grid.style.removeProperty(p));
+    document.querySelectorAll('.el').forEach(e=>{
+      SZ_EL_PROPS.forEach(p=>e.style.removeProperty(p));
+    });
+    btn.textContent='⊡ Large';btn.classList.remove('on');
   }
 }
 
-/* ── FONT ────────────────────────────────────────── */
-function toggleFd(){
-  document.getElementById('fd-menu').classList.toggle('open');
-  document.getElementById('fx-menu').classList.remove('open');
+/* ── SIZE via options menu ───────────────────────── */
+function setSizeOpt(mode, el){
+  document.querySelectorAll('#opt-menu [id^=sz-opt]').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  if(mode==='large'&&!szLarge){toggleSize();}
+  else if(mode==='small'&&szLarge){toggleSize();}
 }
+
+/* ── FONT ────────────────────────────────────────── */
+function toggleFd(){toggleOptMenu();}  // legacy stub
 document.addEventListener('click',e=>{
-  if(!document.getElementById('fd-wrap').contains(e.target))document.getElementById('fd-menu').classList.remove('open');
-  if(!document.getElementById('fx-wrap').contains(e.target))document.getElementById('fx-menu').classList.remove('open');
+  if(!document.getElementById('opt-wrap').contains(e.target))
+    document.getElementById('opt-menu').classList.remove('open');
 });
 function setFont(el){
-  document.querySelectorAll('#fd-menu .fd-opt').forEach(o=>o.classList.remove('sel'));
+  document.querySelectorAll('#opt-menu [data-f]').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel');
   const r = document.documentElement;
   const isDay = document.documentElement.dataset.theme === 'day';
@@ -1163,13 +1202,18 @@ function setFont(el){
   document.getElementById('fd-menu').classList.remove('open');
 }
 
+/* ── OPTIONS MENU ────────────────────────────────── */
+function toggleOptMenu(){
+  document.getElementById('opt-menu').classList.toggle('open');
+}
+
 /* ── EFFECT SWITCHER ─────────────────────────────── */
 let currentFx = 1;
 const fxNames = {1:'Fade', 2:'Domino Glow', 3:'Ring Glow'};
 
 function toggleFxMenu(){
-  document.getElementById('fx-menu').classList.toggle('open');
-  document.getElementById('fd-menu').classList.remove('open');
+  // legacy stub — now handled by opt-menu
+  toggleOptMenu();
 }
 
 function setEffect(fx, el){
@@ -1183,11 +1227,10 @@ function setEffect(fx, el){
   grid.classList.remove('fx1','fx2','fx3');
   grid.classList.add('fx'+fx);
   // Update button label
-  document.getElementById('fx-btn').textContent = '✦ Effect: ' + fxNames[fx];
-  // Update dropdown selection
-  document.querySelectorAll('#fx-menu .fd-opt').forEach(o=>o.classList.remove('sel'));
+  // Update dropdown selection in merged menu
+  document.querySelectorAll('#opt-menu [data-fx]').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel');
-  document.getElementById('fx-menu').classList.remove('open');
+  // keep menu open so user can keep browsing options
 }
 
 /* ── LEGEND ──────────────────────────────────────── */
@@ -1377,15 +1420,34 @@ function showEl(num){
   drawElectrons(el);
 }
 function closePanel(){
+  collapsePanel(); // ensure expanded state is cleared
   document.getElementById('info-panel').classList.remove('show');
   if(aEl!==null){document.querySelector(`.el[data-num="${aEl}"]`)?.classList.remove('acel');aEl=null}
   if(eRAF)cancelAnimationFrame(eRAF);
   const dt=document.getElementById('det-toggle'),dp=document.getElementById('det-panel');
   if(dt)dt.classList.remove('open');if(dp)dp.classList.remove('open');
-  // Reset any drag position so next open uses default corner
+  // Reset drag position
   const ip=document.getElementById('info-panel');
   ip.style.removeProperty('left');ip.style.removeProperty('top');
   ip.style.removeProperty('right');ip.style.removeProperty('bottom');
+}
+function expandPanel(){
+  const ip=document.getElementById('info-panel');
+  // Reset any drag offset first
+  ip.style.removeProperty('left');ip.style.removeProperty('top');
+  ip.style.removeProperty('right');ip.style.removeProperty('bottom');
+  ip.classList.add('expanded');
+  document.body.style.overflow='hidden';
+  // Update back bar title with element name
+  const name=document.getElementById('p-name')?.textContent||'Element';
+  const et=document.getElementById('pan-expand-title');
+  if(et)et.textContent=name;
+}
+function collapsePanel(){
+  const ip=document.getElementById('info-panel');
+  if(!ip.classList.contains('expanded'))return;
+  ip.classList.remove('expanded');
+  document.body.style.overflow='';
 }
 
 /* ── PANEL DRAG ──────────────────────────────────── */
