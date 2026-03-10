@@ -210,6 +210,27 @@ body::before{
 .pt-inner{max-width:1700px;margin:0 auto}
 .pt-grid{display:grid;grid-template-columns:repeat(18,minmax(53px,1fr));grid-template-rows:repeat(10,minmax(57px,auto));gap:3px;min-width:1000px}
 
+/* ── SIZE TOGGLE (compact mode) ─────────────────── */
+/* Compact: matches the screenshot's large-cell look  */
+.pt-grid.compact{
+  grid-template-columns:repeat(18,minmax(53px,1fr));
+  grid-template-rows:repeat(10,minmax(57px,auto));
+  gap:3px;min-width:1000px;
+}
+/* Normal default on mobile is already smaller via @media,
+   but user can toggle back to "full" desktop sizing         */
+.sz-btn{
+  background:var(--surf2);border:1px solid var(--brd2);
+  border-radius:8px;color:var(--txt2);
+  font-family:'IBM Plex Mono',monospace;font-size:.63rem;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:.42rem .82rem;cursor:pointer;white-space:nowrap;
+  transition:all .18s;flex-shrink:0;
+  display:flex;align-items:center;gap:.35rem;
+}
+.sz-btn:hover{border-color:var(--brd3);color:var(--txt)}
+.sz-btn.on{border-color:var(--acc);color:var(--acc);background:rgba(var(--acc-rgb),.08)}
+
 .el{
   background:var(--surf);border:1px solid var(--brd);border-radius:7px;
   padding:5px 6px 4px;cursor:pointer;position:relative;
@@ -471,29 +492,24 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
 /* ═══════════════════════════════════════════════
    ELEMENT DETAIL PAGE  ·  Full-screen overlay
 ═══════════════════════════════════════════════ */
-/* Mini-panel "View Details" button */
-.pan-view-btn{
-  display:flex;align-items:center;justify-content:center;gap:.45rem;
-  margin:.15rem 1.1rem .9rem;padding:.55rem;
-  background:var(--surf2);border:1.5px solid var(--brd2);border-radius:11px;
-  font-family:'IBM Plex Mono',monospace;font-size:.64rem;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);
-  cursor:pointer;transition:all .18s;flex-shrink:0;
-}
-.pan-view-btn:hover{border-color:var(--pc,var(--acc));color:var(--pc,var(--acc));background:var(--surf3)}
 
 /* Full-screen detail page */
 #dp{
-  position:fixed;inset:0;z-index:1200;
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  width:100%;height:100%;
+  z-index:9999;
   background:var(--bg);
   transform:translateX(100%);
   transition:transform .38s cubic-bezier(.4,0,.2,1);
   display:flex;flex-direction:column;overflow:hidden;
+  /* Ensure no parent can clip this */
+  contain:none;
 }
 #dp.open{transform:translateX(0)}
 /* Mobile: make sure it truly fills the screen */
 @media(max-width:600px){
-  #dp{inset:0!important;border-radius:0}
+  #dp{top:0!important;left:0!important;right:0!important;bottom:0!important;
+      width:100%!important;height:100%!important;border-radius:0}
   .dp-bar{padding:.5rem .75rem;gap:.6rem}
   .dp-bar-sym{font-size:1.8rem}
   .dp-bar-name{font-size:.92rem}
@@ -810,6 +826,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--brd);padding:1.35r
           </div>
         </div>
 
+        <button class="sz-btn" id="sz-btn" onclick="toggleSize()">⊡ Large</button>
         <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">Day</button>
       </div>
     </div>
@@ -1063,6 +1080,41 @@ function toggleTheme(){
   // update mass color for new theme
   h.style.setProperty('--el-mass-color', isN ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.45)');
   if(aEl!==null)drawElectrons(byN[aEl]);
+}
+
+/* ── SIZE TOGGLE ────────────────────────────────── */
+let szLarge=false;
+function toggleSize(){
+  szLarge=!szLarge;
+  const grid=document.getElementById('pt-grid');
+  const btn=document.getElementById('sz-btn');
+  if(szLarge){
+    // Override to large (desktop) size on mobile
+    grid.style.cssText=[
+      'grid-template-columns:repeat(18,minmax(53px,1fr))',
+      'grid-template-rows:repeat(10,minmax(57px,auto))',
+      'gap:3px',
+      'min-width:1000px',
+      '--el-sym-size:1.28rem',
+      '--el-num-size:.65rem',
+      '--el-name-size:.42rem',
+      '--el-mass-size:.55rem',
+    ].join(';');
+    // Also restore element sizing
+    document.querySelectorAll('.el').forEach(e=>{
+      e.style.minHeight='57px';
+      e.style.padding='5px 6px 4px';
+      e.style.borderRadius='7px';
+    });
+    btn.textContent='⊟ Small';
+    btn.classList.add('on');
+  } else {
+    // Restore CSS-driven size (mobile @media takes over)
+    grid.style.cssText='';
+    document.querySelectorAll('.el').forEach(e=>e.style.cssText='');
+    btn.textContent='⊡ Large';
+    btn.classList.remove('on');
+  }
 }
 
 /* ── FONT ────────────────────────────────────────── */
